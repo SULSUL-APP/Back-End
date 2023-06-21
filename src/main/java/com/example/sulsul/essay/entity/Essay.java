@@ -5,17 +5,14 @@ import com.example.sulsul.common.type.EType;
 import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.user.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
-
 @Entity
 @Getter
+@Setter(AccessLevel.PROTECTED)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -66,8 +63,6 @@ public class Essay extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ReviewState reviewState; // 리뷰 생성 여부
-
-
 
     public void updateEType(EType eType) {
         this.eType = eType;
