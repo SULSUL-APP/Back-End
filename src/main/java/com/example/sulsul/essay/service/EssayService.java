@@ -3,7 +3,7 @@ package com.example.sulsul.essay.service;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.repository.EssayRepository;
-import com.example.sulsul.exception.CustomException;
+import com.example.sulsul.essay.exception.CustomException;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

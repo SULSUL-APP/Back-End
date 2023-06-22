@@ -1,4 +1,4 @@
-package com.example.sulsul.exception;
+package com.example.sulsul.essay.exception;
 
 public class CustomException extends RuntimeException {
     public CustomException(String message) {

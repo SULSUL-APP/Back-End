@@ -1,9 +1,9 @@
-package com.example.sulsul.exceptionhandler;
+package com.example.sulsul.essay.exceptionhandler;
 
-import com.example.sulsul.exception.CustomException;
-import com.example.sulsul.exception.CustomValidationException;
-import com.example.sulsul.exceptionhandler.dto.response.ErrorResponse;
-import com.example.sulsul.exceptionhandler.dto.response.ValidationErrorResponse;
+import com.example.sulsul.essay.exception.CustomException;
+import com.example.sulsul.essay.exception.CustomValidationException;
+import com.example.sulsul.essay.exceptionhandler.dto.response.ErrorResponse;
+import com.example.sulsul.essay.exceptionhandler.dto.response.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

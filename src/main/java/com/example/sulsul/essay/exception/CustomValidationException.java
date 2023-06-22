@@ -1,4 +1,4 @@
-package com.example.sulsul.exception;
+package com.example.sulsul.essay.exception;
 
 import java.util.Map;
 

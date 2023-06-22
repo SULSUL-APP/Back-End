@@ -1,4 +1,4 @@
-package com.example.sulsul.exceptionhandler.dto.response;
+package com.example.sulsul.essay.exceptionhandler.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
