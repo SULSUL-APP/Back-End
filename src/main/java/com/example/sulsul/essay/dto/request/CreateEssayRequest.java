@@ -31,7 +31,7 @@ public class CreateEssayRequest {
     @Size(min = 2, max = 200, message = "문의사항은 2글자 이상 200글자 이하입니다.")
     private String inquiry;
 
-    private MultipartFile file;
+    private MultipartFile file; // 첨삭파일
 
     public Essay toEntity(User student, User teacher) {
         return Essay.builder()

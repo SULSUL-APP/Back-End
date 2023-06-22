@@ -23,6 +23,8 @@ public class EssayService {
         User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new CustomException("학생 유저를 찾을 수 없습니다."));
 
+        // 첨삭파일 저장 로직
+        
         Essay essay = request.toEntity(student, teacher);
         return essayRepository.save(essay);
     }
