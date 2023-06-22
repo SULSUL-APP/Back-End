@@ -26,6 +26,9 @@ public class EssayController {
 
     private final EssayService essayService;
 
+    /**
+     * 첨삭요청
+     */
     @PostMapping(value = "/profiles/{profileId}/essay",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,7 +67,10 @@ public class EssayController {
         Essay essay = essayService.createEssay(profileId, loginedUser, request);
         return new ResponseEntity<>(new CreateEssayResponse(essay), HttpStatus.CREATED);
     }
-
+    
+    /**
+     * 첨삭목록 조회
+     */
     @GetMapping("/essay/request")
     public ResponseEntity<?> getRequestEssays() {
 
@@ -117,6 +123,9 @@ public class EssayController {
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
+    /**
+     * 첨삭개별 조회
+     */
     @GetMapping("/essay/request/{essayId}")
     public ResponseEntity<?> getRequestEssay(@PathVariable Long essayId) {
         RequestEssayResponse essayResponse = (RequestEssayResponse) essayService.getEssayWithStudentFile(essayId);
@@ -132,6 +141,12 @@ public class EssayController {
     @GetMapping("/essay/proceed/{essayId}")
     public ResponseEntity<?> getProceedEssay(@PathVariable Long essayId) {
         ProceedEssayResponse essayResponse = (ProceedEssayResponse) essayService.getEssayWithFilePaths(essayId);
+        return new ResponseEntity<>(essayResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/essay/complete/{essayId}")
+    public ResponseEntity<?> getCompleteEssay(@PathVariable Long essayId) {
+        CompleteEssayResponse essayResponse = (CompleteEssayResponse) essayService.getEssayWithFilePaths(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 }

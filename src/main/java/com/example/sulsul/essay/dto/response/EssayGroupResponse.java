@@ -12,7 +12,8 @@ public class EssayGroupResponse {
     private final List<EssayResponse> essays = new ArrayList<>();
 
     public EssayGroupResponse(List<Essay> essays) {
-        essays.stream().map(EssayResponse::new)
+        essays.stream()
+                .map(EssayResponse::new)
                 .forEach(essay -> this.essays.add(essay));
     }
 }

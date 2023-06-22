@@ -31,7 +31,7 @@ public interface EssayRepository extends JpaRepository<Essay, Long> {
      */
     List<Essay> findAllByStudentAndEssayState(Long studentId, EssayState essayState);
 
-    // GET /essay/request/{essayId} - findEssayById
+    // GET /essay/request/{essayId} - findById
     // GET /essay/request/{essayId}
     // GET /essay/request/{essayId}
     // GET /essay/request/{essayId}

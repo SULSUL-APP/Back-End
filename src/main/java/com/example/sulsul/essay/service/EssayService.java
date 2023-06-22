@@ -1,16 +1,19 @@
 package com.example.sulsul.essay.service;
 
+import com.example.sulsul.comment.entity.Comment;
+import com.example.sulsul.comment.repository.CommentRepository;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
-import com.example.sulsul.essay.dto.response.EssayResponse;
-import com.example.sulsul.essay.dto.response.RejectEssayResponse;
-import com.example.sulsul.essay.dto.response.RequestEssayResponse;
+import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
+import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.essay.exception.CustomException;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
+import com.example.sulsul.review.entity.Review;
+import com.example.sulsul.review.repository.ReviewRepository;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,8 @@ public class EssayService {
     private final UserRepository userRepository;
     private final EssayRepository essayRepository;
     private final FileRepository fileRepository;
+    private final CommentRepository commentRepository;
+    private final ReviewRepository reviewRepository;
 
     public Essay createEssay(Long profileId, User student, CreateEssayRequest request) {
         User teacher = userRepository.findById(profileId)
@@ -65,7 +70,36 @@ public class EssayService {
         return new RejectEssayResponse(essay, filePath); // REJECT
     }
 
-    public Object getEssayWithFilePaths(Long essayId) {
-        return null;
+    public EssayResponse getEssayWithFilePaths(Long essayId) {
+
+        Essay essay = essayRepository.findById(essayId)
+                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+
+        // 학생이 올린 첨삭파일 조회
+        Long studentId = essay.getStudent().getId();
+        File studentFile = fileRepository.getStudentEssayFile(essayId, studentId)
+                .orElseThrow(() -> new CustomException("해당 첨삭글의 첨삭파일을 찾을 수 없습니다."));
+        String studentFileFilePath = studentFile.getFilePath();
+
+        // 강사가 올린 첨삭파일 조회
+        Long teacherId = essay.getTeacher().getId();
+        File teacherFile = fileRepository.getTeacherEssayFile(essayId, teacherId)
+                .orElseThrow(() -> new CustomException("해당 첨삭글의 첨삭파일을 찾을 수 없습니다."));
+        String teacherFileFilePath = teacherFile.getFilePath();
+
+        // 첨삭에 작성된 모든 댓글 조회
+        List<Comment> comments = commentRepository.findAllByEssayId(essayId);
+
+        // 첨삭완료 상태인 경우
+        if (essay.getEssayState().equals(EssayState.COMPLETE)) {
+            Review review = null;
+            if (essay.getReviewState().equals(ReviewState.ON)) {
+                review = reviewRepository.findByEssayId(essayId)
+                        .orElseThrow(() -> new CustomException("해당 첨삭글의 리뷰를 찾을 수 없습니다."));
+            }
+            return new CompleteEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments, review);
+        }
+        // 첨삭진행 상태인 경우
+        return new ProceedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
     }
 }
