@@ -1,21 +1,21 @@
 package com.example.sulsul.essay.controller;
 
+import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
-import com.example.sulsul.essay.dto.response.CreateEssayResponse;
+import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
+import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.essay.exception.CustomException;
 import com.example.sulsul.essay.exception.CustomValidationException;
+import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -47,10 +47,85 @@ public class EssayController {
             throw new CustomValidationException("입력값 유효성 검사 실패", errorMap);
         }
 
-        // 로그인 되어 있는 유저의 id값을 가져오는 로직
-        long studentId = 1L; // 임시로 생성한 학생 id;
+        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // User student = (User) auth.getPrincipal();
+        // 또는 @AuthenticationPrincipal 활용
 
-        Essay essay = essayService.createEssay(profileId, studentId, request);
+        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        Long userId = 1L; // 임시로 생성한 유저 id;
+        User loginedUser = User.builder()
+                .id(userId)
+                .build();
+
+        if (loginedUser.getUType().equals(UType.TEACHER)) {
+            throw new CustomException("강사는 첨삭요청을 보낼 수 없습니다.");
+        }
+
+        Essay essay = essayService.createEssay(profileId, loginedUser, request);
         return new ResponseEntity<>(new CreateEssayResponse(essay), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/essay/request")
+    public ResponseEntity<?> getRequestEssays() {
+
+        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        Long userId = 1L; // 임시로 생성한 유저 id;
+        User loginedUser = User.builder()
+                .id(userId)
+                .build();
+
+        List<Essay> essays = essayService.getEssays(loginedUser, EssayState.REQUEST);
+        return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
+    }
+
+    @GetMapping("/essay/proceed")
+    public ResponseEntity<?> getProceedEssays() {
+
+        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        Long userId = 1L; // 임시로 생성한 유저 id;
+        User loginedUser = User.builder()
+                .id(userId)
+                .build();
+
+        List<Essay> essays = essayService.getEssays(loginedUser, EssayState.PROCEED);
+        return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
+    }
+
+    @GetMapping("/essay/reject")
+    public ResponseEntity<?> getRejectEssays() {
+
+        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        Long userId = 1L; // 임시로 생성한 유저 id;
+        User loginedUser = User.builder()
+                .id(userId)
+                .build();
+
+        List<Essay> essays = essayService.getEssays(loginedUser, EssayState.REJECT);
+        return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
+    }
+
+    @GetMapping("/essay/complete")
+    public ResponseEntity<?> getCompleteEssays() {
+
+        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        Long userId = 1L; // 임시로 생성한 유저 id;
+        User loginedUser = User.builder()
+                .id(userId)
+                .build();
+
+        List<Essay> essays = essayService.getEssays(loginedUser, EssayState.COMPLETE);
+        return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
+    }
+
+    @GetMapping("/essay/request/{essayId}")
+    public ResponseEntity<?> getRequestEssay(@PathVariable Long essayId) {
+        RequestEssayResponse essayResponse = (RequestEssayResponse) essayService.getEssayWithStudentFile(essayId);
+        return new ResponseEntity<>(essayResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/essay/reject/{essayId}")
+    public ResponseEntity<?> getRejectEssay(@PathVariable Long essayId) {
+        RejectEssayResponse essayResponse = (RejectEssayResponse) essayService.getEssayWithStudentFile(essayId);
+        return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 }
