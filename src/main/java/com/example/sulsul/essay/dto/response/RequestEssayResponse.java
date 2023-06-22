@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 public class RequestEssayResponse extends EssayResponse {
 
-    private String inquiry;
-    private String studentFilePath;
+    private final String inquiry;
+    private final String studentFilePath;
 
     public RequestEssayResponse(Essay essay, String studentFilePath) {
         super(essay);

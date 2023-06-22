@@ -7,14 +7,14 @@ import lombok.Getter;
 @Getter
 public class EssayResponse {
 
-    private Long id;
-    private String univ;
-    private String year;
-    private String eType;
+    private final Long id;
+    private final String univ;
+    private final String year;
+    private final String eType;
 
     // TODO: User -> UserDto
-    private User student;
-    private User teacher;
+    private final User student;
+    private final User teacher;
 
     public EssayResponse(Essay essay) {
         this.id = essay.getId();

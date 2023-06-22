@@ -128,4 +128,10 @@ public class EssayController {
         RejectEssayResponse essayResponse = (RejectEssayResponse) essayService.getEssayWithStudentFile(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
+
+    @GetMapping("/essay/proceed/{essayId}")
+    public ResponseEntity<?> getProceedEssay(@PathVariable Long essayId) {
+        ProceedEssayResponse essayResponse = (ProceedEssayResponse) essayService.getEssayWithFilePaths(essayId);
+        return new ResponseEntity<>(essayResponse, HttpStatus.OK);
+    }
 }

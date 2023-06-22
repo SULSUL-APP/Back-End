@@ -64,4 +64,8 @@ public class EssayService {
 
         return new RejectEssayResponse(essay, filePath); // REJECT
     }
+
+    public Object getEssayWithFilePaths(Long essayId) {
+        return null;
+    }
 }
