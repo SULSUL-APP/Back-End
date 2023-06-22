@@ -8,6 +8,7 @@ import com.example.sulsul.essay.exception.CustomException;
 import com.example.sulsul.essay.exception.CustomValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -25,7 +26,9 @@ public class EssayController {
 
     private final EssayService essayService;
 
-    @PostMapping("/profiles/{profileId}/essay")
+    @PostMapping(value = "/profiles/{profileId}/essay",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createEssay(@PathVariable Long profileId,
                                          @Valid @RequestBody CreateEssayRequest request,
                                          BindingResult bindingResult) throws RuntimeException {
@@ -44,6 +47,7 @@ public class EssayController {
             throw new CustomValidationException("입력값 유효성 검사 실패", errorMap);
         }
 
+        // 로그인 되어 있는 유저의 id값을 가져오는 로직
         long studentId = 1L; // 임시로 생성한 학생 id;
 
         Essay essay = essayService.createEssay(profileId, studentId, request);
