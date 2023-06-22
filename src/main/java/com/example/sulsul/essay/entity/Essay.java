@@ -1,7 +1,6 @@
 package com.example.sulsul.essay.entity;
 
 import com.example.sulsul.common.BaseEntity;
-import com.example.sulsul.common.type.EType;
 import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.user.entity.User;
@@ -51,11 +50,11 @@ public class Essay extends BaseEntity {
     private String inquiry; // 문의사항
 
     @Column()
-    private String rejectDetail; //거절 사유
+    private String rejectDetail; // 거절사유
 
+//    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EType eType;
+    private String eType;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -64,7 +63,7 @@ public class Essay extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReviewState reviewState; // 리뷰 생성 여부
 
-    public void updateEType(EType eType) {
+    public void updateEType(String eType) {
         this.eType = eType;
     }
 
