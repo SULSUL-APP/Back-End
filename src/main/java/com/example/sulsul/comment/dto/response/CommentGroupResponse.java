@@ -3,12 +3,13 @@ package com.example.sulsul.comment.dto.response;
 import com.example.sulsul.comment.entity.Comment;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class CommentGroupResponse {
 
-    private List<CommentResponse> comments;
+    private final List<CommentResponse> comments = new ArrayList<>();
 
     public CommentGroupResponse(List<Comment> comments) {
         comments.stream()

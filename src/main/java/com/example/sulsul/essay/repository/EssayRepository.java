@@ -21,7 +21,7 @@ public interface EssayRepository extends JpaRepository<Essay, Long> {
      * @param essayState 조회할 첨삭상태
      * @return 지정한 첨삭상태의 첨삭목록을 반환한다.
      */
-    List<Essay> findAllByTeacherAndEssayState(Long teacherId, EssayState essayState);
+    List<Essay> findAllByTeacherIdAndEssayState(Long teacherId, EssayState essayState);
 
     /**
      * 학생이 자신이 요청한 첨삭목록을 조회한다.
@@ -29,7 +29,7 @@ public interface EssayRepository extends JpaRepository<Essay, Long> {
      * @param essayState 조회할 첨삭상태
      * @return 지정한 첨삭상태의 첨삭목록을 반환한다.
      */
-    List<Essay> findAllByStudentAndEssayState(Long studentId, EssayState essayState);
+    List<Essay> findAllByStudentIdAndEssayState(Long studentId, EssayState essayState);
 
     // GET /essay/request/{essayId} - findById
     // GET /essay/request/{essayId}

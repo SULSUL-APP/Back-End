@@ -6,11 +6,11 @@ import lombok.Getter;
 
 @Getter
 public class CommentResponse {
-    private Long commentId;
-    private String detail;
+    private final Long commentId;
+    private final String detail;
 
     // TODO: User -> UserDto
-    private User user;
+    private final User user;
 
     public CommentResponse(Comment comment) {
         this.commentId = comment.getId();

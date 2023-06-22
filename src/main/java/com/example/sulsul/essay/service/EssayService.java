@@ -47,9 +47,9 @@ public class EssayService {
         List<Essay> essays = null;
 
         if (userType.equals(UType.TEACHER)) {
-            essays = essayRepository.findAllByTeacherAndEssayState(userId, essayState);
+            essays = essayRepository.findAllByTeacherIdAndEssayState(userId, essayState);
         } else if (userType.equals(UType.STUDENT)) {
-            essays = essayRepository.findAllByStudentAndEssayState(userId, essayState);
+            essays = essayRepository.findAllByStudentIdAndEssayState(userId, essayState);
         }
         return essays;
     }

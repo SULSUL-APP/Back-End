@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 public class ReviewResponse {
 
-    private Long reviewId;
-    private String detail;
-    public Integer score;
+    private final Long reviewId;
+    private final String detail;
+    public final Integer score;
 
     public ReviewResponse(Review review) {
         this.reviewId = review.getId();
