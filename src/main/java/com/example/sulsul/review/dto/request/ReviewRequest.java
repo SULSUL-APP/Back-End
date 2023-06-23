@@ -1,6 +1,5 @@
 package com.example.sulsul.review.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
