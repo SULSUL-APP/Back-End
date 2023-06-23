@@ -3,7 +3,7 @@ package com.example.sulsul.essay.dto.response;
 import com.example.sulsul.comment.dto.response.CommentGroupResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.review.dto.ReviewResponse;
+import com.example.sulsul.review.dto.response.ReviewResponse;
 import com.example.sulsul.review.entity.Review;
 import lombok.Getter;
 
