@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 public class ChangeEssayStateResponse {
 
-    private String message;
-    private EssayResponse essay;
+    private final String message;
+    private final EssayResponse essay;
 
     public ChangeEssayStateResponse(String message, Essay essay) {
         this.message = message;

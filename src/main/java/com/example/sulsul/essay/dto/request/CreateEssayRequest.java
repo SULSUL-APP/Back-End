@@ -5,7 +5,6 @@ import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
