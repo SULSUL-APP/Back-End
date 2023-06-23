@@ -4,6 +4,7 @@ import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.repository.CommentRepository;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
+import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
@@ -101,5 +102,30 @@ public class EssayService {
         }
         // 첨삭진행 상태인 경우
         return new ProceedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
+    }
+
+    public Essay acceptEssay(Long essayId) {
+        Essay essay = essayRepository.findById(essayId)
+                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+
+        essay.updateEssayState(EssayState.PROCEED);
+        return essayRepository.save(essay);
+    }
+
+    public Essay rejectEssay(Long essayId, RejectRequest rejectRequest) {
+        Essay essay = essayRepository.findById(essayId)
+                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+
+        essay.updateEssayState(EssayState.REJECT);
+        essay.updateRejectDetail(rejectRequest.getRejectDetail());
+        return essayRepository.save(essay);
+    }
+
+    public Essay completeEssay(Long essayId) {
+        Essay essay = essayRepository.findById(essayId)
+                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+
+        essay.updateEssayState(EssayState.COMPLETE);
+        return essayRepository.save(essay);
     }
 }

@@ -2,6 +2,7 @@ package com.example.sulsul.essay.controller;
 
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
+import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
@@ -67,7 +68,7 @@ public class EssayController {
         Essay essay = essayService.createEssay(profileId, loginedUser, request);
         return new ResponseEntity<>(new CreateEssayResponse(essay), HttpStatus.CREATED);
     }
-    
+
     /**
      * 첨삭목록 조회
      */
@@ -148,5 +149,44 @@ public class EssayController {
     public ResponseEntity<?> getCompleteEssay(@PathVariable Long essayId) {
         CompleteEssayResponse essayResponse = (CompleteEssayResponse) essayService.getEssayWithFilePaths(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
+    }
+
+    /**
+     * 첨삭상태 변경
+     */
+    @PutMapping("/essay/{essayId}/accept")
+    public ResponseEntity<?> acceptEssay(@PathVariable Long essayId) {
+        Essay essay = essayService.acceptEssay(essayId);
+        String message = "첨삭요청이 수락되었습니다.";
+
+        // TODO: 첨삭요청 수락 알림 전송 로직
+        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
+    }
+
+    @PutMapping("/essay/{essayId}/reject")
+    public ResponseEntity<?> rejectEssay(@PathVariable Long essayId,
+                                         @Valid @RequestBody RejectRequest rejectRequest,
+                                         BindingResult bindingResult) {
+        // 거절사유 유효성 검사
+        if (bindingResult.hasErrors()) {
+            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+            String message = fieldError.getDefaultMessage();
+            throw new CustomException(message);
+        }
+
+        Essay essay = essayService.rejectEssay(essayId, rejectRequest);
+        String message = "첨삭요청이 거절되었습니다.";
+
+        // TODO: 첨삭요청 거절 알림 전송 로직
+        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
+    }
+
+    @PutMapping("/essay/{essayId}/complete")
+    public ResponseEntity<?> completeEssay(@PathVariable Long essayId) {
+        Essay essay = essayService.completeEssay(essayId);
+        String message = "첨삭이 완료되었습니다.";
+
+        // TODO: 첨삭완료 알림 전송 로직
+        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
     }
 }

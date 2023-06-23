@@ -1,6 +1,7 @@
 package com.example.sulsul.essay.dto.response;
 
 import com.example.sulsul.essay.entity.Essay;
+import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.user.entity.User;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ public class EssayResponse {
     private final String univ;
     private final String year;
     private final String eType;
+    private final EssayState essayState;
 
     // TODO: User -> UserDto
     private final User student;
@@ -21,6 +23,7 @@ public class EssayResponse {
         this.univ = essay.getUniv();
         this.year = essay.getYear();
         this.eType = essay.getEType();
+        this.essayState = essay.getEssayState();
         this.teacher = essay.getTeacher();
         this.student = essay.getStudent();
     }
