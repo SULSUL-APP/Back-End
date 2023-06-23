@@ -55,7 +55,7 @@ public class EssayController {
         // User student = (User) auth.getPrincipal();
         // 또는 @AuthenticationPrincipal 활용
 
-        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
@@ -75,7 +75,7 @@ public class EssayController {
     @GetMapping("/essay/request")
     public ResponseEntity<?> getRequestEssays() {
 
-        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
@@ -88,7 +88,7 @@ public class EssayController {
     @GetMapping("/essay/proceed")
     public ResponseEntity<?> getProceedEssays() {
 
-        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
@@ -101,7 +101,7 @@ public class EssayController {
     @GetMapping("/essay/reject")
     public ResponseEntity<?> getRejectEssays() {
 
-        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
@@ -114,7 +114,7 @@ public class EssayController {
     @GetMapping("/essay/complete")
     public ResponseEntity<?> getCompleteEssays() {
 
-        // 로그인 되어 있는 유저의 id값을 가져오는 로직
+        // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
@@ -169,7 +169,7 @@ public class EssayController {
                                          BindingResult bindingResult) {
         // 거절사유 유효성 검사
         if (bindingResult.hasErrors()) {
-            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+            FieldError fieldError = bindingResult.getFieldError("rejectDetail");
             String message = fieldError.getDefaultMessage();
             throw new CustomException(message);
         }

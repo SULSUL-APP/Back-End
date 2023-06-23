@@ -12,4 +12,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @return 해당 첨삭의 모든 댓글 반환
      */
     List<Comment> findAllByEssayId(Long essayId);
+
+    // POST /essay/{essayId}/comments - save
+    // PUT /comments/{commentId} - save
+    // DELETE /commentss/{commentId} - deleteById
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class CommentResponse {
+
     private final Long commentId;
     private final String detail;
 
