@@ -38,7 +38,7 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "essay_id")
     private Essay essay;
 
-    public void updateDetail() {
+    public void updateDetail(String detail) {
         this.detail = detail;
     }
 
