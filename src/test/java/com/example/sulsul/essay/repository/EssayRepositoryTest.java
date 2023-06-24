@@ -9,6 +9,7 @@ import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -17,8 +18,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-
-// TODO: 첨삭파일 부분 점검 필요
 
 @DataJpaTest
 class EssayRepositoryTest {
@@ -30,7 +29,8 @@ class EssayRepositoryTest {
     private UserRepository userRepository;
 
     @BeforeEach
-    void 데이터_준비하기() {
+    @DisplayName("데이터 준비하기")
+    void setUp() {
         // 강사, 학생 데이터 생성
         User s1 = User.builder()
                 .name("김경근")
@@ -73,7 +73,8 @@ class EssayRepositoryTest {
     }
 
     @Test
-    void 유저_데이터_확인하기() {
+    @DisplayName("준비한 유저 데이터 확인하기")
+    void findUserByEmailTest() {
         // given && when
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User s2 = userRepository.findByEmail("sulsul@g.hongik.ac.kr").get();
@@ -89,7 +90,8 @@ class EssayRepositoryTest {
     }
 
     @Test
-    void 첨삭생성_테스트() {
+    @DisplayName("첨삭 생성 테스트")
+    void saveEssayTest() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User t1 = userRepository.findByEmail("sulsul@naver.com").get();
@@ -119,7 +121,8 @@ class EssayRepositoryTest {
     }
 
     @Test
-    void 첨삭개별조회_테스트() {
+    @DisplayName("첨삭 개별 조회 테스트")
+    void findEssayByIdTest() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User t1 = userRepository.findByEmail("sulsul@naver.com").get();
@@ -150,7 +153,8 @@ class EssayRepositoryTest {
     }
 
     @Test
-    void 강사에게_요청된_첨삭목록_조회_테스트() {
+    @DisplayName("강사에게 요청된 첨삭목록 조회 테스트")
+    void findByTeacherAndEssayStateTest() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User s2 = userRepository.findByEmail("sulsul@g.hongik.ac.kr").get();
@@ -191,7 +195,8 @@ class EssayRepositoryTest {
     }
 
     @Test
-    void 학생이_요청한_첨삭목록_조회_테스트() {
+    @DisplayName("학생이 요청한 첨삭목록 조회 테스트")
+    void findByStudentAndEssayStateTest() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User t1 = userRepository.findByEmail("sulsul@naver.com").get();
@@ -232,7 +237,8 @@ class EssayRepositoryTest {
     }
 
     @Test
-    void 첨삭상태_변경_테스트() {
+    @DisplayName("첨삭상태 변경 테스트")
+    void updateEssayStateTest() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User t1 = userRepository.findByEmail("sulsul@naver.com").get();
