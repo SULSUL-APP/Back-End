@@ -5,6 +5,7 @@ import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.user.entity.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Getter
+@Builder
 @AllArgsConstructor
 public class CreateEssayRequest {
     @NotBlank
