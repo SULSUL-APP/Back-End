@@ -5,10 +5,14 @@ import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
+import com.example.sulsul.essay.dto.response.EssayResponse;
+import com.example.sulsul.essay.dto.response.RejectEssayResponse;
+import com.example.sulsul.essay.dto.response.RequestEssayResponse;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.essay.repository.EssayRepository;
+import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
 import com.example.sulsul.review.repository.ReviewRepository;
 import com.example.sulsul.user.entity.User;
@@ -23,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -226,7 +231,112 @@ class EssayServiceTest {
     }
 
     @Test
-    void getEssayWithStudentFile() {
+    @DisplayName("요청상태인 첨삭 개별조회 테스트")
+    void getRequestEssayWithStudentFileTest() {
+        // given
+        User s1 = User.builder()
+                .id(1L)
+                .name("김경근")
+                .email("sulsul@gmail.com")
+                .uType(UType.STUDENT)
+                .eType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
+                .build();
+
+        User t1 = User.builder()
+                .id(2L)
+                .name("임탁균")
+                .email("sulsul@naver.com")
+                .uType(UType.TEACHER)
+                .eType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
+                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
+                .build();
+
+        Essay essay1 = Essay.builder()
+                .id(1L)
+                .univ("홍익대")
+                .examYear("2022")
+                .eType("수리")
+                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
+                .essayState(EssayState.REQUEST) // 첨삭요청 상태
+                .reviewState(ReviewState.OFF)
+                .student(s1)
+                .teacher(t1)
+                .build();
+        // stub
+
+        String filePath = "http://s3-ap-northeast-2.amazonaws.com/sulsul";
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
+        when(fileRepository.getStudentEssayFile(1L, 1L))
+                .thenReturn(Optional.of(File.builder()
+                        .id(1L)
+                        .filePath(filePath)
+                        .build()));
+        RequestEssayResponse response = (RequestEssayResponse) essayService.getEssayWithStudentFile(1L);
+        // when
+        assertAll(
+                () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
+                () -> assertThat(response.getExamYear()).isEqualTo("2022"),
+                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
+                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.REQUEST),
+                () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath)
+        );
+    }
+
+    @Test
+    @DisplayName("거절상태인 첨삭 개별조회 테스트")
+    void getRejectEssayWithStudentFileTest() {
+        // given
+        User s1 = User.builder()
+                .id(1L)
+                .name("김경근")
+                .email("sulsul@gmail.com")
+                .uType(UType.STUDENT)
+                .eType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
+                .build();
+
+        User t1 = User.builder()
+                .id(2L)
+                .name("임탁균")
+                .email("sulsul@naver.com")
+                .uType(UType.TEACHER)
+                .eType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
+                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
+                .build();
+
+        Essay essay1 = Essay.builder()
+                .id(1L)
+                .univ("홍익대")
+                .examYear("2022")
+                .eType("수리")
+                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
+                .essayState(EssayState.REJECT) // 첨삭거절 상태
+                .reviewState(ReviewState.OFF)
+                .student(s1)
+                .teacher(t1)
+                .build();
+        // stub
+        String filePath = "http://s3-ap-northeast-2.amazonaws.com/sulsul";
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
+        when(fileRepository.getStudentEssayFile(1L, 1L))
+                .thenReturn(Optional.of(File.builder()
+                        .id(1L)
+                        .filePath(filePath)
+                        .build()));
+        RejectEssayResponse response = (RejectEssayResponse) essayService.getEssayWithStudentFile(1L);
+        // when
+        assertAll(
+                () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
+                () -> assertThat(response.getExamYear()).isEqualTo("2022"),
+                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
+                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.REJECT),
+                () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath)
+        );
     }
 
     @Test
