@@ -11,10 +11,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
-@Getter
-@Builder
-@Setter(AccessLevel.PROTECTED)
 @Table(name = "users")
+@Builder
+@Getter
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User extends BaseEntity {

@@ -10,10 +10,11 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
+@Table(name = "essays")
+@Builder
 @Getter
 @Setter(AccessLevel.PROTECTED)
-@Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Essay extends BaseEntity {
     @Id
@@ -44,7 +45,7 @@ public class Essay extends BaseEntity {
 
     @Column(nullable = false)
     @NotBlank(message = "논술 연도는 필수 값입니다.")
-    private String year;
+    private String examYear;
 
     @Column(nullable = false)
     private String inquiry; // 문의사항

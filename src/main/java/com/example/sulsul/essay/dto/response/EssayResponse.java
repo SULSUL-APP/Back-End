@@ -10,7 +10,7 @@ public class EssayResponse {
 
     private final Long id;
     private final String univ;
-    private final String year;
+    private final String examYear;
     private final String eType;
     private final EssayState essayState;
 
@@ -21,7 +21,7 @@ public class EssayResponse {
     public EssayResponse(Essay essay) {
         this.id = essay.getId();
         this.univ = essay.getUniv();
-        this.year = essay.getYear();
+        this.examYear = essay.getExamYear();
         this.eType = essay.getEType();
         this.essayState = essay.getEssayState();
         this.teacher = essay.getTeacher();

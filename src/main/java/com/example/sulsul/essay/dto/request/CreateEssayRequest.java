@@ -2,6 +2,7 @@ package com.example.sulsul.essay.dto.request;
 
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
+import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class CreateEssayRequest {
 
     @NotBlank
     @Size(min = 2, max = 8, message = "시험년도는 2글자 이상 8글자 이하입니다.")
-    private String year;
+    private String examYear;
 
     @NotBlank
     @Size(min = 2, max = 8, message = "논술분야는 2글자 이상 8글자 이하입니다.")
@@ -34,10 +35,11 @@ public class CreateEssayRequest {
     public Essay toEntity(User student, User teacher) {
         return Essay.builder()
                 .univ(univ)
-                .year(year)
+                .examYear(examYear)
                 .eType(eType)
                 .inquiry(inquiry)
                 .essayState(EssayState.REQUEST)
+                .reviewState(ReviewState.OFF)
                 .student(student)
                 .teacher(teacher)
                 .build();
