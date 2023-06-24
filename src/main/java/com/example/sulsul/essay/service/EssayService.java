@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EssayService {
-
+    
     private final UserRepository userRepository;
     private final EssayRepository essayRepository;
     private final FileRepository fileRepository;
@@ -33,42 +33,49 @@ public class EssayService {
     private final ReviewRepository reviewRepository;
 
     public Essay createEssay(Long profileId, User student, CreateEssayRequest request) {
+        // profileId에 해당하는 강사 유저 조회
         User teacher = userRepository.findById(profileId)
                 .orElseThrow(() -> new CustomException("강사 유저를 찾을 수 없습니다."));
 
         // 첨삭파일 저장 로직
 
-        Essay essay = request.toEntity(student, teacher);
-        return essayRepository.save(essay);
+        Essay essay = request.toEntity(student, teacher); // Essay 엔티티 생성
+        return essayRepository.save(essay); // Essay 엔티티 저장
     }
 
     public List<Essay> getEssays(User user, EssayState essayState) {
         UType userType = user.getUType();
         Long userId = user.getId();
         List<Essay> essays = null;
-
-        if (userType.equals(UType.TEACHER)) {
+        
+        if (userType.equals(UType.TEACHER)) { // 강사인 경우
+            // 강사에게 요청된 첨삭글 목록 조회
             essays = essayRepository.findAllByTeacherIdAndEssayState(userId, essayState);
-        } else if (userType.equals(UType.STUDENT)) {
+        } else if (userType.equals(UType.STUDENT)) { // 학생인 경우
+            // 학생이 요청한 첨삭글 목록 조회
             essays = essayRepository.findAllByStudentIdAndEssayState(userId, essayState);
         }
-        return essays;
+        return essays; // 첨삭목록 반환
     }
 
     public EssayResponse getEssayWithStudentFile(Long essayId) {
+        // essayId에 해당하는 첨삭 조회
         Essay essay = essayRepository.findById(essayId)
                 .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
 
         Long studentId = essay.getStudent().getId();
+        // 학생이 올린 첨삭파일 조회
         File file = fileRepository.getStudentEssayFile(essayId, studentId)
                 .orElseThrow(() -> new CustomException("해당 첨삭글의 첨삭파일을 찾을 수 없습니다."));
-        String filePath = file.getFilePath();
+        String filePath = file.getFilePath(); // 첨삭파일이 위치한 s3 경로
 
+        // 첨삭요청 상태인 경우
         if (essay.getEssayState().equals(EssayState.REQUEST)) {
             return new RequestEssayResponse(essay, filePath);
         }
 
-        return new RejectEssayResponse(essay, filePath); // REJECT
+        // 첨삭거절 상태인 경우
+        return new RejectEssayResponse(essay, filePath);
     }
 
     public EssayResponse getEssayWithFilePaths(Long essayId) {
@@ -91,7 +98,7 @@ public class EssayService {
         // 첨삭에 작성된 모든 댓글 조회
         List<Comment> comments = commentRepository.findAllByEssayId(essayId);
 
-        // 첨삭완료 상태인 경우
+        // COMPLETE 상태인 경우
         if (essay.getEssayState().equals(EssayState.COMPLETE)) {
             Review review = null;
             if (essay.getReviewState().equals(ReviewState.ON)) {
@@ -100,7 +107,7 @@ public class EssayService {
             }
             return new CompleteEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments, review);
         }
-        // 첨삭진행 상태인 경우
+        // PROCEED 상태인 경우
         return new ProceedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
     }
 
