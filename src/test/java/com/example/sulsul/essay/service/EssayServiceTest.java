@@ -31,12 +31,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -203,7 +201,7 @@ class EssayServiceTest {
         // given
         User s1 = DemoDataFactory.createStudent1(1L);
         User s2 = DemoDataFactory.createStudent2(2L);
-        Long teacherId = 3L;
+        long teacherId = 3L;
         User t1 = DemoDataFactory.createTeacher1(teacherId);
         Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
         Essay essay2 = DemoDataFactory.createEssay2(2L, s2, t1, EssayState.REQUEST, ReviewState.OFF);
@@ -223,7 +221,7 @@ class EssayServiceTest {
     @Test
     void 학생이_요청한_첨삭목록_조회_테스트() {
         // given
-        Long studentId = 1L;
+        long studentId = 1L;
         User s1 = DemoDataFactory.createStudent1(studentId);
         User t1 = DemoDataFactory.createTeacher1(2L);
         User t2 = DemoDataFactory.createTeacher2(3L);
