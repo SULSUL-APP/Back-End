@@ -1,6 +1,7 @@
 package com.example.sulsul.review.service;
 
 import com.example.sulsul.essay.entity.Essay;
+import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.essay.exception.CustomException;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.review.dto.request.ReviewRequest;
@@ -31,6 +32,10 @@ public class ReviewService {
                 .score(request.getScore())
                 .build();
 
+        // 첨삭리뷰 여부 update
+        essay.updateReviewState(ReviewState.ON);
+
+        essayRepository.save(essay);
         return reviewRepository.save(review);
     }
 

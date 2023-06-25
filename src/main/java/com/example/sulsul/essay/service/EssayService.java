@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EssayService {
-    
+
     private final UserRepository userRepository;
     private final EssayRepository essayRepository;
     private final FileRepository fileRepository;
@@ -47,7 +47,7 @@ public class EssayService {
         UType userType = user.getUType();
         Long userId = user.getId();
         List<Essay> essays = null;
-        
+
         if (userType.equals(UType.TEACHER)) { // 강사인 경우
             // 강사에게 요청된 첨삭글 목록 조회
             essays = essayRepository.findAllByTeacherIdAndEssayState(userId, essayState);
@@ -98,16 +98,15 @@ public class EssayService {
         // 첨삭에 작성된 모든 댓글 조회
         List<Comment> comments = commentRepository.findAllByEssayId(essayId);
 
-        // 첨삭완료 상태인 경우
+        // 첨삭완료 상태인 경우 && 리뷰가 작성된 경우
         if (essay.getEssayState().equals(EssayState.COMPLETE)) {
-            Review review = null;
             if (essay.getReviewState().equals(ReviewState.ON)) {
-                review = reviewRepository.findByEssayId(essayId)
+                Review review = reviewRepository.findByEssayId(essayId)
                         .orElseThrow(() -> new CustomException("해당 첨삭글의 리뷰를 찾을 수 없습니다."));
+                return new CompleteEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments, review);
             }
-            return new CompleteEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments, review);
         }
-        // 첨삭진행 상태인 경우
+        // 첨삭진행 상태인 경우 || 첨삭이 완료되었지만 리뷰되지 않은 경우
         return new ProceedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
     }
 

@@ -7,7 +7,7 @@ import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
-import com.example.sulsul.essay.dto.response.EssayResponse;
+import com.example.sulsul.essay.dto.response.CompleteEssayResponse;
 import com.example.sulsul.essay.dto.response.ProceedEssayResponse;
 import com.example.sulsul.essay.dto.response.RejectEssayResponse;
 import com.example.sulsul.essay.dto.response.RequestEssayResponse;
@@ -17,10 +17,10 @@ import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
+import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.review.repository.ReviewRepository;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,7 +30,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -58,28 +57,119 @@ class EssayServiceTest {
     @InjectMocks
     private EssayService essayService;
 
-    @Test
-    @DisplayName("첨삭생성 테스트")
-    void createEssayTest() {
-        // given
-        User s1 = User.builder()
-                .name("김경근")
-                .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .build();
+    static class DemoDataFactory {
+        static User createStudent1(long id) {
+            return User.builder()
+                    .id(id)
+                    .name("김경근")
+                    .email("sulsul@gmail.com")
+                    .uType(UType.STUDENT)
+                    .eType(EType.NATURE)
+                    .loginType(LoginType.KAKAO)
+                    .build();
+        }
 
+        static User createStudent2(long id) {
+            return User.builder()
+                    .id(id)
+                    .name("류동완")
+                    .email("sulsul@g.hongik.ac.kr")
+                    .uType(UType.STUDENT)
+                    .eType(EType.SOCIETY)
+                    .loginType(LoginType.APPLE)
+                    .build();
+        }
+
+        static User createTeacher1(long id) {
+            return User.builder()
+                    .id(id)
+                    .name("임탁균")
+                    .email("sulsul@naver.com")
+                    .uType(UType.TEACHER)
+                    .eType(EType.NATURE)
+                    .loginType(LoginType.KAKAO)
+                    .catchPhrase("항상 최선을 다하겠습니다. 화이링")
+                    .build();
+        }
+
+        static User createTeacher2(long id) {
+            return User.builder()
+                    .id(id)
+                    .name("전용수")
+                    .email("smc@gmail.com")
+                    .uType(UType.TEACHER)
+                    .eType(EType.SOCIETY)
+                    .loginType(LoginType.KAKAO)
+                    .catchPhrase("항상 최선을 다하겠습니다.")
+                    .build();
+        }
+
+        static Essay createEssay1(long id, User student, User teacher,
+                                  EssayState essayState, ReviewState reviewState) {
+            return Essay.builder()
+                    .id(id)
+                    .univ("홍익대")
+                    .examYear("2022")
+                    .eType("수리")
+                    .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
+                    .essayState(essayState)
+                    .reviewState(reviewState)
+                    .student(student)
+                    .teacher(teacher)
+                    .build();
+        }
+
+        static Essay createEssay2(long id, User student, User teacher,
+                                  EssayState essayState, ReviewState reviewState) {
+            return Essay.builder()
+                    .id(id)
+                    .univ("홍익대")
+                    .examYear("2023")
+                    .eType("인문사회")
+                    .inquiry("2023년 인문 첨삭 부탁드립니다.")
+                    .essayState(essayState)
+                    .reviewState(reviewState)
+                    .student(student)
+                    .teacher(teacher)
+                    .build();
+        }
+
+        static Comment createComment1(long id, User user, Essay essay) {
+            return Comment.builder()
+                    .id(id)
+                    .user(user)
+                    .essay(essay)
+                    .detail("첨삭한 파일 첨부했습니다.")
+                    .build();
+        }
+
+        static Comment createComment2(long id, User user, Essay essay) {
+            return Comment.builder()
+                    .id(id)
+                    .user(user)
+                    .essay(essay)
+                    .detail("네 확인했습니다.")
+                    .build();
+        }
+
+        public static Review createReview1(long id, Essay essay, User student, User teacher) {
+            return Review.builder()
+                    .id(id)
+                    .detail("구체적으로 첨삭해주셔서 좋았어요.")
+                    .score(5)
+                    .essay(essay)
+                    .student(student)
+                    .teacher(teacher)
+                    .build();
+        }
+    }
+
+    @Test
+    void 첨삭생성_테스트() {
+        // given
         Long profileId = 2L;
-        User t1 = User.builder()
-                .id(profileId)
-                .name("임탁균")
-                .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
-                .build();
+        User t1 = DemoDataFactory.createTeacher1(profileId);
+        User s1 = DemoDataFactory.createStudent1(1L);
 
         CreateEssayRequest request = CreateEssayRequest.builder()
                 .univ("홍익대")
@@ -106,57 +196,14 @@ class EssayServiceTest {
     }
 
     @Test
-    @DisplayName("강사에게 요청된 첨삭목록 조회 테스트")
-    void getEssaysByTeacherTest() {
+    void 강사에게_요청된_첨삭목록_조회_테스트() {
         // given
-        User s1 = User.builder()
-                .name("김경근")
-                .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .build();
-
-        User s2 = User.builder()
-                .name("류동완")
-                .email("sulsul@g.hongik.ac.kr")
-                .uType(UType.STUDENT)
-                .eType(EType.SOCIETY)
-                .loginType(LoginType.APPLE)
-                .build();
-
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User s2 = DemoDataFactory.createStudent2(2L);
         Long teacherId = 3L;
-        User t1 = User.builder()
-                .id(teacherId)
-                .name("임탁균")
-                .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
-                .build();
-
-        Essay essay1 = Essay.builder()
-                .univ("홍익대")
-                .examYear("2022")
-                .eType("수리")
-                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
-                .essayState(EssayState.REQUEST)
-                .reviewState(ReviewState.OFF)
-                .student(s1)
-                .teacher(t1)
-                .build();
-
-        Essay essay2 = Essay.builder()
-                .univ("홍익대")
-                .examYear("2023")
-                .eType("인문사회")
-                .inquiry("2023년 인문 첨삭 부탁드립니다.")
-                .essayState(EssayState.REQUEST)
-                .reviewState(ReviewState.OFF)
-                .student(s2)
-                .teacher(t1)
-                .build();
+        User t1 = DemoDataFactory.createTeacher1(teacherId);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
+        Essay essay2 = DemoDataFactory.createEssay2(2L, s2, t1, EssayState.REQUEST, ReviewState.OFF);
         // stub
         when(essayRepository.findAllByTeacherIdAndEssayState(teacherId, EssayState.REQUEST))
                 .thenReturn(List.of(essay1, essay2));
@@ -171,58 +218,14 @@ class EssayServiceTest {
     }
 
     @Test
-    @DisplayName("학생이 요청한 첨삭목록 조회 테스트")
-    void getEssaysByStudentTest() {
+    void 학생이_요청한_첨삭목록_조회_테스트() {
         // given
         Long studentId = 1L;
-        User s1 = User.builder()
-                .id(studentId)
-                .name("김경근")
-                .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .build();
-
-        User t1 = User.builder()
-                .name("임탁균")
-                .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
-                .build();
-
-        User t2 = User.builder()
-                .name("전용수")
-                .email("smc@gmail.com")
-                .uType(UType.TEACHER)
-                .eType(EType.SOCIETY)
-                .loginType(LoginType.KAKAO)
-                .catchPhrase("항상 최선을 다하겠습니다.")
-                .build();
-
-        Essay essay1 = Essay.builder()
-                .univ("홍익대")
-                .examYear("2022")
-                .eType("수리")
-                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
-                .essayState(EssayState.REQUEST)
-                .reviewState(ReviewState.OFF)
-                .student(s1)
-                .teacher(t1)
-                .build();
-
-        Essay essay2 = Essay.builder()
-                .univ("홍익대")
-                .examYear("2023")
-                .eType("인문사회")
-                .inquiry("2023년 인문 첨삭 부탁드립니다.")
-                .essayState(EssayState.REQUEST)
-                .reviewState(ReviewState.OFF)
-                .student(s1)
-                .teacher(t2)
-                .build();
+        User s1 = DemoDataFactory.createStudent1(studentId);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        User t2 = DemoDataFactory.createTeacher2(3L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
+        Essay essay2 = DemoDataFactory.createEssay2(2L, s1, t2, EssayState.REQUEST, ReviewState.OFF);
         // stub
         when(essayRepository.findAllByStudentIdAndEssayState(studentId, EssayState.REQUEST))
                 .thenReturn(List.of(essay1, essay2));
@@ -237,39 +240,11 @@ class EssayServiceTest {
     }
 
     @Test
-    @DisplayName("요청상태인 첨삭 개별조회 테스트")
-    void getRequestEssayWithStudentFileTest() {
+    void 요청상태인_첨삭_개별조회_테스트() {
         // given
-        User s1 = User.builder()
-                .id(1L)
-                .name("김경근")
-                .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .build();
-
-        User t1 = User.builder()
-                .id(2L)
-                .name("임탁균")
-                .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
-                .build();
-
-        Essay essay1 = Essay.builder()
-                .id(1L)
-                .univ("홍익대")
-                .examYear("2022")
-                .eType("수리")
-                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
-                .essayState(EssayState.REQUEST) // 첨삭요청 상태
-                .reviewState(ReviewState.OFF)
-                .student(s1)
-                .teacher(t1)
-                .build();
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
         // stub
         when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
 
@@ -293,39 +268,11 @@ class EssayServiceTest {
     }
 
     @Test
-    @DisplayName("거절상태인 첨삭 개별조회 테스트")
-    void getRejectEssayWithStudentFileTest() {
+    void 거절상태인_첨삭_개별조회_테스트() {
         // given
-        User s1 = User.builder()
-                .id(1L)
-                .name("김경근")
-                .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .build();
-
-        User t1 = User.builder()
-                .id(2L)
-                .name("임탁균")
-                .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
-                .build();
-
-        Essay essay1 = Essay.builder()
-                .id(1L)
-                .univ("홍익대")
-                .examYear("2022")
-                .eType("수리")
-                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
-                .essayState(EssayState.REJECT) // 첨삭거절 상태
-                .reviewState(ReviewState.OFF)
-                .student(s1)
-                .teacher(t1)
-                .build();
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REJECT, ReviewState.OFF);
         // stub
         when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
 
@@ -349,51 +296,13 @@ class EssayServiceTest {
     }
 
     @Test
-    @DisplayName("진행상태인 첨삭 개별조회 테스트")
-    void getProceedEssayWithFilePaths() {
+    void 진행상태인_첨삭_개별조회_테스트() {
         // given
-        User s1 = User.builder()
-                .id(1L)
-                .name("김경근")
-                .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .build();
-
-        User t1 = User.builder()
-                .id(2L)
-                .name("임탁균")
-                .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
-                .build();
-
-        Essay essay1 = Essay.builder()
-                .id(1L)
-                .univ("홍익대")
-                .examYear("2022")
-                .eType("수리")
-                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
-                .essayState(EssayState.PROCEED) // 첨삭진행 상태
-                .reviewState(ReviewState.OFF)
-                .student(s1)
-                .teacher(t1)
-                .build();
-
-        Comment c1 = Comment.builder()
-                .essay(essay1)
-                .user(t1)
-                .detail("첨삭한 파일 첨부했습니다.")
-                .build();
-
-        Comment c2 = Comment.builder()
-                .essay(essay1)
-                .user(s1)
-                .detail("네 확인했습니다.")
-                .build();
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.PROCEED, ReviewState.OFF);
+        Comment c1 = DemoDataFactory.createComment1(1L, t1, essay1);
+        Comment c2 = DemoDataFactory.createComment2(2L, s1, essay1);
         // when
         when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
 
@@ -430,10 +339,93 @@ class EssayServiceTest {
     }
 
     @Test
-    @DisplayName("완료상태인 첨삭 개별조회 테스트")
-    void getCompleteEssayWithFilePaths() {
+    void 리뷰가_없는_완료상태의_첨삭_개별조회_테스트() {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.COMPLETE, ReviewState.OFF);
+        Comment c1 = DemoDataFactory.createComment1(1L, t1, essay1);
+        Comment c2 = DemoDataFactory.createComment2(2L, s1, essay1);
+        // when
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
 
+        String filePath1 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230624.pdf";
+        String filePath2 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230625.pdf";
+        when(fileRepository.getStudentEssayFile(1L, 1L))
+                .thenReturn(Optional.of(File.builder()
+                        .id(1L)
+                        .filePath(filePath1)
+                        .build()));
+        when(fileRepository.getTeacherEssayFile(1L, 2L))
+                .thenReturn(Optional.of(File.builder()
+                        .id(2L)
+                        .filePath(filePath2)
+                        .build()));
 
+        when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
+
+        ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayWithFilePaths(1L);
+        CommentGroupResponse commentGroup = response.getComments();
+        // then
+        assertAll(
+                () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
+                () -> assertThat(response.getExamYear()).isEqualTo("2022"),
+                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
+                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.COMPLETE),
+                () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
+                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
+                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
+                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다.")
+        );
+    }
+
+    @Test
+    void 리뷰된_완료상태의_첨삭_개별조회_테스트() {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.COMPLETE, ReviewState.ON);
+        Comment c1 = DemoDataFactory.createComment1(1L, t1, essay1);
+        Comment c2 = DemoDataFactory.createComment2(2L, s1, essay1);
+        Review r1 = DemoDataFactory.createReview1(1L, essay1, s1, t1);
+        // when
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
+
+        String filePath1 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230624.pdf";
+        String filePath2 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230625.pdf";
+        when(fileRepository.getStudentEssayFile(1L, 1L))
+                .thenReturn(Optional.of(File.builder()
+                        .id(1L)
+                        .filePath(filePath1)
+                        .build()));
+        when(fileRepository.getTeacherEssayFile(1L, 2L))
+                .thenReturn(Optional.of(File.builder()
+                        .id(2L)
+                        .filePath(filePath2)
+                        .build()));
+
+        when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
+        when(reviewRepository.findByEssayId(1L)).thenReturn(Optional.of(r1));
+
+        CompleteEssayResponse response = (CompleteEssayResponse) essayService.getEssayWithFilePaths(1L);
+        CommentGroupResponse commentGroup = response.getComments();
+        // then
+        assertAll(
+                () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
+                () -> assertThat(response.getExamYear()).isEqualTo("2022"),
+                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
+                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.COMPLETE),
+                () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
+                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
+                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
+                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다."),
+                () -> assertThat(response.getReview().getDetail()).isEqualTo("구체적으로 첨삭해주셔서 좋았어요."),
+                () -> assertThat(response.getReview().getScore()).isEqualTo(5)
+        );
     }
 
     @Test
