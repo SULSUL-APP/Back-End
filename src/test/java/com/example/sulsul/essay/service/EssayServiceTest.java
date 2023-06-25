@@ -7,6 +7,7 @@ import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
+import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.CompleteEssayResponse;
 import com.example.sulsul.essay.dto.response.ProceedEssayResponse;
 import com.example.sulsul.essay.dto.response.RejectEssayResponse;
@@ -30,10 +31,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -180,7 +183,7 @@ class EssayServiceTest {
                 .build();
         // stub
         when(userRepository.findById(profileId)).thenReturn(Optional.of(t1));
-        when(essayRepository.save(any())).then(returnsFirstArg());
+        when(essayRepository.save(any(Essay.class))).then(returnsFirstArg());
         // when
         Essay essay = essayService.createEssay(profileId, s1, request);
         // then
@@ -429,14 +432,70 @@ class EssayServiceTest {
     }
 
     @Test
-    void acceptEssay() {
+    void 첨삭요청_수락_테스트() {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
+        // stub
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
+        when(essayRepository.save(any(Essay.class))).then(returnsFirstArg());
+        // when
+        Essay accepted = essayService.acceptEssay(1L);
+        // then
+        assertAll(
+                () -> assertThat(accepted.getUniv()).isEqualTo("홍익대"),
+                () -> assertThat(accepted.getExamYear()).isEqualTo("2022"),
+                () -> assertThat(accepted.getEType()).isEqualTo("수리"),
+                () -> assertThat(accepted.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
+                () -> assertThat(accepted.getEssayState()).isEqualTo(EssayState.PROCEED),
+                () -> assertThat(accepted.getReviewState()).isEqualTo(ReviewState.OFF)
+        );
     }
 
     @Test
-    void rejectEssay() {
+    void 첨삭요청_거절_테스트() {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
+        RejectRequest request = new RejectRequest("시간상 첨삭이 불가능할 것 같습니다.");
+        // stub
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
+        when(essayRepository.save(any(Essay.class))).then(returnsFirstArg());
+        // when
+        Essay rejected = essayService.rejectEssay(1L, request);
+        // then
+        assertAll(
+                () -> assertThat(rejected.getUniv()).isEqualTo("홍익대"),
+                () -> assertThat(rejected.getExamYear()).isEqualTo("2022"),
+                () -> assertThat(rejected.getEType()).isEqualTo("수리"),
+                () -> assertThat(rejected.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
+                () -> assertThat(rejected.getRejectDetail()).isEqualTo("시간상 첨삭이 불가능할 것 같습니다."),
+                () -> assertThat(rejected.getEssayState()).isEqualTo(EssayState.REJECT),
+                () -> assertThat(rejected.getReviewState()).isEqualTo(ReviewState.OFF)
+        );
     }
 
     @Test
-    void completeEssay() {
+    void 첨삭완료_테스트() {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.PROCEED, ReviewState.OFF);
+        // stub
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
+        when(essayRepository.save(any(Essay.class))).then(returnsFirstArg());
+        // when
+        Essay completed = essayService.completeEssay(1L);
+        // then
+        assertAll(
+                () -> assertThat(completed.getUniv()).isEqualTo("홍익대"),
+                () -> assertThat(completed.getExamYear()).isEqualTo("2022"),
+                () -> assertThat(completed.getEType()).isEqualTo("수리"),
+                () -> assertThat(completed.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
+                () -> assertThat(completed.getEssayState()).isEqualTo(EssayState.COMPLETE),
+                () -> assertThat(completed.getReviewState()).isEqualTo(ReviewState.OFF)
+        );
     }
 }
