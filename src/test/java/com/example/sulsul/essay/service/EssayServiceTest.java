@@ -1,11 +1,14 @@
 package com.example.sulsul.essay.service;
 
+import com.example.sulsul.comment.dto.response.CommentGroupResponse;
+import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.repository.CommentRepository;
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.response.EssayResponse;
+import com.example.sulsul.essay.dto.response.ProceedEssayResponse;
 import com.example.sulsul.essay.dto.response.RejectEssayResponse;
 import com.example.sulsul.essay.dto.response.RequestEssayResponse;
 import com.example.sulsul.essay.entity.Essay;
@@ -88,6 +91,7 @@ class EssayServiceTest {
         // stub
         when(userRepository.findById(profileId)).thenReturn(Optional.of(t1));
         when(essayRepository.save(any())).then(returnsFirstArg());
+        // when
         Essay essay = essayService.createEssay(profileId, s1, request);
         // then
         assertAll(
@@ -156,6 +160,7 @@ class EssayServiceTest {
         // stub
         when(essayRepository.findAllByTeacherIdAndEssayState(teacherId, EssayState.REQUEST))
                 .thenReturn(List.of(essay1, essay2));
+        // when
         List<Essay> essays = essayService.getEssays(t1, EssayState.REQUEST);
         // then
         assertAll(
@@ -221,6 +226,7 @@ class EssayServiceTest {
         // stub
         when(essayRepository.findAllByStudentIdAndEssayState(studentId, EssayState.REQUEST))
                 .thenReturn(List.of(essay1, essay2));
+        // when
         List<Essay> essays = essayService.getEssays(s1, EssayState.REQUEST);
         // then
         assertAll(
@@ -265,16 +271,17 @@ class EssayServiceTest {
                 .teacher(t1)
                 .build();
         // stub
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
 
         String filePath = "http://s3-ap-northeast-2.amazonaws.com/sulsul";
-        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
         when(fileRepository.getStudentEssayFile(1L, 1L))
                 .thenReturn(Optional.of(File.builder()
                         .id(1L)
                         .filePath(filePath)
                         .build()));
-        RequestEssayResponse response = (RequestEssayResponse) essayService.getEssayWithStudentFile(1L);
         // when
+        RequestEssayResponse response = (RequestEssayResponse) essayService.getEssayWithStudentFile(1L);
+        // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(response.getExamYear()).isEqualTo("2022"),
@@ -320,15 +327,17 @@ class EssayServiceTest {
                 .teacher(t1)
                 .build();
         // stub
-        String filePath = "http://s3-ap-northeast-2.amazonaws.com/sulsul";
         when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
+
+        String filePath = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230624.pdf";
         when(fileRepository.getStudentEssayFile(1L, 1L))
                 .thenReturn(Optional.of(File.builder()
                         .id(1L)
                         .filePath(filePath)
                         .build()));
+
         RejectEssayResponse response = (RejectEssayResponse) essayService.getEssayWithStudentFile(1L);
-        // when
+        // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(response.getExamYear()).isEqualTo("2022"),
@@ -340,7 +349,91 @@ class EssayServiceTest {
     }
 
     @Test
-    void getEssayWithFilePaths() {
+    @DisplayName("진행상태인 첨삭 개별조회 테스트")
+    void getProceedEssayWithFilePaths() {
+        // given
+        User s1 = User.builder()
+                .id(1L)
+                .name("김경근")
+                .email("sulsul@gmail.com")
+                .uType(UType.STUDENT)
+                .eType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
+                .build();
+
+        User t1 = User.builder()
+                .id(2L)
+                .name("임탁균")
+                .email("sulsul@naver.com")
+                .uType(UType.TEACHER)
+                .eType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
+                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
+                .build();
+
+        Essay essay1 = Essay.builder()
+                .id(1L)
+                .univ("홍익대")
+                .examYear("2022")
+                .eType("수리")
+                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
+                .essayState(EssayState.PROCEED) // 첨삭진행 상태
+                .reviewState(ReviewState.OFF)
+                .student(s1)
+                .teacher(t1)
+                .build();
+
+        Comment c1 = Comment.builder()
+                .essay(essay1)
+                .user(t1)
+                .detail("첨삭한 파일 첨부했습니다.")
+                .build();
+
+        Comment c2 = Comment.builder()
+                .essay(essay1)
+                .user(s1)
+                .detail("네 확인했습니다.")
+                .build();
+        // when
+        when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
+
+        String filePath1 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230624.pdf";
+        String filePath2 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230625.pdf";
+        when(fileRepository.getStudentEssayFile(1L, 1L))
+                .thenReturn(Optional.of(File.builder()
+                        .id(1L)
+                        .filePath(filePath1)
+                        .build()));
+        when(fileRepository.getTeacherEssayFile(1L, 2L))
+                .thenReturn(Optional.of(File.builder()
+                        .id(2L)
+                        .filePath(filePath2)
+                        .build()));
+
+        when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
+
+        ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayWithFilePaths(1L);
+        CommentGroupResponse commentGroup = response.getComments();
+        // then
+        assertAll(
+                () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
+                () -> assertThat(response.getExamYear()).isEqualTo("2022"),
+                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
+                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.PROCEED),
+                () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
+                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
+                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
+                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다.")
+        );
+    }
+
+    @Test
+    @DisplayName("완료상태인 첨삭 개별조회 테스트")
+    void getCompleteEssayWithFilePaths() {
+
+
     }
 
     @Test

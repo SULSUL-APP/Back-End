@@ -25,4 +25,5 @@ public interface FileRepository extends JpaRepository<File, Long> {
      */
     @Query("select f from File f where f.essay.id = :essayId and f.user.id = :teacherId")
     Optional<File> getTeacherEssayFile(@Param("essayId") Long essayId, @Param("teacherId")Long teacherId);
+
 }

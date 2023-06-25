@@ -79,26 +79,26 @@ public class EssayService {
     }
 
     public EssayResponse getEssayWithFilePaths(Long essayId) {
-
+        // essayId에 해당하는 첨삭 조회
         Essay essay = essayRepository.findById(essayId)
                 .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
 
-        // 학생이 올린 첨삭파일 조회
         Long studentId = essay.getStudent().getId();
+        // 학생이 올린 첨삭파일 조회
         File studentFile = fileRepository.getStudentEssayFile(essayId, studentId)
                 .orElseThrow(() -> new CustomException("해당 첨삭글의 첨삭파일을 찾을 수 없습니다."));
-        String studentFileFilePath = studentFile.getFilePath();
+        String studentFileFilePath = studentFile.getFilePath(); // 학생이 올린 첨삭파일의 s3 경로
 
-        // 강사가 올린 첨삭파일 조회
         Long teacherId = essay.getTeacher().getId();
+        // 강사가 올린 첨삭파일 조회
         File teacherFile = fileRepository.getTeacherEssayFile(essayId, teacherId)
                 .orElseThrow(() -> new CustomException("해당 첨삭글의 첨삭파일을 찾을 수 없습니다."));
-        String teacherFileFilePath = teacherFile.getFilePath();
+        String teacherFileFilePath = teacherFile.getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
 
         // 첨삭에 작성된 모든 댓글 조회
         List<Comment> comments = commentRepository.findAllByEssayId(essayId);
 
-        // COMPLETE 상태인 경우
+        // 첨삭완료 상태인 경우
         if (essay.getEssayState().equals(EssayState.COMPLETE)) {
             Review review = null;
             if (essay.getReviewState().equals(ReviewState.ON)) {
@@ -107,7 +107,7 @@ public class EssayService {
             }
             return new CompleteEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments, review);
         }
-        // PROCEED 상태인 경우
+        // 첨삭진행 상태인 경우
         return new ProceedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
     }
 
