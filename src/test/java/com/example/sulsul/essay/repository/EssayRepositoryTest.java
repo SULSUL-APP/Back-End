@@ -29,8 +29,7 @@ class EssayRepositoryTest {
     private UserRepository userRepository;
 
     @BeforeEach
-    @DisplayName("데이터 준비하기")
-    void setUp() {
+    void 데이터_준비하기() {
         // 강사, 학생 데이터 생성
         User s1 = User.builder()
                 .name("김경근")
@@ -73,8 +72,7 @@ class EssayRepositoryTest {
     }
 
     @Test
-    @DisplayName("준비한 유저 데이터 확인하기")
-    void findUserByEmailTest() {
+    void 준비한_유저_데이터_확인하기() {
         // given && when
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User s2 = userRepository.findByEmail("sulsul@g.hongik.ac.kr").get();
@@ -90,8 +88,7 @@ class EssayRepositoryTest {
     }
 
     @Test
-    @DisplayName("첨삭 생성 테스트")
-    void saveEssayTest() {
+    void 첨삭_생성_테스트() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User t1 = userRepository.findByEmail("sulsul@naver.com").get();
@@ -121,8 +118,7 @@ class EssayRepositoryTest {
     }
 
     @Test
-    @DisplayName("첨삭 개별 조회 테스트")
-    void findEssayByIdTest() {
+    void 첨삭_개별조회_테스트() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User t1 = userRepository.findByEmail("sulsul@naver.com").get();
@@ -153,8 +149,7 @@ class EssayRepositoryTest {
     }
 
     @Test
-    @DisplayName("강사에게 요청된 첨삭목록 조회 테스트")
-    void findByTeacherAndEssayStateTest() {
+    void 강사에게_요청된_첨삭목록_조회_테스트() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User s2 = userRepository.findByEmail("sulsul@g.hongik.ac.kr").get();
@@ -195,8 +190,7 @@ class EssayRepositoryTest {
     }
 
     @Test
-    @DisplayName("학생이 요청한 첨삭목록 조회 테스트")
-    void findByStudentAndEssayStateTest() {
+    void 학생이_요청한_첨삭목록_조회_테스트() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User t1 = userRepository.findByEmail("sulsul@naver.com").get();
@@ -237,8 +231,7 @@ class EssayRepositoryTest {
     }
 
     @Test
-    @DisplayName("첨삭상태 변경 테스트")
-    void updateEssayStateTest() {
+    void 첨삭상태_변경_테스트() {
         // given
         User s1 = userRepository.findByEmail("sulsul@gmail.com").get();
         User t1 = userRepository.findByEmail("sulsul@naver.com").get();
