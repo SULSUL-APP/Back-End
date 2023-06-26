@@ -79,6 +79,7 @@ public class EssayController {
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
+                .uType(UType.STUDENT)
                 .build();
 
         List<Essay> essays = essayService.getEssays(loginedUser, EssayState.REQUEST);
