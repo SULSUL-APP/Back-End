@@ -2,7 +2,7 @@ package com.example.sulsul.review.service;
 
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.ReviewState;
-import com.example.sulsul.essay.exception.CustomException;
+import com.example.sulsul.exception.CustomException;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.review.dto.request.ReviewRequest;
 import com.example.sulsul.review.entity.Review;

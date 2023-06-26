@@ -14,6 +14,7 @@ public class CreateEssayResponse {
     private final User student;
 
     public CreateEssayResponse(Essay essay) {
+        System.out.println(essay == null);
         this.essayId = essay.getId();
         this.teacher = essay.getTeacher();
         this.student = essay.getStudent();

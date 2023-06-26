@@ -7,8 +7,8 @@ import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.service.EssayService;
-import com.example.sulsul.essay.exception.CustomException;
-import com.example.sulsul.essay.exception.CustomValidationException;
+import com.example.sulsul.exception.CustomException;
+import com.example.sulsul.exception.CustomValidationException;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,16 +31,23 @@ public class EssayController {
      * 첨삭요청
      */
     @PostMapping(value = "/profiles/{profileId}/essay",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<?> createEssay(@PathVariable Long profileId,
-                                         @Valid @RequestBody CreateEssayRequest request,
+                                         @ModelAttribute @Valid CreateEssayRequest request,
                                          BindingResult bindingResult) throws RuntimeException {
 
         // 첨삭 파일 여부 검증
-        if (request.getFile().isEmpty()) {
+        if (request.getEssayFile().isEmpty()) {
             throw new CustomException("첨삭파일이 첨부되지 않았습니다.");
         }
+
+//        System.out.println(request.getEssayFile().getOriginalFilename());
+//        System.out.println("univ = " + request.getUniv());
+//        System.out.println("examYear = " + request.getExamYear());
+//        System.out.println("inquiry = " + request.getInquiry());
+//        System.out.println("etype = " + request.getEType());
 
         // 입력값 유효성 검사
         if (bindingResult.hasErrors()) {
@@ -56,9 +63,10 @@ public class EssayController {
         // 또는 @AuthenticationPrincipal 활용
 
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 1L; // 임시로 생성한 유저 id;
+        Long userId = 2L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
+                .uType(UType.STUDENT)
                 .build();
 
         if (loginedUser.getUType().equals(UType.TEACHER)) {

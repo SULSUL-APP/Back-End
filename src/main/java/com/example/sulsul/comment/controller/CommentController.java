@@ -6,7 +6,7 @@ import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.dto.response.DeleteSuccessResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.service.CommentService;
-import com.example.sulsul.essay.exception.CustomException;
+import com.example.sulsul.exception.CustomException;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

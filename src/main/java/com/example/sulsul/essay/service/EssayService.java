@@ -10,7 +10,7 @@ import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.essay.repository.EssayRepository;
-import com.example.sulsul.essay.exception.CustomException;
+import com.example.sulsul.exception.CustomException;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
 import com.example.sulsul.review.entity.Review;

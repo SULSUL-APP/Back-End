@@ -4,17 +4,17 @@ import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.entity.type.ReviewState;
 import com.example.sulsul.user.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
+//@NoArgsConstructor
 public class CreateEssayRequest {
     @NotBlank
     @Size(min = 2, max = 20, message = "대학이름은 2글자 이상 20글자 이하입니다.")
@@ -32,7 +32,7 @@ public class CreateEssayRequest {
     @Size(min = 2, max = 200, message = "문의사항은 2글자 이상 200글자 이하입니다.")
     private String inquiry;
 
-    private MultipartFile file; // 첨삭파일
+    private MultipartFile essayFile; // 첨삭파일
 
     public Essay toEntity(User student, User teacher) {
         return Essay.builder()
