@@ -31,6 +31,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
+    private String profileImage; // 프로필 이미지 경로
+
     @Column()
     private String catchPhrase;
 

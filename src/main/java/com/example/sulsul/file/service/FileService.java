@@ -2,6 +2,7 @@ package com.example.sulsul.file.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.exception.CustomException;
 import com.example.sulsul.file.entity.File;
@@ -88,6 +89,17 @@ public class FileService {
         if (essayFile.isEmpty()) {
             throw new CustomException("첨삭파일이 비어있습니다.");
         }
+        // 기존에 업로드한 첨삭파일이 있으면 삭제
+        if (uploader.getUType().equals(UType.STUDENT)) {
+            fileRepository.getStudentEssayFile(essay.getId(), uploader.getId()).ifPresent(file -> {
+                deleteFile(file.getFilePath());
+            });
+        } else if (uploader.getUType().equals(UType.TEACHER)) {
+            fileRepository.getTeacherEssayFile(essay.getId(), uploader.getId())
+                    .ifPresent(file -> {
+                        deleteFile(file.getFilePath());
+                    });
+        }
         // 첨삭파일을 s3 스토리지에 업로드하고 파일경로를 반환
         String filePath = uploadEssayFileToBucket(essayFile);
         // File 엔티티 생성
@@ -132,14 +144,22 @@ public class FileService {
     /**
      * 이미지를 S3 스토리지에 업로드하고 파일경로를 반환한다.
      *
-     * @param uploader  이s미지를 업로드한 유저
+     * @param uploader  이미지를 업로드한 유저
      * @param imageFile s3 스토리지에 저장할 이미지
      * @return 저장된 이미지의 s3 스토리지 경로
      */
+    @Transactional
     public File uploadImageFile(User uploader, MultipartFile imageFile) {
         // 이미지 파일이 비어있는지 확인
         if (imageFile.isEmpty()) {
             throw new CustomException("이미지 파일이 비어있습니다.");
+        }
+        // 기존에 업로드한 이미지 파일이 있으면 삭제
+        if (uploader.getProfileImage() != null) {
+            fileRepository.findByFilePath(uploader.getProfileImage())
+                    .ifPresent(file -> {
+                        deleteFile(file.getFilePath());
+                    });
         }
         // 이미지 파일을 s3 스토리지에 업로드하고 파일경로를 반환
         String filePath = uploadImageToBucket(imageFile);
@@ -172,7 +192,7 @@ public class FileService {
     }
 
     /**
-     * 파일 엔티티를 조회한 후 삭제한 후 S3 버킷에서 파일을 삭제한다.
+     * 파일 엔티티와 S3 버킷에서 파일을 삭제한다.
      *
      * @param filePath 삭제할 파일의 파일경로
      */
@@ -191,19 +211,6 @@ public class FileService {
     }
 
     /**
-     * 파일 엔티티를 조회한다.
-     *
-     * @param filePath 조회할 파일의 경로
-     * @return 파일이 저장된 경로 반환
-     */
-    @Transactional(readOnly = true)
-    public File findFileByFilePath(String filePath) {
-        // File 엔티티 조회 후 반환
-        return fileRepository.findByFilePath(filePath)
-                .orElseThrow(() -> new CustomException("조회할 파일이 존재하지 않습니다."));
-    }
-
-    /**
      * s3 버킷에서 파일을 조회한다.
      *
      * @param filePath 조회할 파일의 경로
@@ -217,5 +224,18 @@ public class FileService {
         } else {
             throw new CustomException("조회할 파일이 존재하지 않습니다.");
         }
+    }
+
+    /**
+     * 파일 엔티티를 조회한다.
+     *
+     * @param filePath 조회할 파일의 경로
+     * @return 파일이 저장된 경로 반환
+     */
+    @Transactional(readOnly = true)
+    public File findFileByFilePath(String filePath) {
+        // File 엔티티 조회 후 반환
+        return fileRepository.findByFilePath(filePath)
+                .orElseThrow(() -> new CustomException("조회할 파일이 존재하지 않습니다."));
     }
 }
