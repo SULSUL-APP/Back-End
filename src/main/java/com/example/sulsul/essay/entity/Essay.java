@@ -30,15 +30,6 @@ public class Essay extends BaseEntity {
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
-//    @OneToMany(mappedBy = "essay", cascade = CascadeType.ALL)
-//    private List<Comment> commentList = new ArrayList<>();
-//
-//    @OneToOne(mappedBy = "essay", cascade = CascadeType.ALL)
-//    private Review review
-//
-//    @OneToMany(mappedBy = "essay", cascade = CascadeType.ALL)
-//    private List<File> fileList = new ArrayList<>();
-
     @Column(nullable = false)
     @NotBlank(message = "대학 이름은 필수 값입니다.")
     private String univ;
@@ -53,7 +44,6 @@ public class Essay extends BaseEntity {
     @Column()
     private String rejectDetail; // 거절사유
 
-//    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private String eType;
 

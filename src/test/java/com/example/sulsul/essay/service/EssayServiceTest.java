@@ -25,7 +25,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,18 +60,26 @@ class EssayServiceTest {
     private EssayService essayService;
 
     @Test
-    void 첨삭생성_테스트() {
+    void 첨삭생성_테스트() throws IOException {
         // given
         Long profileId = 2L;
         User t1 = DemoDataFactory.createTeacher1(profileId);
         User s1 = DemoDataFactory.createStudent1(1L);
-
+        // 테스트용 첨삭파일 생성
+        String fileName = "test";
+        String contentType = "pdf";
+        String originalFileName = fileName + "." + contentType;
+        String filePath = "src/test/resources/pdf/test.pdf";
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        MockMultipartFile testFile =
+                new MockMultipartFile(fileName, originalFileName, contentType, fileInputStream);
+        // 첨삭요청 생성
         CreateEssayRequest request = CreateEssayRequest.builder()
                 .univ("홍익대")
                 .examYear("2022")
                 .eType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
-//                .file() // TODO: 첨삭파일 테스트는 보류, 공부해야 함..
+                .essayFile(testFile)
                 .build();
         // stub
         when(userRepository.findById(profileId)).thenReturn(Optional.of(t1));
@@ -100,7 +111,7 @@ class EssayServiceTest {
         when(essayRepository.findAllByTeacherIdAndEssayState(teacherId, EssayState.REQUEST))
                 .thenReturn(List.of(essay1, essay2));
         // when
-        List<Essay> essays = essayService.getEssays(t1, EssayState.REQUEST);
+        List<Essay> essays = essayService.getEssaysByUser(t1, EssayState.REQUEST);
         // then
         assertAll(
                 () -> assertThat(essays.size()).isEqualTo(2),
@@ -122,7 +133,7 @@ class EssayServiceTest {
         when(essayRepository.findAllByStudentIdAndEssayState(studentId, EssayState.REQUEST))
                 .thenReturn(List.of(essay1, essay2));
         // when
-        List<Essay> essays = essayService.getEssays(s1, EssayState.REQUEST);
+        List<Essay> essays = essayService.getEssaysByUser(s1, EssayState.REQUEST);
         // then
         assertAll(
                 () -> assertThat(essays.size()).isEqualTo(2),
@@ -147,7 +158,7 @@ class EssayServiceTest {
                         .filePath(filePath)
                         .build()));
         // when
-        RequestEssayResponse response = (RequestEssayResponse) essayService.getEssayWithStudentFile(1L);
+        RequestEssayResponse response = (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(1L);
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
@@ -175,7 +186,7 @@ class EssayServiceTest {
                         .filePath(filePath)
                         .build()));
 
-        RejectEssayResponse response = (RejectEssayResponse) essayService.getEssayWithStudentFile(1L);
+        RejectEssayResponse response = (RejectEssayResponse) essayService.getEssayResponseWithStudentFile(1L);
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
@@ -213,7 +224,7 @@ class EssayServiceTest {
 
         when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
 
-        ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayWithFilePaths(1L);
+        ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
         CommentGroupResponse commentGroup = response.getComments();
         // then
         assertAll(
@@ -256,7 +267,7 @@ class EssayServiceTest {
 
         when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
 
-        ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayWithFilePaths(1L);
+        ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
         CommentGroupResponse commentGroup = response.getComments();
         // then
         assertAll(
@@ -301,7 +312,7 @@ class EssayServiceTest {
         when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
         when(reviewRepository.findByEssayId(1L)).thenReturn(Optional.of(r1));
 
-        CompleteEssayResponse response = (CompleteEssayResponse) essayService.getEssayWithFilePaths(1L);
+        CompleteEssayResponse response = (CompleteEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
         CommentGroupResponse commentGroup = response.getComments();
         // then
         assertAll(

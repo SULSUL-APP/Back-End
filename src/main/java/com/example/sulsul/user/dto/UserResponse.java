@@ -11,6 +11,7 @@ public class UserResponse {
     private final String email;
     private final String profileImage;
     private final String uType;
+    private final String eType;
 
     public UserResponse(User user) {
         this.id = user.getId();
@@ -18,5 +19,6 @@ public class UserResponse {
         this.email = user.getName();
         this.profileImage = user.getProfileImage();
         this.uType = user.getUType().name();
+        this.eType = user.getEType().name();
     }
 }

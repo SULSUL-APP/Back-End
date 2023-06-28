@@ -1,11 +1,11 @@
 package com.example.sulsul.essay.controller;
 
+import com.example.sulsul.common.type.EssayState;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.common.type.EssayState;
 import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.exception.CustomException;
 import com.example.sulsul.exception.CustomValidationException;
@@ -18,9 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,12 +33,11 @@ public class EssayController {
     private final FileService fileService;
 
     /**
-     * 첨삭요청
+     * 첨삭요청 (학생)
      */
     @PostMapping(value = "/profiles/{profileId}/essay",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createEssay(@PathVariable Long profileId,
                                          @ModelAttribute @Valid CreateEssayRequest request,
                                          BindingResult bindingResult) throws RuntimeException {
@@ -51,11 +53,6 @@ public class EssayController {
             }
             throw new CustomValidationException("입력값 유효성 검사 실패", errorMap);
         }
-
-        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // User student = (User) auth.getPrincipal();
-        // 또는 @AuthenticationPrincipal 활용
-
         // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 2L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
@@ -70,8 +67,39 @@ public class EssayController {
         Essay essay = essayService.createEssay(profileId, loginedUser, request);
         // 첨삭 파일 업로드
         fileService.uploadEssayFile(loginedUser, essay, request.getEssayFile());
+        // 첨삭요청 응답 생성
+        RequestEssayResponse essayResponse =
+                (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(essay.getId());
         // 첨삭 요청 완료: 201 CREATED
-        return new ResponseEntity<>(new CreateEssayResponse(essay), HttpStatus.CREATED);
+        return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
+    }
+
+    /**
+     * 진행중인 첨삭에 첨삭파일 첨부 (강사)
+     */
+    @PostMapping(value = "/essay/{essayId}/upload",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> uploadTeacherEssayFile(@PathVariable Long essayId,
+                                                    @RequestParam("essayFile") MultipartFile essayFile) {
+        // 첨삭 파일 여부 검증
+        if (essayFile.isEmpty()) {
+            throw new CustomException("첨삭파일이 첨부되지 않았습니다.");
+        }
+        // 로그인 되어 있는 유저 객체를 가져오는 로직
+        Long userId = 1L; // 임시로 생성한 유저 id;
+        User loginedUser = User.builder()
+                .id(userId)
+                .uType(UType.TEACHER)
+                .build();
+        // 첨삭 엔티티 조회
+        Essay essay = essayService.getEssayById(essayId);
+        // 강사 첨삭 파일 업로드
+        fileService.uploadEssayFile(loginedUser, essay, essayFile);
+        ProceedEssayResponse essayResponse =
+                (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
+        // 강사 첨삭 파일 업로드 완료: 201 CREATED
+        return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
     }
 
     /**
@@ -79,54 +107,50 @@ public class EssayController {
      */
     @GetMapping("/essay/request")
     public ResponseEntity<?> getRequestEssays() {
-
         // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
                 .uType(UType.STUDENT)
                 .build();
-
-        List<Essay> essays = essayService.getEssays(loginedUser, EssayState.REQUEST);
+        // 첨삭요청 목록 조회
+        List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.REQUEST);
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
     @GetMapping("/essay/proceed")
     public ResponseEntity<?> getProceedEssays() {
-
         // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
                 .build();
-
-        List<Essay> essays = essayService.getEssays(loginedUser, EssayState.PROCEED);
+        // 진행중인 첨삭목록 조회
+        List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.PROCEED);
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
     @GetMapping("/essay/reject")
     public ResponseEntity<?> getRejectEssays() {
-
         // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
                 .build();
-
-        List<Essay> essays = essayService.getEssays(loginedUser, EssayState.REJECT);
+        // 거절된 첨삭목록 조회
+        List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.REJECT);
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
     @GetMapping("/essay/complete")
     public ResponseEntity<?> getCompleteEssays() {
-
         // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
                 .build();
-
-        List<Essay> essays = essayService.getEssays(loginedUser, EssayState.COMPLETE);
+        // 완료된 첨삭목록 조회
+        List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.COMPLETE);
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
@@ -135,25 +159,29 @@ public class EssayController {
      */
     @GetMapping("/essay/request/{essayId}")
     public ResponseEntity<?> getRequestEssay(@PathVariable Long essayId) {
-        RequestEssayResponse essayResponse = (RequestEssayResponse) essayService.getEssayWithStudentFile(essayId);
+        RequestEssayResponse essayResponse =
+                (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
     @GetMapping("/essay/reject/{essayId}")
     public ResponseEntity<?> getRejectEssay(@PathVariable Long essayId) {
-        RejectEssayResponse essayResponse = (RejectEssayResponse) essayService.getEssayWithStudentFile(essayId);
+        RejectEssayResponse essayResponse =
+                (RejectEssayResponse) essayService.getEssayResponseWithStudentFile(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
     @GetMapping("/essay/proceed/{essayId}")
     public ResponseEntity<?> getProceedEssay(@PathVariable Long essayId) {
-        ProceedEssayResponse essayResponse = (ProceedEssayResponse) essayService.getEssayWithFilePaths(essayId);
+        ProceedEssayResponse essayResponse =
+                (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
     @GetMapping("/essay/complete/{essayId}")
     public ResponseEntity<?> getCompleteEssay(@PathVariable Long essayId) {
-        CompleteEssayResponse essayResponse = (CompleteEssayResponse) essayService.getEssayWithFilePaths(essayId);
+        CompleteEssayResponse essayResponse =
+                (CompleteEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
