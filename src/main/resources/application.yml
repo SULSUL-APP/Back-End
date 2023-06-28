@@ -15,3 +15,24 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  cloud:
+    aws:
+      s3:
+        bucket: ${BUCKET}
+      credentials:
+        access-key: ${ACCESSKEY}
+        secret-key: ${SECRETKEY}
+      region:
+        static: ${REGION}
+        auto: false
+      stack:
+        auto: false
+
+# Failed to connect to service endpoint 무시
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
