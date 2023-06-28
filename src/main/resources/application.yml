@@ -21,6 +21,12 @@ spring:
       hibernate:
         format_sql: true
 
+  # ddl-auto 과정에서 더미데이터 생성
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+
 cloud:
   aws:
     s3:
