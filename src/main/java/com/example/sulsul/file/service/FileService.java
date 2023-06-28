@@ -91,14 +91,11 @@ public class FileService {
         }
         // 기존에 업로드한 첨삭파일이 있으면 삭제
         if (uploader.getUType().equals(UType.STUDENT)) {
-            fileRepository.getStudentEssayFile(essay.getId(), uploader.getId()).ifPresent(file -> {
-                deleteFile(file.getFilePath());
-            });
+            fileRepository.getStudentEssayFile(essay.getId(), uploader.getId())
+                    .ifPresent(file -> deleteFile(file.getFilePath()));
         } else if (uploader.getUType().equals(UType.TEACHER)) {
             fileRepository.getTeacherEssayFile(essay.getId(), uploader.getId())
-                    .ifPresent(file -> {
-                        deleteFile(file.getFilePath());
-                    });
+                    .ifPresent(file -> deleteFile(file.getFilePath()));
         }
         // 첨삭파일을 s3 스토리지에 업로드하고 파일경로를 반환
         String filePath = uploadEssayFileToBucket(essayFile);
@@ -157,9 +154,7 @@ public class FileService {
         // 기존에 업로드한 이미지 파일이 있으면 삭제
         if (uploader.getProfileImage() != null) {
             fileRepository.findByFilePath(uploader.getProfileImage())
-                    .ifPresent(file -> {
-                        deleteFile(file.getFilePath());
-                    });
+                    .ifPresent(file -> deleteFile(file.getFilePath()));
         }
         // 이미지 파일을 s3 스토리지에 업로드하고 파일경로를 반환
         String filePath = uploadImageToBucket(imageFile);
