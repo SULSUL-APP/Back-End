@@ -74,6 +74,9 @@ public class EssayController {
         }
 
         Essay essay = essayService.createEssay(profileId, loginedUser, request);
+        
+        // 파일 업로드
+        
         return new ResponseEntity<>(new CreateEssayResponse(essay), HttpStatus.CREATED);
     }
 

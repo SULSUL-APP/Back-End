@@ -29,6 +29,10 @@ spring:
       stack:
         auto: false
 
+s3:
+  host:
+    name: https://${BUCKET}.s3.${REGION}.amazonaws.com/
+
 # Failed to connect to service endpoint 무시
 logging:
   level:
