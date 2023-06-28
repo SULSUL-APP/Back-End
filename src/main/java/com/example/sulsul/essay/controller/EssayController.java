@@ -77,7 +77,7 @@ public class EssayController {
     /**
      * 진행중인 첨삭에 첨삭파일 첨부 (강사)
      */
-    @PostMapping(value = "/essay/{essayId}/upload",
+    @PostMapping(value = "/essay/proceed/{essayId}/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> uploadTeacherEssayFile(@PathVariable Long essayId,
