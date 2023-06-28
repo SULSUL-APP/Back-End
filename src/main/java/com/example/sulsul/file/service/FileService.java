@@ -37,26 +37,22 @@ public class FileService {
      * @return 파일의 확장자 반환
      */
     private String getFileExtension(MultipartFile file) {
-        String filename = file.getOriginalFilename();
-        int pos = filename.lastIndexOf(".");
-        // 파일 확장자 반환
-        return filename.substring(pos + 1);
+        try {
+            String filename = file.getOriginalFilename();
+            int pos = filename.lastIndexOf(".");
+            return filename.substring(pos + 1);
+        } catch (Exception e) {
+            throw new CustomException("파일 확장자 추출에 실패했습니다.");
+        }
     }
 
     /**
      * 첨삭파일을 S3 스토리지에 업로드하고 파일경로를 반환한다.
      *
-     * @param uploader  첨삭파일을 업로드한 유저
-     * @param essay     첨삭파일을 업로드한 에세이
-     * @param essayFile s3 스토리지에 저장할 첨삭파일
-     * @return 저장된 파일의 s3 스토리지 경로
+     * @param essayFile S3 스토리지에 업로드할 첨삭파일
+     * @return S3 스토리지에 업로드된 첨삭파일의 경로
      */
-    @Transactional
-    public File uploadEssayFile(User uploader, Essay essay, MultipartFile essayFile) {
-        // 첨삭파일이 비어있는지 확인
-        if (essayFile.isEmpty()) {
-            throw new CustomException("첨삭파일이 비어있습니다.");
-        }
+    public String uploadEssayFileToBucket(MultipartFile essayFile) {
         // 첨삭파일의 확장자가 pdf인지 확인
         if (!getFileExtension(essayFile).equals("pdf")) {
             throw new CustomException("첨삭파일은 pdf 파일만 업로드 가능합니다.");
@@ -75,7 +71,25 @@ public class FileService {
             throw new CustomException(bucketName + "에 첨삭파일을 업로드하는데 실패했습니다.");
         }
         // 업로드한 첨삭파일의 s3 스토리지 경로
-        String filePath = amazonS3.getUrl(bucketName, s3FileName).toString();
+        return amazonS3.getUrl(bucketName, s3FileName).toString();
+    }
+
+    /**
+     * 첨삭파일을 S3 스토리지에 업로드하고 파일 엔티티를 생성한다.
+     *
+     * @param uploader  첨삭파일을 업로드한 유저
+     * @param essay     첨삭파일을 업로드한 에세이
+     * @param essayFile s3 스토리지에 저장할 첨삭파일
+     * @return 생성한 파일 엔티티 반환
+     */
+    @Transactional
+    public File uploadEssayFile(User uploader, Essay essay, MultipartFile essayFile) {
+        // 첨삭파일이 비어있는지 확인
+        if (essayFile.isEmpty()) {
+            throw new CustomException("첨삭파일이 비어있습니다.");
+        }
+        // 첨삭파일을 s3 스토리지에 업로드하고 파일경로를 반환
+        String filePath = uploadEssayFileToBucket(essayFile);
         // File 엔티티 생성
         return fileRepository.save(File.builder()
                 .essay(essay)
@@ -86,18 +100,12 @@ public class FileService {
     }
 
     /**
-     * 이미지를 S3 스토리지에 업로드하고 파일경로를 반환한다.
+     * 이미지 파일을 S3 버킷에 업로드하고 파일경로를 반환한다.
      *
-     * @param uploader  이s미지를 업로드한 유저
-     * @param imageFile s3 스토리지에 저장할 이미지
-     * @return 저장된 이미지의 s3 스토리지 경로
+     * @param imageFile S3 버킷에 업로드할 이미지 파일
+     * @return S3 버킷에 업로드된 이미지 파일의 경로
      */
-    public File uploadImageFile(User uploader, MultipartFile imageFile) {
-        // 이미지 파일이 비어있는지 확인
-        if (imageFile.isEmpty()) {
-            throw new CustomException("이미지 파일이 비어있습니다.");
-        }
-
+    public String uploadImageToBucket(MultipartFile imageFile) {
         List<String> imageExtensions = List.of("jpg", "jpeg", "png");
         String fileExt = getFileExtension(imageFile).toLowerCase();
         // 이미지 파일의 확장자가 jpg, jpeg, png인지 확인
@@ -118,7 +126,23 @@ public class FileService {
             throw new CustomException(bucketName + "에 이미지를 업로드하는데 실패했습니다.");
         }
         // 업로드한 이미지의 s3 스토리지 경로
-        String filePath = amazonS3.getUrl(bucketName, s3FileName).toString();
+        return amazonS3.getUrl(bucketName, s3FileName).toString();
+    }
+
+    /**
+     * 이미지를 S3 스토리지에 업로드하고 파일경로를 반환한다.
+     *
+     * @param uploader  이s미지를 업로드한 유저
+     * @param imageFile s3 스토리지에 저장할 이미지
+     * @return 저장된 이미지의 s3 스토리지 경로
+     */
+    public File uploadImageFile(User uploader, MultipartFile imageFile) {
+        // 이미지 파일이 비어있는지 확인
+        if (imageFile.isEmpty()) {
+            throw new CustomException("이미지 파일이 비어있습니다.");
+        }
+        // 이미지 파일을 s3 스토리지에 업로드하고 파일경로를 반환
+        String filePath = uploadImageToBucket(imageFile);
         // File 엔티티 생성
         return fileRepository.save(File.builder()
                 .user(uploader)
@@ -128,7 +152,7 @@ public class FileService {
     }
 
     /**
-     * s3 스토리지에 저장된 파일을 삭제한다.
+     * s3 버킷에 저장된 파일을 삭제한다.
      *
      * @param fileUrl 삭제할 파일의 s3 스토리지 경로
      */
@@ -137,10 +161,6 @@ public class FileService {
         if (!fileUrl.startsWith(hostName)) {
             throw new CustomException(fileUrl + "은 잘못된 경로입니다.");
         }
-        // File 엔티티 조회 후 삭제
-//        File file = fileRepository.findByFilePath(fileUrl)
-//                .orElseThrow(() -> new CustomException("삭제할 파일이 존재하지 않습니다."));
-//        fileRepository.deleteById(file.getId());
         // S3 버킷에 파일이 존재하는지 확인
         boolean fileExists = amazonS3.doesObjectExist(bucketName, fileUrl);
         // S3 버킷에서 파일 삭제
@@ -152,22 +172,44 @@ public class FileService {
     }
 
     /**
-     * 파일 조회하기
+     * 파일 엔티티를 조회한 후 삭제한 후 S3 버킷에서 파일을 삭제한다.
      *
-     * @param dirName  조회할 버킷의 디렉토리 이름 (images / essays)
-     * @param fileName 조회할 파일 이름
+     * @param filePath 삭제할 파일의 파일경로
+     */
+    @Transactional
+    public void deleteFile(String filePath) {
+        // 파일경로가 S3 HostName으로 시작하는지 점검
+        if (!filePath.startsWith(hostName)) {
+            throw new CustomException(filePath + "은 잘못된 경로입니다.");
+        }
+        // File 엔티티 조회 후 삭제
+        File file = fileRepository.findByFilePath(filePath)
+                .orElseThrow(() -> new CustomException("삭제할 파일이 존재하지 않습니다."));
+        fileRepository.deleteById(file.getId());
+        // S3 버킷에서 파일 삭제
+        deleteFileFromBucket(filePath);
+    }
+
+    /**
+     * 파일 엔티티를 조회한다.
+     *
+     * @param filePath 조회할 파일의 경로
      * @return 파일이 저장된 경로 반환
      */
     @Transactional(readOnly = true)
-    public File findFileByFilePath(String dirName, String fileName) {
-        String filePath = dirName + "/" + fileName;
+    public File findFileByFilePath(String filePath) {
         // File 엔티티 조회 후 반환
         return fileRepository.findByFilePath(filePath)
                 .orElseThrow(() -> new CustomException("조회할 파일이 존재하지 않습니다."));
     }
 
-    private String getFilePathFromBucket(String dirName, String fileName) {
-        String filePath = dirName + "/" + fileName;
+    /**
+     * s3 버킷에서 파일을 조회한다.
+     *
+     * @param filePath 조회할 파일의 경로
+     * @return 파일이 저장된 경로 반환s
+     */
+    private String getFilePathFromBucket(String filePath) {
         boolean fileExists = amazonS3.doesObjectExist(bucketName, filePath);
         // 파일이 존재하는 경우 파일 경로 반환
         if (fileExists) {
