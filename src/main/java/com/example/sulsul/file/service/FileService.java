@@ -7,7 +7,7 @@ import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.exception.CustomException;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
-import com.example.sulsul.file.type.FileType;
+import com.example.sulsul.common.type.FileType;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

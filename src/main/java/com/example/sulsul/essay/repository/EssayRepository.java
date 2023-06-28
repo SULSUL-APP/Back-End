@@ -1,7 +1,7 @@
 package com.example.sulsul.essay.repository;
 
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.essay.entity.type.EssayState;
+import com.example.sulsul.common.type.EssayState;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

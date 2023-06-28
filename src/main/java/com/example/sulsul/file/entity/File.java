@@ -2,7 +2,7 @@ package com.example.sulsul.file.entity;
 
 import com.example.sulsul.common.BaseEntity;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.file.type.FileType;
+import com.example.sulsul.common.type.FileType;
 import com.example.sulsul.user.entity.User;
 import lombok.*;
 

@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class TeacherResponse extends UserResponse {
 
-    private String catchPhrase;
+    private final String catchPhrase;
 
     public TeacherResponse(User user) {
         super(user);

@@ -1,8 +1,8 @@
 package com.example.sulsul.essay.dto.request;
 
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.essay.entity.type.EssayState;
-import com.example.sulsul.essay.entity.type.ReviewState;
+import com.example.sulsul.common.type.EssayState;
+import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.user.entity.User;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -2,7 +2,6 @@ package com.example.sulsul.comment.dto.response;
 
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.user.dto.UserResponse;
-import com.example.sulsul.user.entity.User;
 import lombok.Getter;
 
 @Getter

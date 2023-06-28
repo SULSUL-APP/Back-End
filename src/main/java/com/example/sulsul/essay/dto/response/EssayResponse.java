@@ -1,11 +1,9 @@
 package com.example.sulsul.essay.dto.response;
 
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.essay.entity.type.EssayState;
+import com.example.sulsul.common.type.EssayState;
 import com.example.sulsul.user.dto.StudentResponse;
 import com.example.sulsul.user.dto.TeacherResponse;
-import com.example.sulsul.user.dto.UserResponse;
-import com.example.sulsul.user.entity.User;
 import lombok.Getter;
 
 @Getter

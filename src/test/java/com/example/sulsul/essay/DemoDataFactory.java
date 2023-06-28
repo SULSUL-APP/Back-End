@@ -5,8 +5,8 @@ import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.essay.entity.type.EssayState;
-import com.example.sulsul.essay.entity.type.ReviewState;
+import com.example.sulsul.common.type.EssayState;
+import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.user.entity.User;
 

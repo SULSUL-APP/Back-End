@@ -1,4 +1,4 @@
-package com.example.sulsul.essay.entity.type;
+package com.example.sulsul.common.type;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
