@@ -2,6 +2,9 @@ package com.example.sulsul.essay.dto.response;
 
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.entity.type.EssayState;
+import com.example.sulsul.user.dto.StudentResponse;
+import com.example.sulsul.user.dto.TeacherResponse;
+import com.example.sulsul.user.dto.UserResponse;
 import com.example.sulsul.user.entity.User;
 import lombok.Getter;
 
@@ -13,10 +16,8 @@ public class EssayResponse {
     private final String examYear;
     private final String eType;
     private final EssayState essayState;
-
-    // TODO: User -> UserDto
-    private final User student;
-    private final User teacher;
+    private final StudentResponse student;
+    private final TeacherResponse teacher;
 
     public EssayResponse(Essay essay) {
         this.id = essay.getId();
@@ -24,7 +25,7 @@ public class EssayResponse {
         this.examYear = essay.getExamYear();
         this.eType = essay.getEType();
         this.essayState = essay.getEssayState();
-        this.teacher = essay.getTeacher();
-        this.student = essay.getStudent();
+        this.teacher = new TeacherResponse(essay.getTeacher());
+        this.student = new StudentResponse(essay.getStudent());
     }
 }

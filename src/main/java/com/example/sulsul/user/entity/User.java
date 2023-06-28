@@ -33,7 +33,6 @@ public class User extends BaseEntity {
 
     private String profileImage; // 프로필 이미지 경로
 
-    @Column()
     private String catchPhrase;
 
     @Enumerated(EnumType.STRING)

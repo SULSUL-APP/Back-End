@@ -9,6 +9,7 @@ import com.example.sulsul.essay.entity.type.EssayState;
 import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.exception.CustomException;
 import com.example.sulsul.exception.CustomValidationException;
+import com.example.sulsul.file.service.FileService;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import java.util.*;
 public class EssayController {
 
     private final EssayService essayService;
+    private final FileService fileService;
 
     /**
      * 첨삭요청
@@ -37,18 +39,10 @@ public class EssayController {
     public ResponseEntity<?> createEssay(@PathVariable Long profileId,
                                          @ModelAttribute @Valid CreateEssayRequest request,
                                          BindingResult bindingResult) throws RuntimeException {
-
         // 첨삭 파일 여부 검증
         if (request.getEssayFile().isEmpty()) {
             throw new CustomException("첨삭파일이 첨부되지 않았습니다.");
         }
-
-//        System.out.println(request.getEssayFile().getOriginalFilename());
-//        System.out.println("univ = " + request.getUniv());
-//        System.out.println("examYear = " + request.getExamYear());
-//        System.out.println("inquiry = " + request.getInquiry());
-//        System.out.println("etype = " + request.getEType());
-
         // 입력값 유효성 검사
         if (bindingResult.hasErrors()) {
             Map<String, String> errorMap = new HashMap<>();
@@ -68,15 +62,15 @@ public class EssayController {
                 .id(userId)
                 .uType(UType.STUDENT)
                 .build();
-
+        // 학생 유저만 첨삭요청 가능
         if (loginedUser.getUType().equals(UType.TEACHER)) {
             throw new CustomException("강사는 첨삭요청을 보낼 수 없습니다.");
         }
-
+        // 첨삭 엔티티 생성
         Essay essay = essayService.createEssay(profileId, loginedUser, request);
-        
-        // 파일 업로드
-        
+        // 첨삭 파일 업로드
+        fileService.uploadEssayFile(loginedUser, essay, request.getEssayFile());
+        // 첨삭 요청 완료: 201 CREATED
         return new ResponseEntity<>(new CreateEssayResponse(essay), HttpStatus.CREATED);
     }
 

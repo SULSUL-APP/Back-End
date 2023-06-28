@@ -1,6 +1,9 @@
 package com.example.sulsul.essay.dto.response;
 
 import com.example.sulsul.essay.entity.Essay;
+import com.example.sulsul.user.dto.StudentResponse;
+import com.example.sulsul.user.dto.TeacherResponse;
+import com.example.sulsul.user.dto.UserResponse;
 import com.example.sulsul.user.entity.User;
 import lombok.Getter;
 
@@ -8,15 +11,12 @@ import lombok.Getter;
 public class CreateEssayResponse {
 
     private final Long essayId;
-
-    // User -> UserDto
-    private final User teacher;
-    private final User student;
+    private final TeacherResponse teacher;
+    private final StudentResponse student;
 
     public CreateEssayResponse(Essay essay) {
-        System.out.println(essay == null);
         this.essayId = essay.getId();
-        this.teacher = essay.getTeacher();
-        this.student = essay.getStudent();
+        this.teacher = new TeacherResponse(essay.getTeacher());
+        this.student = new StudentResponse(essay.getStudent());
     }
 }
