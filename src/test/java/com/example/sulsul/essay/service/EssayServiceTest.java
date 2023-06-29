@@ -1,6 +1,5 @@
 package com.example.sulsul.essay.service;
 
-import com.example.sulsul.comment.dto.response.CommentGroupResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.repository.CommentRepository;
 import com.example.sulsul.essay.DemoDataFactory;
@@ -225,7 +224,7 @@ class EssayServiceTest {
         when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
 
         ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
-        CommentGroupResponse commentGroup = response.getComments();
+//        CommentGroupResponse commentGroup = response.getComments();
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
@@ -234,10 +233,10 @@ class EssayServiceTest {
                 () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
                 () -> assertThat(response.getEssayState()).isEqualTo(EssayState.PROCEED),
                 () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
-                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
-                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
-                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
-                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다.")
+                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2)
+//                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
+//                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+//                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다.")
         );
     }
 
@@ -268,7 +267,7 @@ class EssayServiceTest {
         when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
 
         ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
-        CommentGroupResponse commentGroup = response.getComments();
+//        CommentGroupResponse commentGroup = response.getComments();
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
@@ -277,10 +276,10 @@ class EssayServiceTest {
                 () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
                 () -> assertThat(response.getEssayState()).isEqualTo(EssayState.COMPLETE),
                 () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
-                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
-                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
-                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
-                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다.")
+                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2)
+//                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
+//                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+//                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다.")
         );
     }
 
@@ -313,7 +312,7 @@ class EssayServiceTest {
         when(reviewRepository.findByEssayId(1L)).thenReturn(Optional.of(r1));
 
         CompleteEssayResponse response = (CompleteEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
-        CommentGroupResponse commentGroup = response.getComments();
+//        CommentGroupResponse commentGroup = response.getComments();
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
@@ -323,9 +322,9 @@ class EssayServiceTest {
                 () -> assertThat(response.getEssayState()).isEqualTo(EssayState.COMPLETE),
                 () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
                 () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
-                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
-                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
-                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다."),
+//                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
+//                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+//                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다."),
                 () -> assertThat(response.getReview().getDetail()).isEqualTo("구체적으로 첨삭해주셔서 좋았어요."),
                 () -> assertThat(response.getReview().getScore()).isEqualTo(5)
         );

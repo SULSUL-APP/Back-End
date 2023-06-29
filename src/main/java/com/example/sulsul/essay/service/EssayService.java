@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -104,6 +105,9 @@ public class EssayService {
         String teacherFileFilePath = teacherFile.getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
         // 첨삭에 작성된 모든 댓글 조회
         List<Comment> comments = commentRepository.findAllByEssayId(essayId);
+        if (comments == null) {
+            comments = new ArrayList<>();
+        }
         // 첨삭완료 상태인 경우 && 리뷰가 작성된 경우
         if (essay.getEssayState().equals(EssayState.COMPLETE)) {
             if (essay.getReviewState().equals(ReviewState.ON)) {

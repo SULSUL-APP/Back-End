@@ -16,8 +16,4 @@ public class CommentGroupResponse {
                 .map(CommentResponse::new)
                 .forEach(comment -> this.comments.add(comment));
     }
-
-    public int getCommentsSize() {
-        return comments.size();
-    }
 }
