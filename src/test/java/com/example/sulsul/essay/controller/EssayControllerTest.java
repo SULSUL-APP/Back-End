@@ -493,7 +493,27 @@ class EssayControllerTest {
     }
 
     @Test
-    @DisplayName("첨삭요청 수락 PUT /essay/{essayId}/complete")
-    void completeEssay() {
+    @DisplayName("첨삭완료처리 PUT /essay/{essayId}/complete")
+    void completeEssay() throws Exception {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.COMPLETE, ReviewState.OFF);
+        // stub
+        when(essayService.completeEssay(eq(1L))).thenReturn(essay1);
+        // when && then
+        mockMvc.perform(put("/essay/{essayId}/complete", 1L))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("첨삭이 완료되었습니다."))
+                .andExpect(jsonPath("$.essay.id").value(1L))
+                .andExpect(jsonPath("$.essay.univ").value("홍익대"))
+                .andExpect(jsonPath("$.essay.examYear").value("2022"))
+                .andExpect(jsonPath("$.essay.essayState").value("COMPLETE"))
+                .andExpect(jsonPath("$.essay.teacher.name").value("임탁균"))
+                .andExpect(jsonPath("$.essay.teacher.email").value("sulsul@naver.com"))
+                .andExpect(jsonPath("$.essay.teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
+                .andExpect(jsonPath("$.essay.student.name").value("김경근"))
+                .andExpect(jsonPath("$.essay.student.email").value("sulsul@gmail.com"));
     }
 }
