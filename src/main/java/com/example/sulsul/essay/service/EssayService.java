@@ -113,15 +113,18 @@ public class EssayService {
         if (comments == null) {
             comments = new ArrayList<>(); // 아직 댓글이 없는 경우
         }
-        // 첨삭완료 상태인 경우 && 리뷰가 작성된 경우
+        // 첨삭완료 상태인 경우
         if (essay.getEssayState().equals(EssayState.COMPLETE)) {
+            // 리뷰가 작성된 경우
             if (essay.getReviewState().equals(ReviewState.ON)) {
                 Review review = reviewRepository.findByEssayId(essayId)
                         .orElseThrow(() -> new CustomException("해당 첨삭글의 리뷰를 찾을 수 없습니다."));
                 return new CompleteEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments, review);
             }
+            // 리뷰가 작성되지 않은 경우
+            return new NotReviewedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
         }
-        // 첨삭진행 상태인 경우 || 첨삭이 완료되었지만 리뷰되지 않은 경우
+        // 첨삭진행 상태인 경우
         return new ProceedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
     }
 
