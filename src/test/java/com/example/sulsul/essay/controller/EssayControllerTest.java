@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -45,9 +46,6 @@ class EssayControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private MockMultipartFile getMockMultipartFile(String fileName, String contentType, String path) throws IOException {
         FileInputStream fileInputStream = new FileInputStream(path);
@@ -99,7 +97,7 @@ class EssayControllerTest {
         User s1 = DemoDataFactory.createStudent1(2L);
         Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.PROCEED, ReviewState.OFF);
         Comment c1 = DemoDataFactory.createComment1(1L, s1, essay1);
-        Comment c2 = DemoDataFactory.createComment1(2L, t1, essay1);
+        Comment c2 = DemoDataFactory.createComment2(2L, t1, essay1);
         List<Comment> comments = List.of(c1, c2);
         // 테스트용 첨삭파일 생성
         String fileName = "test";
@@ -322,7 +320,39 @@ class EssayControllerTest {
     }
 
     @Test
-    void getProceedEssay() {
+    @DisplayName("진행상태의 첨삭 개별조회 GET /essay/proceed/{essayId}")
+    void getProceedEssay() throws Exception {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.PROCEED, ReviewState.OFF);
+        Comment c1 = DemoDataFactory.createComment1(1L, s1, essay1);
+        Comment c2 = DemoDataFactory.createComment2(2L, t1, essay1);
+        List<Comment> comments = List.of(c1, c2);
+        // stub
+        String teacherFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/751b44f7_sulsul.pdf";
+        String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
+        when(essayService.getEssayResponseWithFilePaths(eq(1L)))
+                .thenReturn(new ProceedEssayResponse(essay1, studentFilePath, teacherFilePath, comments));
+        // when && then
+        mockMvc.perform(get("/essay/proceed/{essayId}", 1L))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.univ").value("홍익대"))
+                .andExpect(jsonPath("$.examYear").value("2022"))
+                .andExpect(jsonPath("$.essayState").value("PROCEED"))
+                .andExpect(jsonPath("$.studentFilePath").value(studentFilePath))
+                .andExpect(jsonPath("$.teacherFilePath").value(teacherFilePath))
+                .andExpect(jsonPath("$.teacher.name").value("임탁균"))
+                .andExpect(jsonPath("$.teacher.email").value("sulsul@naver.com"))
+                .andExpect(jsonPath("$.teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
+                .andExpect(jsonPath("$.student.name").value("김경근"))
+                .andExpect(jsonPath("$.student.email").value("sulsul@gmail.com"))
+                .andExpect(jsonPath("$.comments[0].commentId").value(1L))
+                .andExpect(jsonPath("$.comments[0].user.name").value("김경근"))
+                .andExpect(jsonPath("$.comments[1].commentId").value(2L))
+                .andExpect(jsonPath("$.comments[1].user.name").value("임탁균"));
     }
 
     @Test

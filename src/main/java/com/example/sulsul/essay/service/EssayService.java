@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -84,8 +85,8 @@ public class EssayService {
         return new RejectEssayResponse(essay, filePath);
     }
 
-    // TODO: 메소드가 너무 많은 역할을 하고 있음
-    // 리팩토링 필요 - 기능분리
+    // TODO: 메소드가 너무 많은 역할을 하고 있음 - 리팩토링, 기능분리 필요
+    // TODO: 테스트케이스 추가 - 강사가 첨삭파일을 업로드하지 않은 경우, 댓글이 작성되지 않은 경우 등
     @Transactional(readOnly = true)
     public EssayResponse getEssayResponseWithFilePaths(Long essayId) {
         // essayId에 해당하는 첨삭 조회
@@ -100,13 +101,17 @@ public class EssayService {
 
         Long teacherId = essay.getTeacher().getId();
         // 강사가 올린 첨삭파일 조회
-        File teacherFile = fileRepository.getTeacherEssayFile(essayId, teacherId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글의 첨삭파일을 찾을 수 없습니다."));
-        String teacherFileFilePath = teacherFile.getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
+        Optional<File> teacherEssayFile = fileRepository.getTeacherEssayFile(essayId, teacherId);
+        String teacherFileFilePath = null;
+        if (!teacherEssayFile.isPresent()) {
+            teacherFileFilePath = ""; // 강사가 아직 첨삭파일을 업로드하지 않은 경우
+        } else {
+            teacherFileFilePath = teacherEssayFile.get().getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
+        }
         // 첨삭에 작성된 모든 댓글 조회
         List<Comment> comments = commentRepository.findAllByEssayId(essayId);
         if (comments == null) {
-            comments = new ArrayList<>();
+            comments = new ArrayList<>(); // 아직 댓글이 없는 경우
         }
         // 첨삭완료 상태인 경우 && 리뷰가 작성된 경우
         if (essay.getEssayState().equals(EssayState.COMPLETE)) {
