@@ -38,9 +38,6 @@ class EssayControllerTest {
     @MockBean
     private EssayService essayService;
 
-    @MockBean
-    private FileService fileService;
-
     @Autowired
     private MockMvc mockMvc;
 
