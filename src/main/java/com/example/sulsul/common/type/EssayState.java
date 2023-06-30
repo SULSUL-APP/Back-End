@@ -4,5 +4,5 @@ public enum EssayState {
     REQUEST,
     PROCEED,
     REJECT,
-    COMPLETE;
+    COMPLETE
 }
