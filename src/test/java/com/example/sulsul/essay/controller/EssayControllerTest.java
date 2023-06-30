@@ -166,7 +166,7 @@ class EssayControllerTest {
 
     @Test
     @DisplayName("진행중인 첨삭목록 조회 GET /essay/proceed")
-    void getProceedEssays() throws Exception {
+    void getProceedEssaysTest() throws Exception {
         // given
         User s1 = DemoDataFactory.createStudent1(1L);
         User t1 = DemoDataFactory.createTeacher1(2L);
@@ -199,7 +199,7 @@ class EssayControllerTest {
 
     @Test
     @DisplayName("거절된 첨삭목록 조회 GET /essay/reject")
-    void getRejectEssays() throws Exception {
+    void getRejectEssaysTest() throws Exception {
         // given
         User s1 = DemoDataFactory.createStudent1(1L);
         User t1 = DemoDataFactory.createTeacher1(2L);
@@ -232,7 +232,7 @@ class EssayControllerTest {
 
     @Test
     @DisplayName("완료된 첨삭목록 조회 GET /essay/complete")
-    void getCompleteEssays() throws Exception {
+    void getCompleteEssaysTest() throws Exception {
         // given
         User s1 = DemoDataFactory.createStudent1(1L);
         User t1 = DemoDataFactory.createTeacher1(2L);
@@ -264,7 +264,30 @@ class EssayControllerTest {
     }
 
     @Test
-    void getRequestEssay() {
+    @DisplayName("요청상태의 첨삭 개별조회 GET /essay/request/{essayId}")
+    void getRequestEssayTest() throws Exception {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
+        // stub
+        String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
+        when(essayService.getEssayResponseWithStudentFile(eq(1L)))
+                .thenReturn(new RequestEssayResponse(essay1, studentFilePath));
+        // when && then
+        mockMvc.perform(get("/essay/request/{essayId}", 1L))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.univ").value("홍익대"))
+                .andExpect(jsonPath("$.examYear").value("2022"))
+                .andExpect(jsonPath("$.essayState").value("REQUEST"))
+                .andExpect(jsonPath("$.studentFilePath").value(studentFilePath))
+                .andExpect(jsonPath("$.teacher.name").value("임탁균"))
+                .andExpect(jsonPath("$.teacher.email").value("sulsul@naver.com"))
+                .andExpect(jsonPath("$.teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
+                .andExpect(jsonPath("$.student.name").value("김경근"))
+                .andExpect(jsonPath("$.student.email").value("sulsul@gmail.com"));
     }
 
     @Test
