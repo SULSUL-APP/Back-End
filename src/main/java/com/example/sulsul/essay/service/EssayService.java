@@ -103,7 +103,7 @@ public class EssayService {
         // 강사가 올린 첨삭파일 조회
         Optional<File> teacherEssayFile = fileRepository.getTeacherEssayFile(essayId, teacherId);
         String teacherFileFilePath = null;
-        if (!teacherEssayFile.isPresent()) {
+        if (teacherEssayFile.isEmpty()) {
             teacherFileFilePath = ""; // 강사가 아직 첨삭파일을 업로드하지 않은 경우
         } else {
             teacherFileFilePath = teacherEssayFile.get().getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
@@ -154,5 +154,13 @@ public class EssayService {
         // 첨삭완료 상태로 변경
         essay.updateEssayState(EssayState.COMPLETE);
         return essayRepository.save(essay);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean checkEssayReviewState(Long essayId) {
+        Essay essay = essayRepository.findById(essayId)
+                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+        ReviewState reviewState = essay.getReviewState();
+        return reviewState.equals(ReviewState.ON) ? true : false;
     }
 }

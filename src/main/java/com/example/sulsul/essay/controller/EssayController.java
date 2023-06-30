@@ -180,9 +180,12 @@ public class EssayController {
 
     @GetMapping("/essay/complete/{essayId}")
     public ResponseEntity<?> getCompleteEssay(@PathVariable Long essayId) {
-        CompleteEssayResponse essayResponse =
-                (CompleteEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
-        return new ResponseEntity<>(essayResponse, HttpStatus.OK);
+        EssayResponse essayResponse = essayService.getEssayResponseWithFilePaths(essayId);
+        boolean reviewed = essayService.checkEssayReviewState(essayId);
+        if (reviewed) {
+            return new ResponseEntity<>((CompleteEssayResponse) essayResponse, HttpStatus.OK);
+        }
+        return new ResponseEntity<>((NotReviewedEssayResponse) essayResponse, HttpStatus.OK);
     }
 
     /**
