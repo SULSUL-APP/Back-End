@@ -195,11 +195,39 @@ class EssayControllerTest {
                 .andExpect(jsonPath("$.essays[1].teacher.catchPhrase").value("항상 최선을 다하겠습니다."))
                 .andExpect(jsonPath("$.essays[1].student.name").value("김경근"))
                 .andExpect(jsonPath("$.essays[1].student.email").value("sulsul@gmail.com"));
-
     }
 
     @Test
-    void getRejectEssays() {
+    @DisplayName("거절된 첨삭목록 조회 GET /essay/reject")
+    void getRejectEssays() throws Exception {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        User t2 = DemoDataFactory.createTeacher2(3L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REJECT, ReviewState.OFF);
+        Essay essay2 = DemoDataFactory.createEssay2(2L, s1, t2, EssayState.REJECT, ReviewState.OFF);
+        // stub
+        when(essayService.getEssaysByUser(any(User.class), eq(EssayState.REJECT))).thenReturn(List.of(essay1, essay2));
+        // when && then
+        mockMvc.perform(get("/essay/reject"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.essays[0].id").value(1L))
+                .andExpect(jsonPath("$.essays[0].univ").value("홍익대"))
+                .andExpect(jsonPath("$.essays[0].examYear").value("2022"))
+                .andExpect(jsonPath("$.essays[0].teacher.name").value("임탁균"))
+                .andExpect(jsonPath("$.essays[0].teacher.email").value("sulsul@naver.com"))
+                .andExpect(jsonPath("$.essays[0].teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
+                .andExpect(jsonPath("$.essays[0].student.name").value("김경근"))
+                .andExpect(jsonPath("$.essays[0].student.email").value("sulsul@gmail.com"))
+                .andExpect(jsonPath("$.essays[1].id").value(2L))
+                .andExpect(jsonPath("$.essays[1].univ").value("홍익대"))
+                .andExpect(jsonPath("$.essays[1].examYear").value("2023"))
+                .andExpect(jsonPath("$.essays[1].teacher.name").value("전용수"))
+                .andExpect(jsonPath("$.essays[1].teacher.email").value("smc@gmail.com"))
+                .andExpect(jsonPath("$.essays[1].teacher.catchPhrase").value("항상 최선을 다하겠습니다."))
+                .andExpect(jsonPath("$.essays[1].student.name").value("김경근"))
+                .andExpect(jsonPath("$.essays[1].student.email").value("sulsul@gmail.com"));
     }
 
     @Test
