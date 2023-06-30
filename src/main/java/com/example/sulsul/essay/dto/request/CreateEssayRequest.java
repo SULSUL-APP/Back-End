@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @Setter
 @Builder
 @AllArgsConstructor
-//@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class CreateEssayRequest {
     @NotBlank
     @Size(min = 2, max = 20, message = "대학이름은 2글자 이상 20글자 이하입니다.")

@@ -5,17 +5,20 @@ import com.example.sulsul.common.type.EssayState;
 import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.essay.DemoDataFactory;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
+import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.file.service.FileService;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.user.entity.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,6 +42,9 @@ class EssayControllerTest {
 
     @MockBean
     private FileService fileService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -431,7 +437,7 @@ class EssayControllerTest {
     }
 
     @Test
-    @DisplayName("첨삭요청 수락 /essay/{essayId}/accept")
+    @DisplayName("첨삭요청 수락 PUT /essay/{essayId}/accept")
     void acceptEssay() throws Exception {
         // given
         User s1 = DemoDataFactory.createStudent1(1L);
@@ -456,12 +462,38 @@ class EssayControllerTest {
     }
 
     @Test
-    @DisplayName("첨삭요청 수락 /essay/{essayId}/reject")
-    void rejectEssay() {
+    @DisplayName("첨삭요청 거절 PUT /essay/{essayId}/reject")
+    void rejectEssay() throws Exception {
+        // given
+        User s1 = DemoDataFactory.createStudent1(1L);
+        User t1 = DemoDataFactory.createTeacher1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REJECT, ReviewState.OFF);
+        String rejectDetail = "일정상 첨삭이 불가능할 것 같습니다.";
+        essay1.updateRejectDetail(rejectDetail);
+        // stub
+        when(essayService.rejectEssay(eq(1L), any(RejectRequest.class))).thenReturn(essay1);
+        // when && then
+        String json = objectMapper.writeValueAsString(new RejectRequest(rejectDetail));
+        mockMvc.perform(put("/essay/{essayId}/reject", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("첨삭요청이 거절되었습니다."))
+                .andExpect(jsonPath("$.essay.id").value(1L))
+                .andExpect(jsonPath("$.essay.univ").value("홍익대"))
+                .andExpect(jsonPath("$.essay.examYear").value("2022"))
+                .andExpect(jsonPath("$.essay.essayState").value("REJECT"))
+                .andExpect(jsonPath("$.essay.teacher.name").value("임탁균"))
+                .andExpect(jsonPath("$.essay.teacher.email").value("sulsul@naver.com"))
+                .andExpect(jsonPath("$.essay.teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
+                .andExpect(jsonPath("$.essay.student.name").value("김경근"))
+                .andExpect(jsonPath("$.essay.student.email").value("sulsul@gmail.com"));
+//                .andExpect(jsonPath("$.essay.rejectDetail").value(rejectDetail)); // EssayResponse에는 rejectDetail이 포함되지 않음
     }
 
     @Test
-    @DisplayName("첨삭요청 수락 /essay/{essayId}/complete")
+    @DisplayName("첨삭요청 수락 PUT /essay/{essayId}/complete")
     void completeEssay() {
     }
 }

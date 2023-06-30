@@ -200,7 +200,7 @@ public class EssayController {
         return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
     }
 
-    @PutMapping("/essay/{essayId}/reject")
+    @PutMapping(value = "/essay/{essayId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> rejectEssay(@PathVariable Long essayId,
                                          @Valid @RequestBody RejectRequest rejectRequest,
                                          BindingResult bindingResult) {
