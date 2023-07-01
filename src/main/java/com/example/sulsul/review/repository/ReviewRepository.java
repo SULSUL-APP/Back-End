@@ -20,5 +20,4 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * @return 첨삭에 작성된 리뷰를 반환한다.
      */
     Optional<Review> findByEssayId(Long essayId);
-
 }

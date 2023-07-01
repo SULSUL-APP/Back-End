@@ -2,7 +2,6 @@ package com.example.sulsul.comment.repository;
 
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.common.type.*;
-import com.example.sulsul.essay.DemoDataFactory;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.user.entity.User;
