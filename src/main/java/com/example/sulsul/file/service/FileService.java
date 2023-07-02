@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.exception.CustomException;
+import com.example.sulsul.exception.custom.CustomException;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
 import com.example.sulsul.common.type.FileType;

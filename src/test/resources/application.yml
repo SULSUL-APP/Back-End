@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/sulsul
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+    properties:
+      hibernate:
+        format_sql: true
+
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${ACCESS_KEY}
+      secretKey: ${SECRET_KEY}
+    s3:
+      bucket: sulsul-bucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+
+
+logging.level:
+  org.hibernate.SQL: debug
+  org.hibernate.type: trace
+
+
+s3:
+  host:
+    name: https://sulsul-bucket.s3.ap-northeast-2.amazonaws.com/
+
+
+domain:
+  name: http://localhost:8080

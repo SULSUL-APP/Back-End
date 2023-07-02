@@ -1,6 +1,6 @@
 package com.example.sulsul.review.controller;
 
-import com.example.sulsul.exception.CustomValidationException;
+import com.example.sulsul.exception.custom.CustomValidationException;
 import com.example.sulsul.review.dto.response.ReviewGroupResponse;
 import com.example.sulsul.review.dto.response.ReviewResponse;
 import com.example.sulsul.review.dto.request.ReviewRequest;

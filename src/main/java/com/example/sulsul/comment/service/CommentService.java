@@ -4,7 +4,7 @@ import com.example.sulsul.comment.dto.request.CommentRequest;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.repository.CommentRepository;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.exception.CustomException;
+import com.example.sulsul.exception.custom.CustomException;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
