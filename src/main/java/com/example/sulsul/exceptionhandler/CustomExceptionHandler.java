@@ -1,7 +1,7 @@
 package com.example.sulsul.exceptionhandler;
 
-import com.example.sulsul.exception.CustomException;
-import com.example.sulsul.exception.CustomValidationException;
+import com.example.sulsul.exception.custom.CustomException;
+import com.example.sulsul.exception.custom.CustomValidationException;
 import com.example.sulsul.exceptionhandler.dto.response.ErrorResponse;
 import com.example.sulsul.exceptionhandler.dto.response.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
