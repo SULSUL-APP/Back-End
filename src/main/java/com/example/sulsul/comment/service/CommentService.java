@@ -47,6 +47,6 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException("해당 댓글이 존재하지 않습니다."));
 
-        commentRepository.delete(comment);
+        commentRepository.deleteById(comment.getId());
     }
 }
