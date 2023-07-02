@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:h2:tcp://localhost/~/sulsul
     username: sa
-    password:
+    password: 1234
     driver-class-name: org.h2.Driver
 
   jpa:
@@ -15,3 +15,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+logging.level:
+    org.springframework: debug
+    org.springframework.web: debug
