@@ -7,12 +7,12 @@ import lombok.Getter;
 @Getter
 public class CommentResponse {
 
-    private final Long commentId;
+    private final Long id;
     private final String detail;
     private final UserResponse user;
 
     public CommentResponse(Comment comment) {
-        this.commentId = comment.getId();
+        this.id = comment.getId();
         this.detail = comment.getDetail();
         this.user = new UserResponse(comment.getUser());
     }
