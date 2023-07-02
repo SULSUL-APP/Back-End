@@ -91,7 +91,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("댓글수정 PUT /comments/{commentId}")
-    void updateComment() throws Exception {
+    void updateCommentTest() throws Exception {
         // given
         User t1 = DemoDataFactory.createTeacher1(1L);
         User s1 = DemoDataFactory.createStudent1(2L);
@@ -116,12 +116,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("댓글삭제 DELETE /comments/{commentId}")
-    void deleteComment() throws Exception {
-        // given
-        User t1 = DemoDataFactory.createTeacher1(1L);
-        User s1 = DemoDataFactory.createStudent1(2L);
-        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.PROCEED, ReviewState.OFF);
-        Comment c1 = DemoDataFactory.createComment1(1L, t1, essay1);
+    void deleteCommentTest() throws Exception {
         // stub
         doNothing().when(commentService).deleteComment(eq(1L));
         // when && then
