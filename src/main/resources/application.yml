@@ -22,10 +22,12 @@ spring:
         format_sql: true
 
   # ddl-auto 과정에서 더미데이터 생성
-    defer-datasource-initialization: true
+#    defer-datasource-initialization: true
+    defer-datasource-initialization: false
   sql:
     init:
-      mode: always
+      mode: never
+#      mode: always
 
 cloud:
   aws:
@@ -44,7 +46,7 @@ s3:
   host:
     name: https://${BUCKET}.s3.${REGION}.amazonaws.com/
 
-# Failed to connect to service endpoint 무시
+# Failed to connect to service endpoint 에러 무시
 logging:
   level:
     com:
