@@ -115,4 +115,15 @@ public class DemoDataFactory {
                 .teacher(teacher)
                 .build();
     }
+
+    public static Review createReview2(long id, Essay essay, User student, User teacher) {
+        return Review.builder()
+                .id(id)
+                .detail("바쁘셔서 그런지 의사소통이 잘 안되는 것 같았어요.")
+                .score(2)
+                .essay(essay)
+                .student(student)
+                .teacher(teacher)
+                .build();
+    }
 }

@@ -28,14 +28,15 @@ public class ReviewService {
         Review review = Review.builder()
                 .essay(essay)
                 .student(student)
+                .teacher(essay.getTeacher())
                 .detail(request.getDetail())
                 .score(request.getScore())
                 .build();
 
         // 첨삭리뷰 여부 update
         essay.updateReviewState(ReviewState.ON);
-
         essayRepository.save(essay);
+
         return reviewRepository.save(review);
     }
 
