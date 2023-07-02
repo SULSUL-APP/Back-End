@@ -1,5 +1,6 @@
 package com.example.sulsul.file.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.sulsul.common.type.UType;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +31,8 @@ public class FileService {
     @Value("${s3.host.name}")
     private String hostName;
 
-    private final AmazonS3Client amazonS3;
+    private final AmazonS3 amazonS3;
+    private final AmazonS3Client amazonS3Client;
     private final FileRepository fileRepository;
 
     /**
@@ -166,21 +170,23 @@ public class FileService {
                 .build());
     }
 
+    private String decodeURL(String fileUrl) {
+        // fileUrl에서 hostName 제거, 모든 space 제거, UTF8 형식으로 디코딩
+        return URLDecoder.decode(fileUrl.replace(hostName, "")
+                .replaceAll("\\p{Z}", ""), StandardCharsets.UTF_8);
+    }
+
     /**
      * s3 버킷에 저장된 파일을 삭제한다.
      *
      * @param fileUrl 삭제할 파일의 s3 스토리지 경로
      */
-    private void deleteFileFromBucket(String fileUrl) {
-        // 파일경로가 S3 HostName으로 시작하는지 점검
-        if (!fileUrl.startsWith(hostName)) {
-            throw new CustomException(fileUrl + "은 잘못된 경로입니다.");
-        }
-        // S3 버킷에 파일이 존재하는지 확인
-        boolean fileExists = amazonS3.doesObjectExist(bucketName, fileUrl);
+    public void deleteFileFromBucket(String fileUrl) {
+        String decodeURL = decodeURL(fileUrl);
+        boolean fileExists = amazonS3.doesObjectExist(bucketName, decodeURL);
         // S3 버킷에서 파일 삭제
         if (fileExists) {
-            amazonS3.deleteObject(bucketName, fileUrl);
+            amazonS3.deleteObject(bucketName, decodeURL);
         } else {
             throw new CustomException("S3 버킷에 삭제할 파일이 존재하지 않습니다.");
         }
