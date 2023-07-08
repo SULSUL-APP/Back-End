@@ -41,7 +41,7 @@ public class User extends BaseEntity {
     private EType eType;
 
     @Enumerated(EnumType.STRING)
-    private DType dType;
+    private DType dType = DType.AVAILABLE;
 
     @Enumerated(EnumType.STRING)
     private LoginType loginType;

@@ -1,6 +1,7 @@
 package com.example.sulsul.user.oauth2.parser;
 
 import com.example.sulsul.common.type.LoginType;
+import com.example.sulsul.exception.notFound.UserNotFoundException;
 import com.example.sulsul.user.dto.request.OauthDto;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.oauth2.userinfo.GoogleUserInfo;
@@ -11,6 +12,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 
