@@ -1,6 +1,7 @@
 package com.example.sulsul.exception;
 
-public abstract class BaseException extends RuntimeException{
+public class BaseException extends RuntimeException {
+
 
     private BaseErrorCode errorCode;
 
