@@ -8,6 +8,11 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: ${URL}
+#    username: ${USERNAME}
+#    password: ${USERPASSWORD}
 
   jpa:
     hibernate:
