@@ -4,7 +4,9 @@ import com.example.sulsul.exception.BaseErrorCode;
 
 public enum ResourceNotFoundErrorCode implements BaseErrorCode {
 
-    USER_NOT_FOUND("USER_00", "존재하지 않는 유저입니다.");
+    USER_NOT_FOUND("USER_00", "존재하지 않는 유저입니다."),
+    UTYPE_NOT_FOUND("UTYPE_00", "존재하지 않는 유저 타입입니다."),
+    ETYPE_NOT_FOUND("ETYPE_00", "존재하지 않는 분야입니다.");
 
     private String code;
     private String message;

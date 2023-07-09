@@ -1,5 +1,28 @@
 package com.example.sulsul.common.type;
 
+import com.example.sulsul.exception.notFound.UTypeNotFoundException;
+
+import java.util.Arrays;
+
 public enum EType {
-    NATURE, SOCIETY
+    NATURE("NATURE"), SOCIETY("SOCIETY");
+
+    private String value;
+
+    EType(String eType) {
+        this.value = eType;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public static EType getEType(String eType) {
+        return Arrays.stream(EType.values())
+                .filter(etype -> etype.getValue().equals(eType))
+                .findAny()
+                .orElseThrow(UTypeNotFoundException::new);
+    }
+
 }
+
