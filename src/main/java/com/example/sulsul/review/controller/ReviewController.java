@@ -46,7 +46,8 @@ public class ReviewController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/essay/{essayId}/reviews")
-    public ResponseEntity<?> createReview(@PathVariable @Parameter(description = "리뷰를 작성할 essay의 id") Long essayId,
+    public ResponseEntity<?> createReview(@Parameter(description = "리뷰를 작성할 essay의 id")
+                                          @PathVariable Long essayId,
                                           @Valid @RequestBody ReviewRequest reviewRequest,
                                           BindingResult bindingResult) {
         // 리뷰 내용 유효성 검사
@@ -80,7 +81,8 @@ public class ReviewController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/profiles/{profileId}/reviews")
-    public ResponseEntity<?> getReviews(@PathVariable @Parameter(description = "리뷰를 조회할 강사의 id") Long profileId) {
+    public ResponseEntity<?> getReviews(@Parameter(description = "리뷰를 조회할 강사의 id")
+                                        @PathVariable Long profileId) {
         List<Review> reviews = reviewService.getReviews(profileId);
         return new ResponseEntity<>(new ReviewGroupResponse(reviews), HttpStatus.OK);
     }

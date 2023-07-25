@@ -45,7 +45,8 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/{essayId}/comments")
-    public ResponseEntity<?> getComments(@PathVariable @Parameter(description = "댓글을 조회할 첨삭의 id") Long essayId) {
+    public ResponseEntity<?> getComments(@Parameter(description = "댓글을 조회할 첨삭의 id")
+                                         @PathVariable Long essayId) {
         List<Comment> comments = commentService.getComments(essayId);
         return new ResponseEntity<>(new CommentGroupResponse(comments), HttpStatus.OK);
     }
@@ -62,7 +63,8 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/essay/{essayId}/comments")
-    public ResponseEntity<?> createComment(@PathVariable @Parameter(description = "댓글을 작성할 첨삭의 id") Long essayId,
+    public ResponseEntity<?> createComment(@Parameter(description = "댓글을 작성할 첨삭의 id")
+                                           @PathVariable Long essayId,
                                            @Valid @RequestBody CommentRequest commentRequest,
                                            BindingResult bindingResult) {
         // 댓글 내용 유효성 검사
@@ -94,7 +96,8 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<?> updateComment(@PathVariable @Parameter(description = "수정할 댓글의 id") Long commentId,
+    public ResponseEntity<?> updateComment(@Parameter(description = "수정할 댓글의 id")
+                                           @PathVariable Long commentId,
                                            @Valid @RequestBody CommentRequest commentRequest,
                                            BindingResult bindingResult) {
         // 댓글 내용 유효성 검사
@@ -120,7 +123,8 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable @Parameter(description = "삭제할 댓글의 id") Long commentId) {
+    public ResponseEntity<?> deleteComment(@Parameter(description = "삭제할 댓글의 id")
+                                           @PathVariable Long commentId) {
         commentService.deleteComment(commentId);
         String message = "댓글 삭제 성공";
         return new ResponseEntity<>(new DeleteSuccessResponse(message), HttpStatus.OK);

@@ -58,7 +58,7 @@ public class EssayController {
     public ResponseEntity<?> createEssay(@Parameter(description = "첨삭을 요청할 강사의 id")
                                          @PathVariable Long profileId,
                                          @ModelAttribute @Valid CreateEssayRequest request,
-                                         BindingResult bindingResult) throws RuntimeException {
+                                         BindingResult bindingResult) {
         // 첨삭 파일 여부 검증
         if (request.getEssayFile().isEmpty()) {
             throw new CustomException("첨삭파일이 첨부되지 않았습니다.");
@@ -106,9 +106,9 @@ public class EssayController {
     @PostMapping(value = "/essay/proceed/{essayId}/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> uploadTeacherEssayFile(@Parameter(name = "essayId", description = "파일을 첨부할 첨삭의 id")
+    public ResponseEntity<?> uploadTeacherEssayFile(@Parameter(description = "파일을 첨부할 첨삭의 id")
                                                     @PathVariable Long essayId,
-                                                    @Parameter(name = "essayFile", description = "첨부할 첨삭파일")
+                                                    @Parameter(description = "첨부할 첨삭파일")
                                                     @RequestParam("essayFile") MultipartFile essayFile) {
         // 첨삭 파일 여부 검증
         if (essayFile.isEmpty()) {
@@ -235,7 +235,8 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/request/{essayId}")
-    public ResponseEntity<?> getRequestEssay(@PathVariable Long essayId) {
+    public ResponseEntity<?> getRequestEssay(@Parameter(description = "조회할 첨삭의 id")
+                                             @PathVariable Long essayId) {
         RequestEssayResponse essayResponse =
                 (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
@@ -253,7 +254,8 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/reject/{essayId}")
-    public ResponseEntity<?> getRejectEssay(@PathVariable Long essayId) {
+    public ResponseEntity<?> getRejectEssay(@Parameter(description = "조회할 첨삭의 id")
+                                            @PathVariable Long essayId) {
         RejectEssayResponse essayResponse =
                 (RejectEssayResponse) essayService.getEssayResponseWithStudentFile(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
@@ -271,7 +273,8 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/proceed/{essayId}")
-    public ResponseEntity<?> getProceedEssay(@PathVariable Long essayId) {
+    public ResponseEntity<?> getProceedEssay(@Parameter(description = "조회할 첨삭의 id")
+                                             @PathVariable Long essayId) {
         ProceedEssayResponse essayResponse =
                 (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
@@ -289,7 +292,8 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/complete/{essayId}")
-    public ResponseEntity<?> getCompleteEssay(@PathVariable Long essayId) {
+    public ResponseEntity<?> getCompleteEssay(@Parameter(description = "조회할 첨삭의 id")
+                                              @PathVariable Long essayId) {
         EssayResponse essayResponse = essayService.getEssayResponseWithFilePaths(essayId);
         boolean reviewed = essayService.checkEssayReviewState(essayId);
         if (reviewed) {
@@ -310,7 +314,8 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/essay/{essayId}/accept")
-    public ResponseEntity<?> acceptEssay(@PathVariable Long essayId) {
+    public ResponseEntity<?> acceptEssay(@Parameter(description = "수락할 첨삭요청의 id")
+                                         @PathVariable Long essayId) {
         Essay essay = essayService.acceptEssay(essayId);
         String message = "첨삭요청이 수락되었습니다.";
 
@@ -330,7 +335,8 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping(value = "/essay/{essayId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> rejectEssay(@PathVariable Long essayId,
+    public ResponseEntity<?> rejectEssay(@Parameter(description = "거절할 첨삭요청의 id")
+                                         @PathVariable Long essayId,
                                          @Valid @RequestBody RejectRequest rejectRequest,
                                          BindingResult bindingResult) {
         // 거절사유 유효성 검사
@@ -359,7 +365,8 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/essay/{essayId}/complete")
-    public ResponseEntity<?> completeEssay(@PathVariable Long essayId) {
+    public ResponseEntity<?> completeEssay(@Parameter(description = "완료할 첨삭의 id")
+                                           @PathVariable Long essayId) {
         Essay essay = essayService.completeEssay(essayId);
         String message = "첨삭이 완료되었습니다.";
 
