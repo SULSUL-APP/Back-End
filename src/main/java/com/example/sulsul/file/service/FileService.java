@@ -3,12 +3,16 @@ package com.example.sulsul.file.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.sulsul.common.type.FileType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.exception.custom.CustomException;
+import com.example.sulsul.exception.file.*;
+import com.example.sulsul.exception.s3.S3DeleteException;
+import com.example.sulsul.exception.s3.S3FileNotFoundException;
+import com.example.sulsul.exception.s3.S3EssayUploadException;
+import com.example.sulsul.exception.s3.S3ImageUploadException;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
-import com.example.sulsul.common.type.FileType;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +51,7 @@ public class FileService {
             int pos = filename.lastIndexOf(".");
             return filename.substring(pos + 1);
         } catch (Exception e) {
-            throw new CustomException("파일 확장자 추출에 실패했습니다.");
+            throw new ExtractFileExtensionException(file.getOriginalFilename());
         }
     }
 
@@ -59,11 +63,13 @@ public class FileService {
      */
     public String uploadEssayFileToBucket(MultipartFile essayFile) {
         // 첨삭파일의 확장자가 pdf인지 확인
-        if (!getFileExtension(essayFile).equals("pdf")) {
-            throw new CustomException("첨삭파일은 pdf 파일만 업로드 가능합니다.");
+        String fileExtension = getFileExtension(essayFile);
+        if (!fileExtension.equals("pdf")) {
+            throw new EssayFileExtensionException(fileExtension);
         }
         // s3에 저장할 파일명 생성
-        String s3FileName = "essays/" + UUID.randomUUID() + "_" + essayFile.getOriginalFilename();
+        String filename = essayFile.getOriginalFilename();
+        String s3FileName = "essays/" + UUID.randomUUID() + "_" + filename;
         // s3에 저장할 파일의 메타데이터 생성
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(essayFile.getSize());
@@ -73,7 +79,7 @@ public class FileService {
             amazonS3.putObject(bucketName, s3FileName, essayFile.getInputStream(), metadata);
         } catch (Exception e) {
             // 첨삭파일 업로드 에러 발생
-            throw new CustomException(bucketName + "에 첨삭파일을 업로드하는데 실패했습니다.");
+            throw new S3EssayUploadException(bucketName, filename);
         }
         // 업로드한 첨삭파일의 s3 스토리지 경로
         return amazonS3.getUrl(bucketName, s3FileName).toString();
@@ -89,10 +95,6 @@ public class FileService {
      */
     @Transactional
     public File uploadEssayFile(User uploader, Essay essay, MultipartFile essayFile) {
-        // 첨삭파일이 비어있는지 확인
-        if (essayFile.isEmpty()) {
-            throw new CustomException("첨삭파일이 비어있습니다.");
-        }
         // 기존에 업로드한 첨삭파일이 있으면 삭제
         if (uploader.getUType().equals(UType.STUDENT)) {
             fileRepository.getStudentEssayFile(essay.getId(), uploader.getId())
@@ -123,10 +125,11 @@ public class FileService {
         String fileExt = getFileExtension(imageFile).toLowerCase();
         // 이미지 파일의 확장자가 jpg, jpeg, png인지 확인
         if (!imageExtensions.contains(fileExt)) {
-            throw new CustomException("이미지 파일은 jpg, jpeg, png 파일만 업로드 가능합니다.");
+            throw new ImageFileExtensionException(fileExt);
         }
         // s3에 저장할 파일명 생성
-        String s3FileName = "images/" + UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+        String filename = imageFile.getOriginalFilename();
+        String s3FileName = "images/" + UUID.randomUUID() + "_" + filename;
         // s3에 저장할 파일의 메타데이터 생성
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(imageFile.getSize());
@@ -135,8 +138,8 @@ public class FileService {
         try {
             amazonS3.putObject(bucketName, s3FileName, imageFile.getInputStream(), metadata);
         } catch (Exception e) {
-            // 첨삭파일 업로드 에러 발생
-            throw new CustomException(bucketName + "에 이미지를 업로드하는데 실패했습니다.");
+            // 이미지 업로드 중 에러 발생
+            throw new S3ImageUploadException(bucketName, filename);
         }
         // 업로드한 이미지의 s3 스토리지 경로
         return amazonS3.getUrl(bucketName, s3FileName).toString();
@@ -153,7 +156,7 @@ public class FileService {
     public File uploadImageFile(User uploader, MultipartFile imageFile) {
         // 이미지 파일이 비어있는지 확인
         if (imageFile.isEmpty()) {
-            throw new CustomException("이미지 파일이 비어있습니다.");
+            throw new EmptyImageFileException();
         }
         // 기존에 업로드한 이미지 파일이 있으면 삭제
         if (uploader.getProfileImage() != null) {
@@ -188,7 +191,7 @@ public class FileService {
         if (fileExists) {
             amazonS3.deleteObject(bucketName, decodeURL);
         } else {
-            throw new CustomException("S3 버킷에 삭제할 파일이 존재하지 않습니다.");
+            throw new S3DeleteException(bucketName, decodeURL);
         }
     }
 
@@ -201,11 +204,11 @@ public class FileService {
     public void deleteFile(String filePath) {
         // 파일경로가 S3 HostName으로 시작하는지 점검
         if (!filePath.startsWith(hostName)) {
-            throw new CustomException(filePath + "은 잘못된 경로입니다.");
+            throw new InvalidFilePathException(filePath);
         }
         // File 엔티티 조회 후 삭제
         File file = fileRepository.findByFilePath(filePath)
-                .orElseThrow(() -> new CustomException("삭제할 파일이 존재하지 않습니다."));
+                .orElseThrow(() -> new FileNotFoundException(filePath));
         fileRepository.deleteById(file.getId());
         // S3 버킷에서 파일 삭제
         deleteFileFromBucket(filePath);
@@ -223,7 +226,7 @@ public class FileService {
         if (fileExists) {
             return amazonS3.getUrl(bucketName, filePath).toString();
         } else {
-            throw new CustomException("조회할 파일이 존재하지 않습니다.");
+            throw new S3FileNotFoundException(bucketName, filePath);
         }
     }
 
@@ -237,6 +240,6 @@ public class FileService {
     public File findFileByFilePath(String filePath) {
         // File 엔티티 조회 후 반환
         return fileRepository.findByFilePath(filePath)
-                .orElseThrow(() -> new CustomException("조회할 파일이 존재하지 않습니다."));
+                .orElseThrow(() -> new FileNotFoundException(filePath));
     }
 }

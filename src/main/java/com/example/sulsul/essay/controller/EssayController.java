@@ -7,9 +7,11 @@ import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.service.EssayService;
-import com.example.sulsul.exception.custom.CustomException;
-import com.example.sulsul.exception.custom.CustomValidationException;
-import com.example.sulsul.exceptionhandler.dto.response.ErrorResponse;
+import com.example.sulsul.exception.essay.InvalidEssayCreateException;
+import com.example.sulsul.exception.essay.InvalidRejectDetailException;
+import com.example.sulsul.exception.essay.TeacherCreateEssayException;
+import com.example.sulsul.exception.file.EmptyEssayFileException;
+import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.file.service.FileService;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,7 +63,7 @@ public class EssayController {
                                          BindingResult bindingResult) {
         // 첨삭 파일 여부 검증
         if (request.getEssayFile().isEmpty()) {
-            throw new CustomException("첨삭파일이 첨부되지 않았습니다.");
+            throw new EmptyEssayFileException();
         }
         // 입력값 유효성 검사
         if (bindingResult.hasErrors()) {
@@ -69,7 +71,7 @@ public class EssayController {
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errorMap.put(error.getField(), error.getDefaultMessage());
             }
-            throw new CustomValidationException("입력값 유효성 검사 실패", errorMap);
+            throw new InvalidEssayCreateException(errorMap);
         }
         // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 2L; // 임시로 생성한 유저 id;
@@ -79,7 +81,7 @@ public class EssayController {
                 .build();
         // 학생 유저만 첨삭요청 가능
         if (loginedUser.getUType().equals(UType.TEACHER)) {
-            throw new CustomException("강사는 첨삭요청을 보낼 수 없습니다.");
+            throw new TeacherCreateEssayException(loginedUser.getId());
         }
         // 첨삭 엔티티 생성
         Essay essay = essayService.createEssay(profileId, loginedUser, request);
@@ -112,7 +114,7 @@ public class EssayController {
                                                     @RequestParam("essayFile") MultipartFile essayFile) {
         // 첨삭 파일 여부 검증
         if (essayFile.isEmpty()) {
-            throw new CustomException("첨삭파일이 첨부되지 않았습니다.");
+            throw new EmptyEssayFileException();
         }
         // 로그인 되어 있는 유저 객체를 가져오는 로직
         Long userId = 1L; // 임시로 생성한 유저 id;
@@ -341,9 +343,11 @@ public class EssayController {
                                          BindingResult bindingResult) {
         // 거절사유 유효성 검사
         if (bindingResult.hasErrors()) {
-            FieldError fieldError = bindingResult.getFieldError("rejectDetail");
-            String message = fieldError.getDefaultMessage();
-            throw new CustomException(message);
+            Map<String, String> errorMap = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put(error.getField(), error.getDefaultMessage());
+            }
+            throw new InvalidRejectDetailException(errorMap);
         }
 
         Essay essay = essayService.rejectEssay(essayId, rejectRequest);
