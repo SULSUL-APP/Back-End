@@ -9,8 +9,16 @@ import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.exception.custom.CustomException;
 import com.example.sulsul.exception.custom.CustomValidationException;
+import com.example.sulsul.exceptionhandler.dto.response.ErrorResponse;
 import com.example.sulsul.file.service.FileService;
 import com.example.sulsul.user.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Essay", description = "첨삭 관련 API")
 @RestController
 @RequiredArgsConstructor
 public class EssayController {
@@ -32,13 +41,22 @@ public class EssayController {
     private final EssayService essayService;
     private final FileService fileService;
 
-    /**
-     * 첨삭요청 (학생)
-     */
+    @Operation(summary = "첨삭요청 (학생)", description = "profileId에 해당하는 강사에게 첨삭을 요청한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "CREATED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RequestEssayResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(value = "/profiles/{profileId}/essay",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createEssay(@PathVariable Long profileId,
+    public ResponseEntity<?> createEssay(@Parameter(description = "첨삭을 요청할 강사의 id")
+                                         @PathVariable Long profileId,
                                          @ModelAttribute @Valid CreateEssayRequest request,
                                          BindingResult bindingResult) throws RuntimeException {
         // 첨삭 파일 여부 검증
@@ -74,13 +92,23 @@ public class EssayController {
         return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
     }
 
-    /**
-     * 진행중인 첨삭에 첨삭파일 첨부 (강사)
-     */
+    @Operation(summary = "진행중인 첨삭에 첨삭파일 첨부 (강사)", description = "강사가 진행중인 첨삭에 첨삭파일을 첨부한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "CREATED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProceedEssayResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(value = "/essay/proceed/{essayId}/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> uploadTeacherEssayFile(@PathVariable Long essayId,
+    public ResponseEntity<?> uploadTeacherEssayFile(@Parameter(name = "essayId", description = "파일을 첨부할 첨삭의 id")
+                                                    @PathVariable Long essayId,
+                                                    @Parameter(name = "essayFile", description = "첨부할 첨삭파일")
                                                     @RequestParam("essayFile") MultipartFile essayFile) {
         // 첨삭 파일 여부 검증
         if (essayFile.isEmpty()) {
@@ -102,9 +130,17 @@ public class EssayController {
         return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
     }
 
-    /**
-     * 첨삭목록 조회
-     */
+    @Operation(summary = "첨삭요청 목록 조회", description = "첨삭요청 목록을 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EssayGroupResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/essay/request")
     public ResponseEntity<?> getRequestEssays() {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
@@ -118,6 +154,17 @@ public class EssayController {
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
+    @Operation(summary = "진행중인 첨삭목록 조회", description = "진행중인 첨삭목록을 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EssayGroupResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/essay/proceed")
     public ResponseEntity<?> getProceedEssays() {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
@@ -130,6 +177,17 @@ public class EssayController {
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
+    @Operation(summary = "거절된 첨삭목록 조회", description = "거절된 첨삭목록을 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EssayGroupResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/essay/reject")
     public ResponseEntity<?> getRejectEssays() {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
@@ -142,6 +200,17 @@ public class EssayController {
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
+    @Operation(summary = "완료된 첨삭목록 조회", description = "완료된 첨삭목록을 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EssayGroupResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/essay/complete")
     public ResponseEntity<?> getCompleteEssays() {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
@@ -154,9 +223,17 @@ public class EssayController {
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
-    /**
-     * 첨삭개별 조회
-     */
+    @Operation(summary = "첨삭요청 개별조회", description = "essayId에 해당하는 첨삭요청을 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RequestEssayResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/essay/request/{essayId}")
     public ResponseEntity<?> getRequestEssay(@PathVariable Long essayId) {
         RequestEssayResponse essayResponse =
@@ -164,6 +241,17 @@ public class EssayController {
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
+    @Operation(summary = "거절된 첨삭 개별조회", description = "거절된 첨삭을 개별조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RejectEssayResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/essay/reject/{essayId}")
     public ResponseEntity<?> getRejectEssay(@PathVariable Long essayId) {
         RejectEssayResponse essayResponse =
@@ -171,6 +259,17 @@ public class EssayController {
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
+    @Operation(summary = "진행중인 첨삭 개별조회", description = "진행중인 첨삭을 개별조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProceedEssayResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/essay/proceed/{essayId}")
     public ResponseEntity<?> getProceedEssay(@PathVariable Long essayId) {
         ProceedEssayResponse essayResponse =
@@ -178,6 +277,17 @@ public class EssayController {
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
+    @Operation(summary = "완료된 첨삭 개별조회", description = "완료된 첨삭을 개별조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(oneOf = {CompleteEssayResponse.class, NotReviewedEssayResponse.class}))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/essay/complete/{essayId}")
     public ResponseEntity<?> getCompleteEssay(@PathVariable Long essayId) {
         EssayResponse essayResponse = essayService.getEssayResponseWithFilePaths(essayId);
@@ -188,9 +298,17 @@ public class EssayController {
         return new ResponseEntity<>((NotReviewedEssayResponse) essayResponse, HttpStatus.OK);
     }
 
-    /**
-     * 첨삭상태 변경
-     */
+    @Operation(summary = "첨삭요청 수락", description = "첨삭요청을 수락한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping("/essay/{essayId}/accept")
     public ResponseEntity<?> acceptEssay(@PathVariable Long essayId) {
         Essay essay = essayService.acceptEssay(essayId);
@@ -200,6 +318,17 @@ public class EssayController {
         return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
     }
 
+    @Operation(summary = "첨삭요청 거절", description = "첨삭요청을 거절한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping(value = "/essay/{essayId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> rejectEssay(@PathVariable Long essayId,
                                          @Valid @RequestBody RejectRequest rejectRequest,
@@ -218,6 +347,17 @@ public class EssayController {
         return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
     }
 
+    @Operation(summary = "진행중인 첨삭 완료", description = "진행중인 첨삭요청을 완료한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping("/essay/{essayId}/complete")
     public ResponseEntity<?> completeEssay(@PathVariable Long essayId) {
         Essay essay = essayService.completeEssay(essayId);

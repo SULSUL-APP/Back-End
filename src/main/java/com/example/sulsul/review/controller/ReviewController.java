@@ -1,12 +1,20 @@
 package com.example.sulsul.review.controller;
 
 import com.example.sulsul.exception.custom.CustomValidationException;
+import com.example.sulsul.exceptionhandler.dto.response.ErrorResponse;
+import com.example.sulsul.review.dto.request.ReviewRequest;
 import com.example.sulsul.review.dto.response.ReviewGroupResponse;
 import com.example.sulsul.review.dto.response.ReviewResponse;
-import com.example.sulsul.review.dto.request.ReviewRequest;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.review.service.ReviewService;
 import com.example.sulsul.user.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +27,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Review", description = "리뷰 관련 API")
 @RestController
 @RequiredArgsConstructor
 public class ReviewController {
 
     private final ReviewService reviewService;
 
-    /**
-     * 해당 첨삭에 리뷰 작성
-     */
+    @Operation(summary = "해당 첨삭에 리뷰 작성", description = "essayId에 해당하는 첨삭에 리뷰를 작성한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "CREATED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReviewResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping("/essay/{essayId}/reviews")
-    public ResponseEntity<?> createReview(@PathVariable Long essayId,
+    public ResponseEntity<?> createReview(@PathVariable @Parameter(description = "리뷰를 작성할 essay의 id") Long essayId,
                                           @Valid @RequestBody ReviewRequest reviewRequest,
                                           BindingResult bindingResult) {
         // 리뷰 내용 유효성 검사
@@ -51,11 +68,19 @@ public class ReviewController {
         return new ResponseEntity<>(new ReviewResponse(review), HttpStatus.CREATED);
     }
 
-    /**
-     * 강사에게 작성된 모든 리뷰 조회
-     */
+    @Operation(summary = "강사에게 작성된 모든 리뷰 조회", description = "profileId에 해당하는 강사에게 작성된 모든 리뷰를 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReviewGroupResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/profiles/{profileId}/reviews")
-    public ResponseEntity<?> getReviews(@PathVariable Long profileId) {
+    public ResponseEntity<?> getReviews(@PathVariable @Parameter(description = "리뷰를 조회할 강사의 id") Long profileId) {
         List<Review> reviews = reviewService.getReviews(profileId);
         return new ResponseEntity<>(new ReviewGroupResponse(reviews), HttpStatus.OK);
     }
