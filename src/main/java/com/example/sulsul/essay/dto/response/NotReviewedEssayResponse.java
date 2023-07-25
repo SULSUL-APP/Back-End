@@ -3,6 +3,8 @@ package com.example.sulsul.essay.dto.response;
 import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.essay.entity.Essay;
+import com.example.sulsul.review.dto.response.ReviewResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -11,9 +13,18 @@ import java.util.List;
 @Getter
 public class NotReviewedEssayResponse extends EssayResponse {
 
+    @Schema(description = "문의사항", example = "첨삭 잘 부탁드립니다.")
     private final String inquiry;
+
+    @Schema(description = "학생 첨삭파일 경로",
+            example = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf")
     private final String studentFilePath;
+
+    @Schema(description = "강사 첨삭파일 경로",
+            example = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/751b44f7_sulsul.pdf")
     private final String teacherFilePath;
+
+    @Schema(description = "댓글 리스트")
     private final List<CommentResponse> comments = new ArrayList<>();
 
     public NotReviewedEssayResponse(Essay essay, String studentFilePath,

@@ -20,10 +20,10 @@ public class UserResponse {
             example = "https://sulsul.s3.ap-northeast-2.amazonaws.com/images/314a32f7_image.png")
     private final String profileImage;
 
-    @Schema(description = "유저 타입", example = "STUDENT")
+    @Schema(description = "유저 타입", example = "STUDENT", allowableValues = {"STUDENT", "TEACHER"})
     private final String uType;
 
-    @Schema(description = "첨삭 타입", example = "NATURE")
+    @Schema(description = "첨삭 타입", example = "NATURE", allowableValues = {"NATURE", "SOCIAL"})
     private final String eType;
 
     public UserResponse(User user) {
