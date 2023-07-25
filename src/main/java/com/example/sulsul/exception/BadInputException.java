@@ -1,4 +1,4 @@
-package com.example.sulsul.exception.badinput;
+package com.example.sulsul.exception;
 
 import com.example.sulsul.exception.BaseException;
 

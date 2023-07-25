@@ -1,7 +1,7 @@
 package com.example.sulsul.review.controller;
 
-import com.example.sulsul.exception.custom.CustomValidationException;
-import com.example.sulsul.exceptionhandler.dto.response.ErrorResponse;
+import com.example.sulsul.exception.review.InvalidReviewCreateException;
+import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.review.dto.request.ReviewRequest;
 import com.example.sulsul.review.dto.response.ReviewGroupResponse;
 import com.example.sulsul.review.dto.response.ReviewResponse;
@@ -46,7 +46,7 @@ public class ReviewController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/essay/{essayId}/reviews")
-    public ResponseEntity<?> createReview(@Parameter(description = "리뷰를 작성할 essay의 id")
+    public ResponseEntity<?> createReview(@Parameter(description = "리뷰를 작성할 첨삭의 id")
                                           @PathVariable Long essayId,
                                           @Valid @RequestBody ReviewRequest reviewRequest,
                                           BindingResult bindingResult) {
@@ -56,7 +56,7 @@ public class ReviewController {
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errorMap.put(error.getField(), error.getDefaultMessage());
             }
-            throw new CustomValidationException("입력값 유효성 검사 실패", errorMap);
+            throw new InvalidReviewCreateException(errorMap);
         }
 
         // 로그인 되어 있는 유저 객체를 가져오는 로직

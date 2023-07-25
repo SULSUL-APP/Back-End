@@ -2,8 +2,8 @@ package com.example.sulsul.review.service;
 
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.common.type.ReviewState;
-import com.example.sulsul.exception.custom.CustomException;
 import com.example.sulsul.essay.repository.EssayRepository;
+import com.example.sulsul.exception.essay.EssayNotFoundException;
 import com.example.sulsul.review.dto.request.ReviewRequest;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.review.repository.ReviewRepository;
@@ -22,7 +22,7 @@ public class ReviewService {
 
     public Review createReview(Long essayId, User student, ReviewRequest request) {
         Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭이 존재하지 않습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
 
         // 리뷰 생성
         Review review = Review.builder()

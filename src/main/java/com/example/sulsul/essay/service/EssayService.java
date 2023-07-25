@@ -2,15 +2,18 @@ package com.example.sulsul.essay.service;
 
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.repository.CommentRepository;
+import com.example.sulsul.common.type.EssayState;
+import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.common.type.EssayState;
-import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.essay.repository.EssayRepository;
-import com.example.sulsul.exception.custom.CustomException;
+import com.example.sulsul.exception.essay.EssayNotFoundException;
+import com.example.sulsul.exception.file.FileNotFoundException;
+import com.example.sulsul.exception.review.ReviewNotFoundException;
+import com.example.sulsul.exception.user.TeacherNotFoundException;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
 import com.example.sulsul.review.entity.Review;
@@ -21,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +41,7 @@ public class EssayService {
     public Essay createEssay(Long profileId, User student, CreateEssayRequest request) {
         // profileId에 해당하는 강사 유저 조회
         User teacher = userRepository.findById(profileId)
-                .orElseThrow(() -> new CustomException("강사 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new TeacherNotFoundException(profileId));
         Essay essay = request.toEntity(student, teacher); // Essay 엔티티 생성
         return essayRepository.save(essay); // Essay 엔티티 저장
     }
@@ -47,7 +49,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public Essay getEssayById(Long essayId) {
         return essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
     }
 
     @Transactional(readOnly = true)
@@ -70,12 +72,12 @@ public class EssayService {
     public EssayResponse getEssayResponseWithStudentFile(Long essayId) {
         // essayId에 해당하는 첨삭 조회
         Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
 
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         File file = fileRepository.getStudentEssayFile(essayId, studentId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글의 첨삭파일을 찾을 수 없습니다."));
+                .orElseThrow(() -> new FileNotFoundException());
         String filePath = file.getFilePath(); // 첨삭파일이 위치한 s3 경로
         // 첨삭요청 상태인 경우
         if (essay.getEssayState().equals(EssayState.REQUEST)) {
@@ -91,12 +93,12 @@ public class EssayService {
     public EssayResponse getEssayResponseWithFilePaths(Long essayId) {
         // essayId에 해당하는 첨삭 조회
         Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
 
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         File studentFile = fileRepository.getStudentEssayFile(essayId, studentId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글의 첨삭파일을 찾을 수 없습니다."));
+                .orElseThrow(() -> new FileNotFoundException());
         String studentFileFilePath = studentFile.getFilePath(); // 학생이 올린 첨삭파일의 s3 경로
 
         Long teacherId = essay.getTeacher().getId();
@@ -110,15 +112,15 @@ public class EssayService {
         }
         // 첨삭에 작성된 모든 댓글 조회
         List<Comment> comments = commentRepository.findAllByEssayId(essayId);
-        if (comments == null) {
-            comments = new ArrayList<>(); // 아직 댓글이 없는 경우
-        }
+//        if (comments == null) {
+//            comments = new ArrayList<>(); // 아직 댓글이 없는 경우
+//        }
         // 첨삭완료 상태인 경우
         if (essay.getEssayState().equals(EssayState.COMPLETE)) {
             // 리뷰가 작성된 경우
             if (essay.getReviewState().equals(ReviewState.ON)) {
                 Review review = reviewRepository.findByEssayId(essayId)
-                        .orElseThrow(() -> new CustomException("해당 첨삭글의 리뷰를 찾을 수 없습니다."));
+                        .orElseThrow(() -> new ReviewNotFoundException(essayId));
                 return new CompleteEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments, review);
             }
             // 리뷰가 작성되지 않은 경우
@@ -131,7 +133,7 @@ public class EssayService {
     @Transactional
     public Essay acceptEssay(Long essayId) {
         Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
         // 첨삭진행 상태로 변경
         essay.updateEssayState(EssayState.PROCEED);
         return essayRepository.save(essay);
@@ -140,7 +142,7 @@ public class EssayService {
     @Transactional
     public Essay rejectEssay(Long essayId, RejectRequest rejectRequest) {
         Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
         // 첨삭거절 상태로 변경
         essay.updateEssayState(EssayState.REJECT);
         essay.updateRejectDetail(rejectRequest.getRejectDetail());
@@ -150,7 +152,7 @@ public class EssayService {
     @Transactional
     public Essay completeEssay(Long essayId) {
         Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
         // 첨삭완료 상태로 변경
         essay.updateEssayState(EssayState.COMPLETE);
         return essayRepository.save(essay);
@@ -159,7 +161,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public boolean checkEssayReviewState(Long essayId) {
         Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
         ReviewState reviewState = essay.getReviewState();
         return reviewState.equals(ReviewState.ON);
     }
