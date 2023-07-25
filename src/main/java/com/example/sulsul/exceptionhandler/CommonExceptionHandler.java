@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class CommonExceptionHandler {
-
-
     /**
      * FileException 이 발생하면, ErrorResponse 와 HttpStatus.BAD_REQUEST 를 담은 ResponseEntity 반환한다.
      *
@@ -26,6 +24,4 @@ public class CommonExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
-
-
 }

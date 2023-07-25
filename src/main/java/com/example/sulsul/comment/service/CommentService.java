@@ -6,6 +6,8 @@ import com.example.sulsul.comment.repository.CommentRepository;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.exception.custom.CustomException;
 import com.example.sulsul.essay.repository.EssayRepository;
+import com.example.sulsul.exception.notfound.CommentNotFoundException;
+import com.example.sulsul.exception.notfound.EssayNotFoundException;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class CommentService {
 
     public Comment createComment(Long essayId, User user, CommentRequest request) {
         Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new CustomException("해당 첨삭이 존재하지 않습니다."));
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
 
         Comment comment = Comment.builder()
                 .essay(essay)
@@ -37,7 +39,7 @@ public class CommentService {
 
     public Comment updateComment(Long commentId, CommentRequest commentRequest) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("해당 댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
 
         comment.updateDetail(commentRequest.getDetail());
         return commentRepository.save(comment);
@@ -45,7 +47,7 @@ public class CommentService {
 
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("해당 댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
 
         commentRepository.deleteById(comment.getId());
     }

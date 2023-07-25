@@ -3,7 +3,6 @@ package com.example.sulsul.essay.dto.response;
 import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.review.dto.response.ReviewResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 

@@ -1,7 +1,6 @@
 package com.example.sulsul.exception;
 
-public interface BaseErrorCode {
+public interface SBaseErrorCode {
     String getCode();
     String getMessage();
-
 }

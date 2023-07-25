@@ -6,7 +6,8 @@ import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.dto.response.DeleteSuccessResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.service.CommentService;
-import com.example.sulsul.exception.custom.CustomException;
+import com.example.sulsul.exception.badinput.InvalidCommentCreateException;
+import com.example.sulsul.exception.badinput.InvalidCommentUpdateException;
 import com.example.sulsul.exceptionhandler.dto.response.ErrorResponse;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +25,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Comment", description = "댓글 관련 API")
 @RestController
@@ -69,9 +72,11 @@ public class CommentController {
                                            BindingResult bindingResult) {
         // 댓글 내용 유효성 검사
         if (bindingResult.hasErrors()) {
-            FieldError fieldError = bindingResult.getFieldError("detail");
-            String message = fieldError.getDefaultMessage();
-            throw new CustomException(message);
+            Map<String, String> errorMap = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put(error.getField(), error.getDefaultMessage());
+            }
+            throw new InvalidCommentCreateException(errorMap);
         }
 
         // 로그인 되어 있는 유저 객체를 가져오는 로직
@@ -102,9 +107,11 @@ public class CommentController {
                                            BindingResult bindingResult) {
         // 댓글 내용 유효성 검사
         if (bindingResult.hasErrors()) {
-            FieldError fieldError = bindingResult.getFieldError("detail");
-            String message = fieldError.getDefaultMessage();
-            throw new CustomException(message);
+            Map<String, String> errorMap = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put(error.getField(), error.getDefaultMessage());
+            }
+            throw new InvalidCommentUpdateException(errorMap);
         }
 
         Comment comment = commentService.updateComment(commentId, commentRequest);

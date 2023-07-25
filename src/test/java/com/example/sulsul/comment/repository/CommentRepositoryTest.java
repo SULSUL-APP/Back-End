@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -245,5 +246,47 @@ class CommentRepositoryTest {
                 () -> assertThat(comments.get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
                 () -> assertThat(comments.get(1).getDetail()).isEqualTo("네 확인했습니다.")
         );
+    }
+
+    @Test
+    void 첨삭에_작성된_댓글이_없는_경우_테스트() {
+        // given
+        User s1 = User.builder()
+                .name("김경근")
+                .email("sulsul@gmail.com")
+                .uType(UType.STUDENT)
+                .eType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
+                .build();
+
+        User t1 = User.builder()
+                .name("임탁균")
+                .email("sulsul@naver.com")
+                .uType(UType.TEACHER)
+                .eType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
+                .catchPhrase("항상 최선을 다하겠습니다. 화이링")
+                .build();
+
+        userRepository.save(s1);
+        userRepository.save(t1);
+
+        Essay essay1 = Essay.builder()
+                .univ("홍익대")
+                .examYear("2022")
+                .eType("수리")
+                .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
+                .essayState(EssayState.PROCEED)
+                .reviewState(ReviewState.OFF)
+                .student(s1)
+                .teacher(t1)
+                .build();
+
+        essayRepository.save(essay1);
+        // when
+        List<Comment> comments = commentRepository.findAllByEssayId(essay1.getId());
+        // then
+        assertThat(comments).isNotNull();
+        assertThat(comments.size()).isEqualTo(0);
     }
 }

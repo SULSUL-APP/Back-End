@@ -1,7 +1,6 @@
 package com.example.sulsul.essay.dto.response;
 
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.common.type.EssayState;
 import com.example.sulsul.user.dto.StudentResponse;
 import com.example.sulsul.user.dto.TeacherResponse;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -90,6 +90,30 @@ class CommentControllerTest {
     }
 
     @Test
+    @DisplayName("댓글생성 예외처리 테스트 POST /essay/{essayId}/comments")
+    void createCommentWithNoRequestTest() throws Exception {
+        // given
+        User t1 = DemoDataFactory.createTeacher1(1L);
+        User s1 = DemoDataFactory.createStudent1(2L);
+        Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.PROCEED, ReviewState.OFF);
+        Comment c1 = DemoDataFactory.createComment1(1L, t1, essay1);
+        CommentRequest request = new CommentRequest("첨");
+        String content = objectMapper.writeValueAsString(request);
+//         stub
+//        when(commentService.createComment(eq(1L), any(User.class), any(CommentRequest.class))).thenReturn(c1);
+        // when && then
+        mockMvc.perform(post("/essay/{essayId}/comments", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andDo(print());
+//                .andExpect(status().isCreated())
+//                .andExpect(jsonPath("$.id").value(1L))
+//                .andExpect(jsonPath("$.detail").value("첨삭한 파일 첨부했습니다."))
+//                .andExpect(jsonPath("$.user.name").value("임탁균"))
+//                .andExpect(jsonPath("$.user.email").value("sulsul@naver.com"));
+    }
+
+    @Test
     @DisplayName("댓글수정 PUT /comments/{commentId}")
     void updateCommentTest() throws Exception {
         // given
