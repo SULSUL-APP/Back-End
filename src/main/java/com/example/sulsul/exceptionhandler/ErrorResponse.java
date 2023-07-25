@@ -8,17 +8,14 @@ import java.util.Map;
 @Getter
 public class ErrorResponse {
 
-    private String code;
-
-    private String messages;
-
-    private Map<String, String> errors;
+    private final String code;
+    private final String messages;
+    private final Map<String, String> errors;
 
     @Builder
     public ErrorResponse(String code, String messages, Map<String, String> errors) {
-        this.code= code;
+        this.code = code;
         this.messages = messages;
         this.errors = errors;
     }
-
 }

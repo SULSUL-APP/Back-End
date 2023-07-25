@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   config:
     activate:
@@ -9,14 +12,55 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   jpa:
     hibernate:
-      ddl-auto: update
+        ddl-auto: none
+#        ddl-auto: create
+#        ddl-auto: update
 
     properties:
       hibernate:
         format_sql: true
 
+    # ddl-auto 과정에서 더미데이터 생성
+    #    defer-datasource-initialization: true
+    defer-datasource-initialization: false
+  sql:
+    init:
+      mode: never
+#      mode: always
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
+
+cloud:
+  aws:
+    s3:
+      bucket: ${BUCKET}
+    credentials:
+      accessKey: ${ACCESS_KEY}
+      secretKey: ${SECRET_KEY}
+    region:
+      static: ${REGION}
+      auto: false
+    stack:
+      auto: false
+
+s3:
+  host:
+    name: https://${BUCKET}.s3.${REGION}.amazonaws.com/
 
 domain:
   name: http://www.localhost:8081
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+    com.amazonaws.util.EC2MetadataUtils: error # Failed to connect to service endpoint 에러 무시
