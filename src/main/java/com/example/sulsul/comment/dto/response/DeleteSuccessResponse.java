@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 public class DeleteSuccessResponse {
 
-    @Schema(description = "삭제 확인 메시지", example = "댓글 삭제 성공")
-    String message;
+    @Schema(description = "삭제 확인 메시지")
+    private final String message;
 
-    public DeleteSuccessResponse(String message) {
-        this.message = message;
+    public DeleteSuccessResponse() {
+        this.message = "댓글 삭제 성공";
     }
 }

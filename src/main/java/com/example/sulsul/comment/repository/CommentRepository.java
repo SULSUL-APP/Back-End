@@ -13,7 +13,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      */
     List<Comment> findAllByEssayId(Long essayId);
 
-    // POST /essay/{essayId}/comments - save
-    // PUT /comments/{commentId} - save
-    // DELETE /commentss/{commentId} - deleteById
 }

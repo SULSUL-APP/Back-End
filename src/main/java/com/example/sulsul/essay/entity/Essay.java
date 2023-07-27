@@ -45,7 +45,7 @@ public class Essay extends BaseEntity {
     private String rejectDetail; // 거절사유
 
     @Column(nullable = false)
-    private String eType;
+    private String essayType;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -54,8 +54,12 @@ public class Essay extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReviewState reviewState; // 리뷰 생성 여부
 
-    public void updateEType(String eType) {
-        this.eType = eType;
+    public boolean isReviewed() {
+        return this.reviewState.equals(ReviewState.ON);
+    }
+
+    public void updateEType(String essayType) {
+        this.essayType = essayType;
     }
 
     public void updateEssayState(EssayState essayState) {

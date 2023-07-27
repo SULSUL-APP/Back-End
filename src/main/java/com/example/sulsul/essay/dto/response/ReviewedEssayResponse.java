@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class CompleteEssayResponse extends EssayResponse {
+public class ReviewedEssayResponse extends EssayResponse {
 
     @Schema(description = "문의사항", example = "첨삭 잘 부탁드립니다.")
     private final String inquiry;
@@ -31,7 +31,7 @@ public class CompleteEssayResponse extends EssayResponse {
     @Schema(description = "첨삭 리뷰")
     private final ReviewResponse review;
 
-    public CompleteEssayResponse(Essay essay, String studentFilePath, String teacherFilePath,
+    public ReviewedEssayResponse(Essay essay, String studentFilePath, String teacherFilePath,
                                  List<Comment> comments, Review review) {
         super(essay);
         this.inquiry = essay.getInquiry();
@@ -40,6 +40,6 @@ public class CompleteEssayResponse extends EssayResponse {
         comments.stream()
                 .map(CommentResponse::new)
                 .forEach(comment -> this.comments.add(comment));
-        this.review = new ReviewResponse(review);
+         this.review = new ReviewResponse(review);
     }
 }

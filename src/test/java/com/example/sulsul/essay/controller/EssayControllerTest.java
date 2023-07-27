@@ -372,7 +372,7 @@ class EssayControllerTest {
         String teacherFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/751b44f7_sulsul.pdf";
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
         when(essayService.getEssayResponseWithFilePaths(eq(1L)))
-                .thenReturn(new CompleteEssayResponse(essay1, studentFilePath, teacherFilePath, comments, review));
+                .thenReturn(new ReviewedEssayResponse(essay1, studentFilePath, teacherFilePath, comments, review));
         when(essayService.checkEssayReviewState(eq(1L))).thenReturn(true);
         // when && then
         mockMvc.perform(get("/essay/complete/{essayId}", 1L))
@@ -413,7 +413,7 @@ class EssayControllerTest {
         String teacherFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/751b44f7_sulsul.pdf";
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
         when(essayService.getEssayResponseWithFilePaths(eq(1L)))
-                .thenReturn(new NotReviewedEssayResponse(essay1, studentFilePath, teacherFilePath, comments));
+                .thenReturn(new CompletedEssayResponse(essay1, studentFilePath, teacherFilePath, comments));
         when(essayService.checkEssayReviewState(eq(1L))).thenReturn(false);
         // when && then
         mockMvc.perform(get("/essay/complete/{essayId}", 1L))

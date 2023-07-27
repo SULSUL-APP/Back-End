@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class NotReviewedEssayResponse extends EssayResponse {
+public class CompletedEssayResponse extends EssayResponse {
 
     @Schema(description = "문의사항", example = "첨삭 잘 부탁드립니다.")
     private final String inquiry;
@@ -26,8 +26,10 @@ public class NotReviewedEssayResponse extends EssayResponse {
     @Schema(description = "댓글 리스트")
     private final List<CommentResponse> comments = new ArrayList<>();
 
-    public NotReviewedEssayResponse(Essay essay, String studentFilePath,
-                                    String teacherFilePath, List<Comment> comments) {
+    private final EmptyResponse review;
+
+    public CompletedEssayResponse(Essay essay, String studentFilePath,
+                                  String teacherFilePath, List<Comment> comments) {
         super(essay);
         this.inquiry = essay.getInquiry();
         this.studentFilePath = studentFilePath;
@@ -35,5 +37,6 @@ public class NotReviewedEssayResponse extends EssayResponse {
         comments.stream()
                 .map(CommentResponse::new)
                 .forEach(comment -> this.comments.add(comment));
+        this.review = new EmptyResponse();
     }
 }

@@ -12,6 +12,7 @@ import com.example.sulsul.exception.essay.InvalidRejectDetailException;
 import com.example.sulsul.exception.essay.TeacherCreateEssayException;
 import com.example.sulsul.exception.file.EmptyEssayFileException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
+import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.service.FileService;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -77,19 +78,19 @@ public class EssayController {
         Long userId = 2L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
-                .uType(UType.STUDENT)
+                .userType(UType.STUDENT)
                 .build();
         // 학생 유저만 첨삭요청 가능
-        if (loginedUser.getUType().equals(UType.TEACHER)) {
+        if (loginedUser.getUserType().equals(UType.TEACHER)) {
             throw new TeacherCreateEssayException(loginedUser.getId());
         }
         // 첨삭 엔티티 생성
         Essay essay = essayService.createEssay(profileId, loginedUser, request);
         // 첨삭 파일 업로드
-        fileService.uploadEssayFile(loginedUser, essay, request.getEssayFile());
+        File file = fileService.uploadEssayFile(loginedUser, essay, request.getEssayFile());
+        String filePath = file.getFilePath();
         // 첨삭요청 응답 생성
-        RequestEssayResponse essayResponse =
-                (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(essay.getId());
+        RequestEssayResponse essayResponse = new RequestEssayResponse(essay, filePath);
         // 첨삭 요청 완료: 201 CREATED
         return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
     }
@@ -120,14 +121,13 @@ public class EssayController {
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
-                .uType(UType.TEACHER)
+                .userType(UType.TEACHER)
                 .build();
         // 첨삭 엔티티 조회
         Essay essay = essayService.getEssayById(essayId);
         // 강사 첨삭 파일 업로드
         fileService.uploadEssayFile(loginedUser, essay, essayFile);
-        ProceedEssayResponse essayResponse =
-                (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
+        ProceedEssayResponse essayResponse = essayService.getProceedEssay(essayId);
         // 강사 첨삭 파일 업로드 완료: 201 CREATED
         return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
     }
@@ -149,7 +149,7 @@ public class EssayController {
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
-                .uType(UType.STUDENT)
+                .userType(UType.STUDENT)
                 .build();
         // 첨삭요청 목록 조회
         List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.REQUEST);
@@ -239,8 +239,7 @@ public class EssayController {
     @GetMapping("/essay/request/{essayId}")
     public ResponseEntity<?> getRequestEssay(@Parameter(description = "조회할 첨삭의 id")
                                              @PathVariable Long essayId) {
-        RequestEssayResponse essayResponse =
-                (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(essayId);
+        RequestEssayResponse essayResponse = essayService.getEssayRequest(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
@@ -258,8 +257,7 @@ public class EssayController {
     @GetMapping("/essay/reject/{essayId}")
     public ResponseEntity<?> getRejectEssay(@Parameter(description = "조회할 첨삭의 id")
                                             @PathVariable Long essayId) {
-        RejectEssayResponse essayResponse =
-                (RejectEssayResponse) essayService.getEssayResponseWithStudentFile(essayId);
+        RejectEssayResponse essayResponse = essayService.getEssayReject(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
@@ -277,15 +275,14 @@ public class EssayController {
     @GetMapping("/essay/proceed/{essayId}")
     public ResponseEntity<?> getProceedEssay(@Parameter(description = "조회할 첨삭의 id")
                                              @PathVariable Long essayId) {
-        ProceedEssayResponse essayResponse =
-                (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
+        ProceedEssayResponse essayResponse = essayService.getProceedEssay(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
     @Operation(summary = "완료된 첨삭 개별조회", description = "완료된 첨삭을 개별조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(oneOf = {CompleteEssayResponse.class, NotReviewedEssayResponse.class}))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(oneOf = {ReviewedEssayResponse.class, CompletedEssayResponse.class}))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -296,12 +293,15 @@ public class EssayController {
     @GetMapping("/essay/complete/{essayId}")
     public ResponseEntity<?> getCompleteEssay(@Parameter(description = "조회할 첨삭의 id")
                                               @PathVariable Long essayId) {
-        EssayResponse essayResponse = essayService.getEssayResponseWithFilePaths(essayId);
-        boolean reviewed = essayService.checkEssayReviewState(essayId);
-        if (reviewed) {
-            return new ResponseEntity<>((CompleteEssayResponse) essayResponse, HttpStatus.OK);
+        Essay essay = essayService.getEssayById(essayId);
+        // 리뷰가 작성된 경우
+        if (essay.isReviewed()) {
+            ReviewedEssayResponse essayResponse = essayService.getReviewedEssay(essayId);
+            return new ResponseEntity<>(essayResponse, HttpStatus.OK);
         }
-        return new ResponseEntity<>((NotReviewedEssayResponse) essayResponse, HttpStatus.OK);
+        // 리뷰가 아직 작성되지 않은 경우
+        CompletedEssayResponse essayResponse = essayService.getCompleteEssay(essayId);
+        return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
     @Operation(summary = "첨삭요청 수락", description = "첨삭요청을 수락한다.")

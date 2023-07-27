@@ -54,31 +54,26 @@ public class EssayService {
 
     @Transactional(readOnly = true)
     public List<Essay> getEssaysByUser(User user, EssayState essayState) {
-        UType userType = user.getUType();
+        UType userType = user.getUserType();
         Long userId = user.getId();
-        List<Essay> essays = null;
-
-        if (userType.equals(UType.TEACHER)) { // 강사인 경우
-            // 강사에게 요청된 첨삭글 목록 조회
-            essays = essayRepository.findAllByTeacherIdAndEssayState(userId, essayState);
-        } else if (userType.equals(UType.STUDENT)) { // 학생인 경우
-            // 학생이 요청한 첨삭글 목록 조회
-            essays = essayRepository.findAllByStudentIdAndEssayState(userId, essayState);
+        if (userType.equals(UType.TEACHER)) {
+            // 강사인 경우: 강사에게 요청된 첨삭글 목록 조회
+            return essayRepository.findAllByTeacherIdAndEssayState(userId, essayState);
         }
-        return essays; // 첨삭목록 반환
+        // 학생인 경우: 학생이 요청한 첨삭글 목록 조회
+        return essayRepository.findAllByStudentIdAndEssayState(userId, essayState);
     }
 
+    /**
+     * 제거 예정
+     */
     @Transactional(readOnly = true)
     public EssayResponse getEssayResponseWithStudentFile(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new EssayNotFoundException(essayId));
-
+        Essay essay = getEssayById(essayId);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
-        File file = fileRepository.getStudentEssayFile(essayId, studentId)
-                .orElseThrow(() -> new FileNotFoundException());
-        String filePath = file.getFilePath(); // 첨삭파일이 위치한 s3 경로
+        String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
         // 첨삭요청 상태인 경우
         if (essay.getEssayState().equals(EssayState.REQUEST)) {
             return new RequestEssayResponse(essay, filePath);
@@ -87,8 +82,37 @@ public class EssayService {
         return new RejectEssayResponse(essay, filePath);
     }
 
-    // TODO: 메소드가 너무 많은 역할을 하고 있음 - 리팩토링, 기능분리 필요
-    // TODO: 테스트케이스 추가 - 강사가 첨삭파일을 업로드하지 않은 경우, 댓글이 작성되지 않은 경우 등
+    private String getStudentFilePath(Long essayId, Long studentId) {
+        File file = fileRepository.getStudentEssayFile(essayId, studentId)
+                .orElseThrow(() -> new FileNotFoundException());
+        return file.getFilePath();
+    }
+
+    @Transactional(readOnly = true)
+    public RequestEssayResponse getEssayRequest(Long essayId) {
+        // essayId에 해당하는 첨삭 조회
+        Essay essay = getEssayById(essayId);
+        Long studentId = essay.getStudent().getId();
+        // 학생이 올린 첨삭파일 조회
+        String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
+        // 첨삭요청 정보와 파일경로 반환
+        return new RequestEssayResponse(essay, filePath);
+    }
+
+    @Transactional(readOnly = true)
+    public RejectEssayResponse getEssayReject(Long essayId) {
+        // essayId에 해당하는 첨삭 조회
+        Essay essay = getEssayById(essayId);
+        Long studentId = essay.getStudent().getId();
+        // 학생이 올린 첨삭파일 조회
+        String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
+        // 첨삭요청 정보와 파일경로 반환
+        return new RejectEssayResponse(essay, filePath);
+    }
+
+    /**
+     * 제거 예정
+     */
     @Transactional(readOnly = true)
     public EssayResponse getEssayResponseWithFilePaths(Long essayId) {
         // essayId에 해당하는 첨삭 조회
@@ -97,18 +121,15 @@ public class EssayService {
 
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
-        File studentFile = fileRepository.getStudentEssayFile(essayId, studentId)
-                .orElseThrow(() -> new FileNotFoundException());
-        String studentFileFilePath = studentFile.getFilePath(); // 학생이 올린 첨삭파일의 s3 경로
-
+        String studentFilePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로 // 학생이 올린 첨삭파일의 s3 경로
         Long teacherId = essay.getTeacher().getId();
         // 강사가 올린 첨삭파일 조회
         Optional<File> teacherEssayFile = fileRepository.getTeacherEssayFile(essayId, teacherId);
-        String teacherFileFilePath;
+        String teacherFilePath;
         if (teacherEssayFile.isEmpty()) {
-            teacherFileFilePath = ""; // 강사가 아직 첨삭파일을 업로드하지 않은 경우
+            teacherFilePath = ""; // 강사가 아직 첨삭파일을 업로드하지 않은 경우
         } else {
-            teacherFileFilePath = teacherEssayFile.get().getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
+            teacherFilePath = teacherEssayFile.get().getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
         }
         // 첨삭에 작성된 모든 댓글 조회
         List<Comment> comments = commentRepository.findAllByEssayId(essayId);
@@ -121,13 +142,72 @@ public class EssayService {
             if (essay.getReviewState().equals(ReviewState.ON)) {
                 Review review = reviewRepository.findByEssayId(essayId)
                         .orElseThrow(() -> new ReviewNotFoundException(essayId));
-                return new CompleteEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments, review);
+                return new ReviewedEssayResponse(essay, studentFilePath, teacherFilePath, comments, review);
             }
             // 리뷰가 작성되지 않은 경우
-            return new NotReviewedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
+            return new CompletedEssayResponse(essay, studentFilePath, teacherFilePath, comments);
         }
         // 첨삭진행 상태인 경우
-        return new ProceedEssayResponse(essay, studentFileFilePath, teacherFileFilePath, comments);
+        return new ProceedEssayResponse(essay, studentFilePath, teacherFilePath, comments);
+    }
+
+    private String getTeacherFilePath(Long essayId, Long teacherId) {
+        Optional<File> teacherFile = fileRepository.getTeacherEssayFile(essayId, teacherId);
+        String teacherFilePath = ""; // 강사가 아직 첨삭파일을 업로드하지 않은 경우
+        if (teacherFile.isPresent()) { // 강사가 첨삭파일을 업로드한 경우
+            teacherFilePath = teacherFile.get().getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
+        }
+        return teacherFilePath;
+    }
+
+    @Transactional(readOnly = true)
+    public ProceedEssayResponse getProceedEssay(Long essayId) {
+        // essayId에 해당하는 첨삭 조회
+        Essay essay = getEssayById(essayId);
+        Long studentId = essay.getStudent().getId();
+        // 학생이 올린 첨삭파일 조회
+        String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로
+        // 강사가 올린 첨삭파일 조회
+        Long teacherId = essay.getTeacher().getId();
+        String teacherFilePath = getTeacherFilePath(essayId, teacherId);
+        // 첨삭에 작성된 모든 댓글 조회
+        List<Comment> comments = commentRepository.findAllByEssayId(essayId);
+        // 진행중인 첨삭 Response 반환
+        return new ProceedEssayResponse(essay, studentFilePath, teacherFilePath, comments);
+    }
+
+    @Transactional(readOnly = true)
+    public CompletedEssayResponse getCompleteEssay(Long essayId) {
+        // essayId에 해당하는 첨삭 조회
+        Essay essay = getEssayById(essayId);
+        Long studentId = essay.getStudent().getId();
+        // 학생이 올린 첨삭파일 조회
+        String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로
+        // 강사가 올린 첨삭파일 조회
+        Long teacherId = essay.getTeacher().getId();
+        String teacherFilePath = getTeacherFilePath(essayId, teacherId);
+        // 첨삭에 작성된 모든 댓글 조회
+        List<Comment> comments = commentRepository.findAllByEssayId(essayId);
+        // 리뷰가 작성되지 않은 경우
+        return new CompletedEssayResponse(essay, studentFilePath, teacherFilePath, comments);
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewedEssayResponse getReviewedEssay(Long essayId) {
+        // essayId에 해당하는 첨삭 조회
+        Essay essay = getEssayById(essayId);
+        Long studentId = essay.getStudent().getId();
+        // 학생이 올린 첨삭파일 조회
+        String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로
+        // 강사가 올린 첨삭파일 조회
+        Long teacherId = essay.getTeacher().getId();
+        String teacherFilePath = getTeacherFilePath(essayId, teacherId);
+        // 첨삭에 작성된 모든 댓글 조회
+        List<Comment> comments = commentRepository.findAllByEssayId(essayId);
+        // 첨삭에 작성된 리뷰 조회
+        Review review = reviewRepository.findByEssayId(essayId)
+                .orElseThrow(() -> new ReviewNotFoundException(essayId));
+        return new ReviewedEssayResponse(essay, studentFilePath, teacherFilePath, comments, review);
     }
 
     @Transactional
@@ -158,10 +238,12 @@ public class EssayService {
         return essayRepository.save(essay);
     }
 
+    /**
+     * 제거 예정
+     */
     @Transactional(readOnly = true)
     public boolean checkEssayReviewState(Long essayId) {
-        Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new EssayNotFoundException(essayId));
+        Essay essay = getEssayById(essayId);
         ReviewState reviewState = essay.getReviewState();
         return reviewState.equals(ReviewState.ON);
     }

@@ -21,17 +21,17 @@ public class UserResponse {
     private final String profileImage;
 
     @Schema(description = "유저 타입", example = "STUDENT", allowableValues = {"STUDENT", "TEACHER"})
-    private final String uType;
+    private final String userType;
 
     @Schema(description = "첨삭 타입", example = "NATURE", allowableValues = {"NATURE", "SOCIAL"})
-    private final String eType;
+    private final String essayType;
 
     public UserResponse(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
         this.profileImage = user.getProfileImage();
-        this.uType = user.getUType().name();
-        this.eType = user.getEType().name();
+        this.userType = user.getUserType().name();
+        this.essayType = user.getEssayType().name();
     }
 }
