@@ -8,14 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.util.List;
 
 @Configuration
-public class FcmInitializer {
+public class FcmConfig {
 
     @Value("${fcm.key.path}")
     private String credential;

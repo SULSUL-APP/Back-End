@@ -2,19 +2,22 @@ package com.example.sulsul.review.repository;
 
 import com.example.sulsul.review.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+    /**
+     * 강사의 리뷰 목록을 조회한다.
+     * @param teacherId 강사의 userId
+     * @return 리뷰 목록을 반환한다.
+     */
+    List<Review> findAllByTeacherId(Long teacherId);
 
     /**
-     * 입력받은 아이디 값의 강사의 리뷰 목록을 출력한다.
-     * @param teacherId 목록을 출력할 강사의 아이디 값
-     * @return 강사의 리뷰 목록
+     * 첨삭에 작성된 리뷰를 조회한다.
+     * @param essayId 조회할 첨삭 Id
+     * @return 첨삭에 작성된 리뷰를 반환한다.
      */
-    @Query("select r from Review r where r.teacher.id = :teacherId")
-    public List<Review> getReviewList(@Param("teacherId") Long teacherId);
-
+    Optional<Review> findByEssayId(Long essayId);
 }
