@@ -1,4 +1,4 @@
-package com.example.sulsul.fcm;
+package com.example.sulsul.config;
 
 import com.example.sulsul.exception.fcm.FcmInitException;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -12,7 +12,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.InputStream;
 import java.util.List;
 
-@Configuration
+//@Configuration
 public class FcmConfig {
 
     @Value("${fcm.key.path}")
@@ -41,10 +41,9 @@ public class FcmConfig {
             }
 
             return FirebaseMessaging.getInstance(firebaseApp);
+
         } catch (Exception e) {
-//            log.error("파이어베이스 이니셜라이저 오류 {}", e.getMessage());
             throw new FcmInitException();
         }
-
     }
 }
