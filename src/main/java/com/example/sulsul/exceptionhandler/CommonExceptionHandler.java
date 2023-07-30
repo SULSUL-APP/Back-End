@@ -1,7 +1,6 @@
 package com.example.sulsul.exceptionhandler;
 
 import com.example.sulsul.exception.*;
-import com.example.sulsul.exception.fcm.FcmInitException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
