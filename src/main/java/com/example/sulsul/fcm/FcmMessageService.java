@@ -5,9 +5,11 @@ import com.example.sulsul.exception.fcm.EssayMessageFailureException;
 import com.example.sulsul.fcm.entity.FcmToken;
 import com.example.sulsul.fcm.repository.FcmTokenRepository;
 import com.example.sulsul.user.entity.User;
-import com.google.firebase.messaging.*;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +18,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Async
 @RequiredArgsConstructor
 public class FcmMessageService {
 
@@ -51,7 +52,7 @@ public class FcmMessageService {
 
         try {
             // 첨삭알림 전송
-            FirebaseMessaging.getInstance().sendAsync(message);
+            FirebaseMessaging.getInstance().send(message);
         } catch (Exception e) {
             // 알림 전송 실패
             throw new EssayMessageFailureException(target.getId(), title, body);
