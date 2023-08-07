@@ -1,6 +1,6 @@
 package com.example.sulsul.common.type;
 
-import com.example.sulsul.exception.notFound.UTypeNotFoundException;
+import com.example.sulsul.exception.user.ETypeNotFoundException;
 
 import java.util.Arrays;
 
@@ -21,7 +21,7 @@ public enum EType {
         return Arrays.stream(EType.values())
                 .filter(etype -> etype.getValue().equals(eType))
                 .findAny()
-                .orElseThrow(UTypeNotFoundException::new);
+                .orElseThrow(ETypeNotFoundException::new);
     }
 
 }

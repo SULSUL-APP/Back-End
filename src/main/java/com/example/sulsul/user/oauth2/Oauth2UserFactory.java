@@ -1,6 +1,6 @@
 package com.example.sulsul.user.oauth2;
 
-import com.example.sulsul.exception.notFound.UserNotFoundException;
+import com.example.sulsul.exception.user.UserNotFoundException;
 import com.example.sulsul.user.dto.request.OauthDto;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.oauth2.parser.GoogleUserParser;

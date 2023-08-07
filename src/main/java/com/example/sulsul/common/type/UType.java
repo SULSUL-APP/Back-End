@@ -1,6 +1,6 @@
 package com.example.sulsul.common.type;
 
-import com.example.sulsul.exception.notFound.UTypeNotFoundException;
+import com.example.sulsul.exception.user.UTypeNotFoundException;
 
 import java.util.Arrays;
 
