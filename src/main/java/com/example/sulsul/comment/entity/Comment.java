@@ -9,10 +9,12 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 @Entity
-@Getter
+@Table(name = "comments")
 @Builder
-@AllArgsConstructor
+@Getter
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Comment extends BaseEntity {
 
     @Id

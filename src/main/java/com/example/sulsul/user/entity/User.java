@@ -11,10 +11,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
-@Getter
-@Builder
-@Setter(AccessLevel.PROTECTED)
 @Table(name = "users")
+@Builder
+@Getter
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User extends BaseEntity {
@@ -31,7 +31,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column()
+    private String profileImage; // 프로필 이미지 경로
+
     private String catchPhrase;
 
     @Enumerated(EnumType.STRING)
