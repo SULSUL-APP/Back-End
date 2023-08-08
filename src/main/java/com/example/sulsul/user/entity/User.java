@@ -67,4 +67,7 @@ public class User extends BaseEntity {
         this.userState = dType;
     }
 
+    public boolean isTeacher() {
+        return userType.equals(UType.TEACHER);
+    }
 }

@@ -56,6 +56,10 @@ s3:
   host:
     name: https://${BUCKET}.s3.${REGION}.amazonaws.com/
 
+fcm:
+  key:
+    path: fcm/sulsul-firebase-admin-sdk.json
+
 domain:
   name: http://www.localhost:8081
 
