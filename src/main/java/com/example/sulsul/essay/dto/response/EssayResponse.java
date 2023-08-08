@@ -19,7 +19,7 @@ public class EssayResponse {
     private final String examYear;
 
     @Schema(description = "논술분야", example = "수리")
-    private final String eType;
+    private final String essayType;
 
     @Schema(description = "첨삭상태", example = "REQUEST",
             allowableValues = {"REQUEST", "REJECT", "PROCEED", "COMPLETE"})
@@ -32,7 +32,7 @@ public class EssayResponse {
         this.id = essay.getId();
         this.univ = essay.getUniv();
         this.examYear = essay.getExamYear();
-        this.eType = essay.getEType();
+        this.essayType = essay.getEssayType();
         this.essayState = essay.getEssayState().name();
         this.teacher = new TeacherResponse(essay.getTeacher());
         this.student = new StudentResponse(essay.getStudent());

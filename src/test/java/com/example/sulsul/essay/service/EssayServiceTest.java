@@ -1,17 +1,15 @@
 package com.example.sulsul.essay.service;
 
+import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.repository.CommentRepository;
+import com.example.sulsul.common.type.EssayState;
+import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.essay.DemoDataFactory;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.request.RejectRequest;
-import com.example.sulsul.essay.dto.response.CompleteEssayResponse;
-import com.example.sulsul.essay.dto.response.ProceedEssayResponse;
-import com.example.sulsul.essay.dto.response.RejectEssayResponse;
-import com.example.sulsul.essay.dto.response.RequestEssayResponse;
+import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.common.type.EssayState;
-import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
@@ -70,13 +68,12 @@ class EssayServiceTest {
         String originalFileName = fileName + "." + contentType;
         String filePath = "src/test/resources/pdf/test.pdf";
         FileInputStream fileInputStream = new FileInputStream(filePath);
-        MockMultipartFile testFile =
-                new MockMultipartFile(fileName, originalFileName, contentType, fileInputStream);
+        MockMultipartFile testFile = new MockMultipartFile(fileName, originalFileName, contentType, fileInputStream);
         // 첨삭요청 생성
         CreateEssayRequest request = CreateEssayRequest.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayFile(testFile)
                 .build();
@@ -89,11 +86,13 @@ class EssayServiceTest {
         assertAll(
                 () -> assertThat(essay.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(essay.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(essay.getEType()).isEqualTo("수리"),
+                () -> assertThat(essay.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(essay.getEssayState()).isEqualTo(EssayState.REQUEST),
                 () -> assertThat(essay.getReviewState()).isEqualTo(ReviewState.OFF),
-                () -> assertThat(essay.getStudent()).isEqualTo(s1),
-                () -> assertThat(essay.getTeacher()).isEqualTo(t1)
+                () -> assertThat(essay.getStudent().getName()).isEqualTo("김경근"),
+                () -> assertThat(essay.getStudent().getEmail()).isEqualTo("sulsul@gmail.com"),
+                () -> assertThat(essay.getTeacher().getName()).isEqualTo("임탁균"),
+                () -> assertThat(essay.getTeacher().getEmail()).isEqualTo("sulsul@naver.com")
         );
     }
 
@@ -114,8 +113,14 @@ class EssayServiceTest {
         // then
         assertAll(
                 () -> assertThat(essays.size()).isEqualTo(2),
-                () -> assertThat(essays.get(0).getStudent()).isEqualTo(s1),
-                () -> assertThat(essays.get(1).getStudent()).isEqualTo(s2)
+                () -> assertThat(essays.get(0).getStudent().getName()).isEqualTo("김경근"),
+                () -> assertThat(essays.get(0).getStudent().getEmail()).isEqualTo("sulsul@gmail.com"),
+                () -> assertThat(essays.get(1).getStudent().getName()).isEqualTo("류동완"),
+                () -> assertThat(essays.get(1).getStudent().getEmail()).isEqualTo("sulsul@g.hongik.ac.kr"),
+                () -> assertThat(essays.get(0).getTeacher().getName()).isEqualTo("임탁균"),
+                () -> assertThat(essays.get(0).getTeacher().getEmail()).isEqualTo("sulsul@naver.com"),
+                () -> assertThat(essays.get(1).getTeacher().getName()).isEqualTo("임탁균"),
+                () -> assertThat(essays.get(1).getTeacher().getEmail()).isEqualTo("sulsul@naver.com")
         );
     }
 
@@ -136,8 +141,14 @@ class EssayServiceTest {
         // then
         assertAll(
                 () -> assertThat(essays.size()).isEqualTo(2),
-                () -> assertThat(essays.get(0).getTeacher()).isEqualTo(t1),
-                () -> assertThat(essays.get(1).getTeacher()).isEqualTo(t2)
+                () -> assertThat(essays.get(0).getStudent().getName()).isEqualTo("김경근"),
+                () -> assertThat(essays.get(0).getStudent().getEmail()).isEqualTo("sulsul@gmail.com"),
+                () -> assertThat(essays.get(1).getStudent().getName()).isEqualTo("김경근"),
+                () -> assertThat(essays.get(1).getStudent().getEmail()).isEqualTo("sulsul@gmail.com"),
+                () -> assertThat(essays.get(0).getTeacher().getName()).isEqualTo("임탁균"),
+                () -> assertThat(essays.get(0).getTeacher().getEmail()).isEqualTo("sulsul@naver.com"),
+                () -> assertThat(essays.get(1).getTeacher().getName()).isEqualTo("전용수"),
+                () -> assertThat(essays.get(1).getTeacher().getEmail()).isEqualTo("smc@gmail.com")
         );
     }
 
@@ -149,7 +160,6 @@ class EssayServiceTest {
         Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
         // stub
         when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
-
         String filePath = "http://s3-ap-northeast-2.amazonaws.com/sulsul";
         when(fileRepository.getStudentEssayFile(1L, 1L))
                 .thenReturn(Optional.of(File.builder()
@@ -157,14 +167,14 @@ class EssayServiceTest {
                         .filePath(filePath)
                         .build()));
         // when
-        RequestEssayResponse response = (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(1L);
+        RequestEssayResponse response = essayService.getEssayRequest(1L);
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(response.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
-                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.REQUEST),
+                () -> assertThat(response.getEssayState()).isEqualTo("REQUEST"),
                 () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath)
         );
     }
@@ -177,7 +187,6 @@ class EssayServiceTest {
         Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REJECT, ReviewState.OFF);
         // stub
         when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
-
         String filePath = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230624.pdf";
         when(fileRepository.getStudentEssayFile(1L, 1L))
                 .thenReturn(Optional.of(File.builder()
@@ -185,18 +194,19 @@ class EssayServiceTest {
                         .filePath(filePath)
                         .build()));
 
-        RejectEssayResponse response = (RejectEssayResponse) essayService.getEssayResponseWithStudentFile(1L);
+        RejectedEssayResponse response = essayService.getEssayReject(1L);
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(response.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
-                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.REJECT),
+                () -> assertThat(response.getEssayState()).isEqualTo("REJECT"),
                 () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath)
         );
     }
 
+    // TODO: 강사 첨삭파일 유무, 댓글 유무에 따른 테스트 고민
     @Test
     void 진행상태인_첨삭_개별조회_테스트() {
         // given
@@ -207,7 +217,6 @@ class EssayServiceTest {
         Comment c2 = DemoDataFactory.createComment2(2L, s1, essay1);
         // when
         when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
-
         String filePath1 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230624.pdf";
         String filePath2 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230625.pdf";
         when(fileRepository.getStudentEssayFile(1L, 1L))
@@ -220,23 +229,22 @@ class EssayServiceTest {
                         .id(2L)
                         .filePath(filePath2)
                         .build()));
-
         when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
 
-        ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
-//        CommentGroupResponse commentGroup = response.getComments();
+        ProceedEssayResponse response = essayService.getProceedEssay(1L);
+        List<CommentResponse> comments = response.getComments();
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(response.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
-                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.PROCEED),
+                () -> assertThat(response.getEssayState()).isEqualTo("PROCEED"),
                 () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
-                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2)
-//                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
-//                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
-//                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다.")
+                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
+                () -> assertThat(comments.size()).isEqualTo(2),
+                () -> assertThat(comments.get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+                () -> assertThat(comments.get(1).getDetail()).isEqualTo("네 확인했습니다.")
         );
     }
 
@@ -250,7 +258,6 @@ class EssayServiceTest {
         Comment c2 = DemoDataFactory.createComment2(2L, s1, essay1);
         // when
         when(essayRepository.findById(1L)).thenReturn(Optional.of(essay1));
-
         String filePath1 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230624.pdf";
         String filePath2 = "http://s3-ap-northeast-2.amazonaws.com/sulsul/20230625.pdf";
         when(fileRepository.getStudentEssayFile(1L, 1L))
@@ -263,23 +270,22 @@ class EssayServiceTest {
                         .id(2L)
                         .filePath(filePath2)
                         .build()));
-
         when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
 
-        ProceedEssayResponse response = (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
-//        CommentGroupResponse commentGroup = response.getComments();
+        CompletedEssayResponse response = essayService.getCompleteEssay(1L);
+        List<CommentResponse> comments = response.getComments();
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(response.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
-                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.COMPLETE),
+                () -> assertThat(response.getEssayState()).isEqualTo("COMPLETE"),
                 () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
-                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2)
-//                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
-//                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
-//                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다.")
+                () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
+                () -> assertThat(comments.size()).isEqualTo(2),
+                () -> assertThat(comments.get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+                () -> assertThat(comments.get(1).getDetail()).isEqualTo("네 확인했습니다.")
         );
     }
 
@@ -307,24 +313,23 @@ class EssayServiceTest {
                         .id(2L)
                         .filePath(filePath2)
                         .build()));
-
         when(commentRepository.findAllByEssayId(1L)).thenReturn(List.of(c1, c2));
         when(reviewRepository.findByEssayId(1L)).thenReturn(Optional.of(r1));
 
-        CompleteEssayResponse response = (CompleteEssayResponse) essayService.getEssayResponseWithFilePaths(1L);
-//        CommentGroupResponse commentGroup = response.getComments();
+        ReviewedEssayResponse response = essayService.getReviewedEssay(1L);
+        List<CommentResponse> comments = response.getComments();
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(response.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(response.getEType()).isEqualTo("수리"),
+                () -> assertThat(response.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(response.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
-                () -> assertThat(response.getEssayState()).isEqualTo(EssayState.COMPLETE),
+                () -> assertThat(response.getEssayState()).isEqualTo("COMPLETE"),
                 () -> assertThat(response.getStudentFilePath()).isEqualTo(filePath1),
                 () -> assertThat(response.getTeacherFilePath()).isEqualTo(filePath2),
-//                () -> assertThat(commentGroup.getCommentsSize()).isEqualTo(2),
-//                () -> assertThat(commentGroup.getComments().get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
-//                () -> assertThat(commentGroup.getComments().get(1).getDetail()).isEqualTo("네 확인했습니다."),
+                () -> assertThat(comments.size()).isEqualTo(2),
+                () -> assertThat(comments.get(0).getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
+                () -> assertThat(comments.get(1).getDetail()).isEqualTo("네 확인했습니다."),
                 () -> assertThat(response.getReview().getDetail()).isEqualTo("구체적으로 첨삭해주셔서 좋았어요."),
                 () -> assertThat(response.getReview().getScore()).isEqualTo(5)
         );
@@ -345,7 +350,7 @@ class EssayServiceTest {
         assertAll(
                 () -> assertThat(accepted.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(accepted.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(accepted.getEType()).isEqualTo("수리"),
+                () -> assertThat(accepted.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(accepted.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
                 () -> assertThat(accepted.getEssayState()).isEqualTo(EssayState.PROCEED),
                 () -> assertThat(accepted.getReviewState()).isEqualTo(ReviewState.OFF)
@@ -368,7 +373,7 @@ class EssayServiceTest {
         assertAll(
                 () -> assertThat(rejected.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(rejected.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(rejected.getEType()).isEqualTo("수리"),
+                () -> assertThat(rejected.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(rejected.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
                 () -> assertThat(rejected.getRejectDetail()).isEqualTo("시간상 첨삭이 불가능할 것 같습니다."),
                 () -> assertThat(rejected.getEssayState()).isEqualTo(EssayState.REJECT),
@@ -391,7 +396,7 @@ class EssayServiceTest {
         assertAll(
                 () -> assertThat(completed.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(completed.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(completed.getEType()).isEqualTo("수리"),
+                () -> assertThat(completed.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(completed.getInquiry()).isEqualTo("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다."),
                 () -> assertThat(completed.getEssayState()).isEqualTo(EssayState.COMPLETE),
                 () -> assertThat(completed.getReviewState()).isEqualTo(ReviewState.OFF)
