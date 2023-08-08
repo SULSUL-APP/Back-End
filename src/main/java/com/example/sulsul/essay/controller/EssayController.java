@@ -1,6 +1,8 @@
 package com.example.sulsul.essay.controller;
 
+import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.EssayState;
+import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.request.RejectRequest;
@@ -75,10 +77,13 @@ public class EssayController {
             throw new InvalidEssayCreateException(errorMap);
         }
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 2L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
-                .id(userId)
+                .id(2L)
+                .name("김경근")
+                .email("sulsul@gmail.com")
                 .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
                 .build();
         // 학생 유저만 첨삭요청 가능
         if (loginedUser.getUserType().equals(UType.TEACHER)) {

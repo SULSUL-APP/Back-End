@@ -2,6 +2,7 @@ package com.example.sulsul.essay.controller;
 
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.common.type.EssayState;
+import com.example.sulsul.common.type.FileType;
 import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.essay.DemoDataFactory;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
@@ -9,6 +10,7 @@ import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.service.EssayService;
+import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.service.FileService;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.user.entity.User;
@@ -71,15 +73,20 @@ class EssayControllerTest {
         // stub
         when(essayService.createEssay(eq(1L), any(User.class), any(CreateEssayRequest.class)))
                 .thenReturn(essay1);
-        when(essayService.getEssayResponseWithStudentFile(eq(1L)))
-                .thenReturn(new RequestEssayResponse(essay1, studentFilePath));
+        when(fileService.uploadEssayFile(any(User.class), any(Essay.class), any(MockMultipartFile.class)))
+                .thenReturn(File.builder()
+                        .essay(essay1)
+                        .filePath(studentFilePath)
+                        .user(s1)
+                        .fileType(FileType.ESSAY)
+                        .build());
         // when && then
         mockMvc.perform(multipart("/profiles/{profileId}/essay", 1L)
                         .file("essayFile", testFile.getBytes())
                         .param("univ", "홍익대")
                         .param("examYear", "2022")
                         .param("inquiry", "2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
-                        .param("eType", "수리"))
+                        .param("essayType", "수리"))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -111,7 +118,14 @@ class EssayControllerTest {
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
         // stub
         when(essayService.getEssayById(eq(1L))).thenReturn(essay1);
-        when(essayService.getEssayResponseWithFilePaths(eq(1L)))
+        when(fileService.uploadEssayFile(any(User.class), any(Essay.class), any(MockMultipartFile.class)))
+                .thenReturn(File.builder()
+                        .essay(essay1)
+                        .filePath(teacherFilePath)
+                        .user(t1)
+                        .fileType(FileType.ESSAY)
+                        .build());
+        when(essayService.getProceedEssay(eq(1L)))
                 .thenReturn(new ProceedEssayResponse(essay1, studentFilePath, teacherFilePath, comments));
         // when && then
         mockMvc.perform(multipart("/essay/proceed/{essayId}/upload", 1L)
@@ -126,10 +140,10 @@ class EssayControllerTest {
                 .andExpect(jsonPath("$.student.email").value("sulsul@gmail.com"))
                 .andExpect(jsonPath("$.studentFilePath").value(studentFilePath))
                 .andExpect(jsonPath("$.teacherFilePath").value(teacherFilePath))
-                .andExpect(jsonPath("$.comments[0].commentId").value(1L))
-                .andExpect(jsonPath("$.comments[0].user.name").value("김경근"))
-                .andExpect(jsonPath("$.comments[1].commentId").value(2L))
-                .andExpect(jsonPath("$.comments[1].user.name").value("임탁균"));
+                .andExpect(jsonPath("$.comments[0].id").value(1L))
+                .andExpect(jsonPath("$.comments[0].writer.name").value("김경근"))
+                .andExpect(jsonPath("$.comments[1].id").value(2L))
+                .andExpect(jsonPath("$.comments[1].writer.name").value("임탁균"));
     }
 
     @Test
@@ -273,7 +287,7 @@ class EssayControllerTest {
         Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.REQUEST, ReviewState.OFF);
         // stub
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
-        when(essayService.getEssayResponseWithStudentFile(eq(1L)))
+        when(essayService.getEssayRequest(eq(1L)))
                 .thenReturn(new RequestEssayResponse(essay1, studentFilePath));
         // when && then
         mockMvc.perform(get("/essay/request/{essayId}", 1L))
@@ -302,7 +316,7 @@ class EssayControllerTest {
         essay1.updateRejectDetail(rejectDetail);
         // stub
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
-        when(essayService.getEssayResponseWithStudentFile(eq(1L)))
+        when(essayService.getEssayReject(eq(1L)))
                 .thenReturn(new RejectedEssayResponse(essay1, studentFilePath));
         // when && then
         mockMvc.perform(get("/essay/reject/{essayId}", 1L))
@@ -334,7 +348,7 @@ class EssayControllerTest {
         // stub
         String teacherFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/751b44f7_sulsul.pdf";
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
-        when(essayService.getEssayResponseWithFilePaths(eq(1L)))
+        when(essayService.getProceedEssay(eq(1L)))
                 .thenReturn(new ProceedEssayResponse(essay1, studentFilePath, teacherFilePath, comments));
         // when && then
         mockMvc.perform(get("/essay/proceed/{essayId}", 1L))
@@ -351,10 +365,10 @@ class EssayControllerTest {
                 .andExpect(jsonPath("$.teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
                 .andExpect(jsonPath("$.student.name").value("김경근"))
                 .andExpect(jsonPath("$.student.email").value("sulsul@gmail.com"))
-                .andExpect(jsonPath("$.comments[0].commentId").value(1L))
-                .andExpect(jsonPath("$.comments[0].user.name").value("김경근"))
-                .andExpect(jsonPath("$.comments[1].commentId").value(2L))
-                .andExpect(jsonPath("$.comments[1].user.name").value("임탁균"));
+                .andExpect(jsonPath("$.comments[0].id").value(1L))
+                .andExpect(jsonPath("$.comments[0].writer.name").value("김경근"))
+                .andExpect(jsonPath("$.comments[1].id").value(2L))
+                .andExpect(jsonPath("$.comments[1].writer.name").value("임탁균"));
     }
 
     @Test
@@ -371,9 +385,9 @@ class EssayControllerTest {
         // stub
         String teacherFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/751b44f7_sulsul.pdf";
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
-        when(essayService.getEssayResponseWithFilePaths(eq(1L)))
+        when(essayService.getEssayById(eq(1L))).thenReturn(essay1);
+        when(essayService.getReviewedEssay(eq(1L)))
                 .thenReturn(new ReviewedEssayResponse(essay1, studentFilePath, teacherFilePath, comments, review));
-        when(essayService.checkEssayReviewState(eq(1L))).thenReturn(true);
         // when && then
         mockMvc.perform(get("/essay/complete/{essayId}", 1L))
                 .andDo(print())
@@ -389,10 +403,10 @@ class EssayControllerTest {
                 .andExpect(jsonPath("$.teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
                 .andExpect(jsonPath("$.student.name").value("김경근"))
                 .andExpect(jsonPath("$.student.email").value("sulsul@gmail.com"))
-                .andExpect(jsonPath("$.comments[0].commentId").value(1L))
-                .andExpect(jsonPath("$.comments[0].user.name").value("김경근"))
-                .andExpect(jsonPath("$.comments[1].commentId").value(2L))
-                .andExpect(jsonPath("$.comments[1].user.name").value("임탁균"))
+                .andExpect(jsonPath("$.comments[0].id").value(1L))
+                .andExpect(jsonPath("$.comments[0].writer.name").value("김경근"))
+                .andExpect(jsonPath("$.comments[1].id").value(2L))
+                .andExpect(jsonPath("$.comments[1].writer.name").value("임탁균"))
                 .andExpect(jsonPath("$.review.id").value(1L))
                 .andExpect(jsonPath("$.review.detail").value("구체적으로 첨삭해주셔서 좋았어요."))
                 .andExpect(jsonPath("$.review.score").value(5))
@@ -412,9 +426,9 @@ class EssayControllerTest {
         // stub
         String teacherFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/751b44f7_sulsul.pdf";
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
-        when(essayService.getEssayResponseWithFilePaths(eq(1L)))
+        when(essayService.getEssayById(eq(1L))).thenReturn(essay1);
+        when(essayService.getCompleteEssay(eq(1L)))
                 .thenReturn(new CompletedEssayResponse(essay1, studentFilePath, teacherFilePath, comments));
-        when(essayService.checkEssayReviewState(eq(1L))).thenReturn(false);
         // when && then
         mockMvc.perform(get("/essay/complete/{essayId}", 1L))
                 .andDo(print())
@@ -430,10 +444,10 @@ class EssayControllerTest {
                 .andExpect(jsonPath("$.teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
                 .andExpect(jsonPath("$.student.name").value("김경근"))
                 .andExpect(jsonPath("$.student.email").value("sulsul@gmail.com"))
-                .andExpect(jsonPath("$.comments[0].commentId").value(1L))
-                .andExpect(jsonPath("$.comments[0].user.name").value("김경근"))
-                .andExpect(jsonPath("$.comments[1].commentId").value(2L))
-                .andExpect(jsonPath("$.comments[1].user.name").value("임탁균"));
+                .andExpect(jsonPath("$.comments[0].id").value(1L))
+                .andExpect(jsonPath("$.comments[0].writer.name").value("김경근"))
+                .andExpect(jsonPath("$.comments[1].id").value(2L))
+                .andExpect(jsonPath("$.comments[1].writer.name").value("임탁균"));
     }
 
     @Test
@@ -480,6 +494,7 @@ class EssayControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("첨삭요청이 거절되었습니다."))
+                .andExpect(jsonPath("$.rejectDetail").value(rejectDetail)) // EssayResponse에는 rejectDetail이 포함되지 않음
                 .andExpect(jsonPath("$.essay.id").value(1L))
                 .andExpect(jsonPath("$.essay.univ").value("홍익대"))
                 .andExpect(jsonPath("$.essay.examYear").value("2022"))
@@ -489,7 +504,6 @@ class EssayControllerTest {
                 .andExpect(jsonPath("$.essay.teacher.catchPhrase").value("항상 최선을 다하겠습니다. 화이링"))
                 .andExpect(jsonPath("$.essay.student.name").value("김경근"))
                 .andExpect(jsonPath("$.essay.student.email").value("sulsul@gmail.com"));
-//                .andExpect(jsonPath("$.essay.rejectDetail").value(rejectDetail)); // EssayResponse에는 rejectDetail이 포함되지 않음
     }
 
     @Test

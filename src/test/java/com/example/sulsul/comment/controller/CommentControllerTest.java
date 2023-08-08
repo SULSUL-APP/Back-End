@@ -57,12 +57,12 @@ class CommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.comments[0].id").value(1L))
                 .andExpect(jsonPath("$.comments[0].detail").value("첨삭한 파일 첨부했습니다."))
-                .andExpect(jsonPath("$.comments[0].user.name").value("임탁균"))
-                .andExpect(jsonPath("$.comments[0].user.email").value("sulsul@naver.com"))
+                .andExpect(jsonPath("$.comments[0].writer.name").value("임탁균"))
+                .andExpect(jsonPath("$.comments[0].writer.email").value("sulsul@naver.com"))
                 .andExpect(jsonPath("$.comments[1].id").value(2L))
                 .andExpect(jsonPath("$.comments[1].detail").value("네 확인했습니다."))
-                .andExpect(jsonPath("$.comments[1].user.name").value("김경근"))
-                .andExpect(jsonPath("$.comments[1].user.email").value("sulsul@gmail.com"));
+                .andExpect(jsonPath("$.comments[1].writer.name").value("김경근"))
+                .andExpect(jsonPath("$.comments[1].writer.email").value("sulsul@gmail.com"));
     }
 
     @Test
@@ -85,8 +85,8 @@ class CommentControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.detail").value("첨삭한 파일 첨부했습니다."))
-                .andExpect(jsonPath("$.user.name").value("임탁균"))
-                .andExpect(jsonPath("$.user.email").value("sulsul@naver.com"));
+                .andExpect(jsonPath("$.writer.name").value("임탁균"))
+                .andExpect(jsonPath("$.writer.email").value("sulsul@naver.com"));
     }
 
     @Test
@@ -96,21 +96,13 @@ class CommentControllerTest {
         User t1 = DemoDataFactory.createTeacher1(1L);
         User s1 = DemoDataFactory.createStudent1(2L);
         Essay essay1 = DemoDataFactory.createEssay1(1L, s1, t1, EssayState.PROCEED, ReviewState.OFF);
-        Comment c1 = DemoDataFactory.createComment1(1L, t1, essay1);
         CommentRequest request = new CommentRequest("첨");
         String content = objectMapper.writeValueAsString(request);
-//         stub
-//        when(commentService.createComment(eq(1L), any(User.class), any(CommentRequest.class))).thenReturn(c1);
         // when && then
         mockMvc.perform(post("/essay/{essayId}/comments", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(print());
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.id").value(1L))
-//                .andExpect(jsonPath("$.detail").value("첨삭한 파일 첨부했습니다."))
-//                .andExpect(jsonPath("$.user.name").value("임탁균"))
-//                .andExpect(jsonPath("$.user.email").value("sulsul@naver.com"));
     }
 
     @Test
@@ -134,8 +126,8 @@ class CommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.detail").value("댓글 수정 테스트"))
-                .andExpect(jsonPath("$.user.name").value("임탁균"))
-                .andExpect(jsonPath("$.user.email").value("sulsul@naver.com"));
+                .andExpect(jsonPath("$.writer.name").value("임탁균"))
+                .andExpect(jsonPath("$.writer.email").value("sulsul@naver.com"));
     }
 
     @Test
