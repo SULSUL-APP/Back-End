@@ -3,7 +3,6 @@ package com.example.sulsul.essay.service;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.repository.CommentRepository;
 import com.example.sulsul.common.type.EssayState;
-import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.request.RejectRequest;
@@ -64,24 +63,6 @@ public class EssayService {
         return essayRepository.findAllByStudentIdAndEssayState(userId, essayState);
     }
 
-    /**
-     * 제거 예정
-     */
-    @Transactional(readOnly = true)
-    public EssayResponse getEssayResponseWithStudentFile(Long essayId) {
-        // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
-        Long studentId = essay.getStudent().getId();
-        // 학생이 올린 첨삭파일 조회
-        String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
-        // 첨삭요청 상태인 경우
-        if (essay.getEssayState().equals(EssayState.REQUEST)) {
-            return new RequestEssayResponse(essay, filePath);
-        }
-        // 첨삭거절 상태인 경우
-        return new RejectedEssayResponse(essay, filePath);
-    }
-
     private String getStudentFilePath(Long essayId, Long studentId) {
         File file = fileRepository.getStudentEssayFile(essayId, studentId)
                 .orElseThrow(() -> new FileNotFoundException());
@@ -108,47 +89,6 @@ public class EssayService {
         String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
         // 첨삭요청 정보와 파일경로 반환
         return new RejectedEssayResponse(essay, filePath);
-    }
-
-    /**
-     * 제거 예정
-     */
-    @Transactional(readOnly = true)
-    public EssayResponse getEssayResponseWithFilePaths(Long essayId) {
-        // essayId에 해당하는 첨삭 조회
-        Essay essay = essayRepository.findById(essayId)
-                .orElseThrow(() -> new EssayNotFoundException(essayId));
-
-        Long studentId = essay.getStudent().getId();
-        // 학생이 올린 첨삭파일 조회
-        String studentFilePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로 // 학생이 올린 첨삭파일의 s3 경로
-        Long teacherId = essay.getTeacher().getId();
-        // 강사가 올린 첨삭파일 조회
-        Optional<File> teacherEssayFile = fileRepository.getTeacherEssayFile(essayId, teacherId);
-        String teacherFilePath;
-        if (teacherEssayFile.isEmpty()) {
-            teacherFilePath = ""; // 강사가 아직 첨삭파일을 업로드하지 않은 경우
-        } else {
-            teacherFilePath = teacherEssayFile.get().getFilePath(); // 강사가 올린 첨삭파일의 s3 경로
-        }
-        // 첨삭에 작성된 모든 댓글 조회
-        List<Comment> comments = commentRepository.findAllByEssayId(essayId);
-//        if (comments == null) {
-//            comments = new ArrayList<>(); // 아직 댓글이 없는 경우
-//        }
-        // 첨삭완료 상태인 경우
-        if (essay.getEssayState().equals(EssayState.COMPLETE)) {
-            // 리뷰가 작성된 경우
-            if (essay.getReviewState().equals(ReviewState.ON)) {
-                Review review = reviewRepository.findByEssayId(essayId)
-                        .orElseThrow(() -> new ReviewNotFoundException(essayId));
-                return new ReviewedEssayResponse(essay, studentFilePath, teacherFilePath, comments, review);
-            }
-            // 리뷰가 작성되지 않은 경우
-            return new CompletedEssayResponse(essay, studentFilePath, teacherFilePath, comments);
-        }
-        // 첨삭진행 상태인 경우
-        return new ProceedEssayResponse(essay, studentFilePath, teacherFilePath, comments);
     }
 
     private String getTeacherFilePath(Long essayId, Long teacherId) {
@@ -236,15 +176,5 @@ public class EssayService {
         // 첨삭완료 상태로 변경
         essay.updateEssayState(EssayState.COMPLETE);
         return essayRepository.save(essay);
-    }
-
-    /**
-     * 제거 예정
-     */
-    @Transactional(readOnly = true)
-    public boolean checkEssayReviewState(Long essayId) {
-        Essay essay = getEssayById(essayId);
-        ReviewState reviewState = essay.getReviewState();
-        return reviewState.equals(ReviewState.ON);
     }
 }
