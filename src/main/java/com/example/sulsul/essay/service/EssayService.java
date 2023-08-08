@@ -79,7 +79,7 @@ public class EssayService {
             return new RequestEssayResponse(essay, filePath);
         }
         // 첨삭거절 상태인 경우
-        return new RejectEssayResponse(essay, filePath);
+        return new RejectedEssayResponse(essay, filePath);
     }
 
     private String getStudentFilePath(Long essayId, Long studentId) {
@@ -100,14 +100,14 @@ public class EssayService {
     }
 
     @Transactional(readOnly = true)
-    public RejectEssayResponse getEssayReject(Long essayId) {
+    public RejectedEssayResponse getEssayReject(Long essayId) {
         // essayId에 해당하는 첨삭 조회
         Essay essay = getEssayById(essayId);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
         // 첨삭요청 정보와 파일경로 반환
-        return new RejectEssayResponse(essay, filePath);
+        return new RejectedEssayResponse(essay, filePath);
     }
 
     /**

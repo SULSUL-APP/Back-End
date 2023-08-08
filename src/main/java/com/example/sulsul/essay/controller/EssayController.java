@@ -246,7 +246,7 @@ public class EssayController {
     @Operation(summary = "거절된 첨삭 개별조회", description = "거절된 첨삭을 개별조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RejectEssayResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RejectedEssayResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -257,7 +257,7 @@ public class EssayController {
     @GetMapping("/essay/reject/{essayId}")
     public ResponseEntity<?> getRejectEssay(@Parameter(description = "조회할 첨삭의 id")
                                             @PathVariable Long essayId) {
-        RejectEssayResponse essayResponse = essayService.getEssayReject(essayId);
+        RejectedEssayResponse essayResponse = essayService.getEssayReject(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
@@ -307,7 +307,7 @@ public class EssayController {
     @Operation(summary = "첨삭요청 수락", description = "첨삭요청을 수락한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AcceptEssayResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -319,16 +319,15 @@ public class EssayController {
     public ResponseEntity<?> acceptEssay(@Parameter(description = "수락할 첨삭요청의 id")
                                          @PathVariable Long essayId) {
         Essay essay = essayService.acceptEssay(essayId);
-        String message = "첨삭요청이 수락되었습니다.";
 
         // TODO: 첨삭요청 수락 알림 전송 로직
-        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
+        return new ResponseEntity<>(new AcceptEssayResponse(essay), HttpStatus.OK);
     }
 
     @Operation(summary = "첨삭요청 거절", description = "첨삭요청을 거절한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RejectEssayResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -351,16 +350,15 @@ public class EssayController {
         }
 
         Essay essay = essayService.rejectEssay(essayId, rejectRequest);
-        String message = "첨삭요청이 거절되었습니다.";
 
         // TODO: 첨삭요청 거절 알림 전송 로직
-        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
+        return new ResponseEntity<>(new RejectEssayResponse(essay), HttpStatus.OK);
     }
 
     @Operation(summary = "진행중인 첨삭 완료", description = "진행중인 첨삭요청을 완료한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CompleteEssayResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -372,9 +370,8 @@ public class EssayController {
     public ResponseEntity<?> completeEssay(@Parameter(description = "완료할 첨삭의 id")
                                            @PathVariable Long essayId) {
         Essay essay = essayService.completeEssay(essayId);
-        String message = "첨삭이 완료되었습니다.";
 
         // TODO: 첨삭완료 알림 전송 로직
-        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
+        return new ResponseEntity<>(new CompleteEssayResponse(essay), HttpStatus.OK);
     }
 }

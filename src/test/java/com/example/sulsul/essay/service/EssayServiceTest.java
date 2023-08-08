@@ -7,7 +7,7 @@ import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.ReviewedEssayResponse;
 import com.example.sulsul.essay.dto.response.ProceedEssayResponse;
-import com.example.sulsul.essay.dto.response.RejectEssayResponse;
+import com.example.sulsul.essay.dto.response.RejectedEssayResponse;
 import com.example.sulsul.essay.dto.response.RequestEssayResponse;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.common.type.EssayState;
@@ -185,7 +185,7 @@ class EssayServiceTest {
                         .filePath(filePath)
                         .build()));
 
-        RejectEssayResponse response = (RejectEssayResponse) essayService.getEssayResponseWithStudentFile(1L);
+        RejectedEssayResponse response = (RejectedEssayResponse) essayService.getEssayResponseWithStudentFile(1L);
         // then
         assertAll(
                 () -> assertThat(response.getUniv()).isEqualTo("홍익대"),

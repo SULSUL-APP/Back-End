@@ -303,7 +303,7 @@ class EssayControllerTest {
         // stub
         String studentFilePath = "https://sulsul.s3.ap-northeast-2.amazonaws.com/files/314a32f7_sulsul.pdf";
         when(essayService.getEssayResponseWithStudentFile(eq(1L)))
-                .thenReturn(new RejectEssayResponse(essay1, studentFilePath));
+                .thenReturn(new RejectedEssayResponse(essay1, studentFilePath));
         // when && then
         mockMvc.perform(get("/essay/reject/{essayId}", 1L))
                 .andDo(print())
