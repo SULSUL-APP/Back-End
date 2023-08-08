@@ -36,5 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-### FCM KEY ###
+### FCM ###
 src/main/resources/fcm/*.json
