@@ -61,8 +61,9 @@ public class FcmMessageService {
 
     /**
      * 전체알림 전송
+     *
      * @param title 알림 제목
-     * @param body 알림 내용
+     * @param body  알림 내용
      */
     @Transactional(readOnly = true)
     public void sendToAll(String title, String body) {

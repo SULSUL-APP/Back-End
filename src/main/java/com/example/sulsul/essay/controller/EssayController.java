@@ -14,8 +14,12 @@ import com.example.sulsul.exception.essay.InvalidRejectDetailException;
 import com.example.sulsul.exception.essay.TeacherCreateEssayException;
 import com.example.sulsul.exception.file.EmptyEssayFileException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
+import com.example.sulsul.fcm.FcmMessageService;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.service.FileService;
+import com.example.sulsul.notification.entity.NotiBody;
+import com.example.sulsul.notification.entity.NotiTitle;
+import com.example.sulsul.notification.service.NotificationService;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,6 +49,8 @@ public class EssayController {
 
     private final EssayService essayService;
     private final FileService fileService;
+    private final FcmMessageService fcmMessageService;
+    private final NotificationService notificationService;
 
     @Operation(summary = "첨삭요청 (학생)", description = "profileId에 해당하는 강사에게 첨삭을 요청한다.")
     @ApiResponses({
@@ -94,6 +100,15 @@ public class EssayController {
         // 첨삭 파일 업로드
         File file = fileService.uploadEssayFile(loginedUser, essay, request.getEssayFile());
         String filePath = file.getFilePath();
+
+        // 첨삭요청 알림 전송
+//        User target = essay.getTeacher();
+//        String title = NotiTitle.REQUEST.getTitle();
+//        String studentName = loginedUser.getName();
+//        String body = NotiBody.REQUEST.getDetail(studentName);
+//        notificationService.saveEssayNotification(title, body, target, essay);
+//        fcmMessageService.sendToOne(target, title, body);
+
         // 첨삭요청 응답 생성
         RequestEssayResponse essayResponse = new RequestEssayResponse(essay, filePath);
         // 첨삭 요청 완료: 201 CREATED
@@ -133,6 +148,16 @@ public class EssayController {
         // 강사 첨삭 파일 업로드
         fileService.uploadEssayFile(loginedUser, essay, essayFile);
         ProceedEssayResponse essayResponse = essayService.getProceedEssay(essayId);
+
+        // 첨삭파일 업로드 알림 전송
+//        User student = essay.getStudent();
+//        User teacher = essay.getTeacher();
+//        String teacherName = teacher.getName();
+//        String title = NotiTitle.FILE.getTitle();
+//        String body = NotiBody.FILE.getDetail(teacherName);
+//        notificationService.saveEssayNotification(title, body, student, essay);
+//        fcmMessageService.sendToOne(student, title, body);
+
         // 강사 첨삭 파일 업로드 완료: 201 CREATED
         return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
     }
@@ -325,7 +350,15 @@ public class EssayController {
                                          @PathVariable Long essayId) {
         Essay essay = essayService.acceptEssay(essayId);
 
-        // TODO: 첨삭요청 수락 알림 전송 로직
+        // 첨삭요청 수락 알림 전송
+//        User student = essay.getStudent();
+//        User teacher = essay.getTeacher();
+//        String teacherName = teacher.getName();
+//        String title = NotiTitle.ACCEPT.getTitle();
+//        String body = NotiBody.ACCEPT.getDetail(teacherName);
+//        notificationService.saveEssayNotification(title, body, student, essay);
+//        fcmMessageService.sendToOne(student, title, body);
+
         return new ResponseEntity<>(new AcceptEssayResponse(essay), HttpStatus.OK);
     }
 
@@ -356,7 +389,15 @@ public class EssayController {
 
         Essay essay = essayService.rejectEssay(essayId, rejectRequest);
 
-        // TODO: 첨삭요청 거절 알림 전송 로직
+        // 첨삭요청 거절 알림 전송
+//        User student = essay.getStudent();
+//        User teacher = essay.getTeacher();
+//        String teacherName = teacher.getName();
+//        String title = NotiTitle.REJECT.getTitle();
+//        String body = NotiBody.REJECT.getDetail(teacherName);
+//        notificationService.saveEssayNotification(title, body, student, essay);
+//        fcmMessageService.sendToOne(student, title, body);
+
         return new ResponseEntity<>(new RejectEssayResponse(essay), HttpStatus.OK);
     }
 
@@ -376,7 +417,15 @@ public class EssayController {
                                            @PathVariable Long essayId) {
         Essay essay = essayService.completeEssay(essayId);
 
-        // TODO: 첨삭완료 알림 전송 로직
+        // 첨삭완료 알림 전송
+//        User student = essay.getStudent();
+//        User teacher = essay.getTeacher();
+//        String teacherName = teacher.getName();
+//        String title = NotiTitle.COMPLETE.getTitle();
+//        String body = NotiBody.COMPLETE.getDetail(teacherName);
+//        notificationService.saveEssayNotification(title, body, student, essay);
+//        fcmMessageService.sendToOne(student, title, body);
+
         return new ResponseEntity<>(new CompleteEssayResponse(essay), HttpStatus.OK);
     }
 }

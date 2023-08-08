@@ -6,9 +6,16 @@ import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.dto.response.DeleteSuccessResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.service.CommentService;
+import com.example.sulsul.common.type.UType;
+import com.example.sulsul.essay.entity.Essay;
+import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.exception.comment.InvalidCommentCreateException;
 import com.example.sulsul.exception.comment.InvalidCommentUpdateException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
+import com.example.sulsul.fcm.FcmMessageService;
+import com.example.sulsul.notification.entity.NotiBody;
+import com.example.sulsul.notification.entity.NotiTitle;
+import com.example.sulsul.notification.service.NotificationService;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +41,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CommentController {
 
+    private final EssayService essayService;
     private final CommentService commentService;
+    private final NotificationService notificationService;
+    private final FcmMessageService fcmMessageService;
 
     @Operation(summary = "해당 첨삭의 모든 댓글 조회", description = "essayId에 해당하는 첨삭에 작성된 모든 댓글을 조회한다.")
     @ApiResponses({
@@ -85,7 +95,25 @@ public class CommentController {
                 .id(userId)
                 .build();
 
+        // 댓글 생성
         Comment comment = commentService.createComment(essayId, loginedUser, commentRequest);
+
+        // 댓글작성 알림전송
+//        Essay essay = essayService.getEssayById(essayId);
+//        String name = loginedUser.getName();
+//        String title = NotiTitle.COMMENT.getTitle();
+//        String body = NotiBody.COMMENT.getDetail(name);
+
+//        if (loginedUser.isTeacher()) { // 강사가 댓글을 작성한 경우
+//            User student = essay.getStudent();
+//            notificationService.saveEssayNotification(title, body, student, essay);
+//            fcmMessageService.sendToOne(student, title, body);
+//        } else { // 학생이 댓글을 작성한 경우
+//            User teacher = essay.getTeacher();
+//            notificationService.saveEssayNotification(title, body, teacher, essay);
+//            fcmMessageService.sendToOne(teacher, title, body);
+//        }
+
         return new ResponseEntity<>(new CommentResponse(comment), HttpStatus.CREATED);
     }
 
