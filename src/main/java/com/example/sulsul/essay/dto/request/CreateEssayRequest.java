@@ -29,7 +29,7 @@ public class CreateEssayRequest {
     @Schema(description = "논술분야", example = "수리")
     @NotBlank
     @Size(min = 2, max = 8, message = "논술분야는 2글자 이상 8글자 이하입니다.")
-    private String eType;
+    private String essayType;
 
     @Schema(description = "문의사항", example = "구체적인 첨삭 부탁드립니다.")
     @NotBlank
@@ -43,7 +43,7 @@ public class CreateEssayRequest {
         return Essay.builder()
                 .univ(univ)
                 .examYear(examYear)
-                .eType(eType)
+                .essayType(essayType)
                 .inquiry(inquiry)
                 .essayState(EssayState.REQUEST)
                 .reviewState(ReviewState.OFF)

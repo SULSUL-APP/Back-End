@@ -13,7 +13,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -36,16 +35,16 @@ class CommentRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -56,7 +55,7 @@ class CommentRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.PROCEED)
                 .reviewState(ReviewState.OFF)
@@ -78,7 +77,7 @@ class CommentRepositoryTest {
                 () -> assertThat(saved.getDetail()).isEqualTo("첨삭한 파일 첨부했습니다."),
                 () -> assertThat(saved.getEssay().getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(saved.getEssay().getExamYear()).isEqualTo("2022"),
-                () -> assertThat(saved.getEssay().getEType()).isEqualTo("수리"),
+                () -> assertThat(saved.getEssay().getEssayType()).isEqualTo("수리"),
                 () -> assertThat(saved.getUser().getName()).isEqualTo("임탁균"),
                 () -> assertThat(saved.getUser().getEmail()).isEqualTo("sulsul@naver.com")
         );
@@ -90,16 +89,16 @@ class CommentRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -110,7 +109,7 @@ class CommentRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.PROCEED)
                 .reviewState(ReviewState.OFF)
@@ -134,7 +133,7 @@ class CommentRepositoryTest {
                 () -> assertThat(updated.getDetail()).isEqualTo("댓글 내용 수정"),
                 () -> assertThat(updated.getEssay().getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(updated.getEssay().getExamYear()).isEqualTo("2022"),
-                () -> assertThat(updated.getEssay().getEType()).isEqualTo("수리"),
+                () -> assertThat(updated.getEssay().getEssayType()).isEqualTo("수리"),
                 () -> assertThat(updated.getUser().getName()).isEqualTo("임탁균"),
                 () -> assertThat(updated.getUser().getEmail()).isEqualTo("sulsul@naver.com")
         );
@@ -146,16 +145,16 @@ class CommentRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -166,7 +165,7 @@ class CommentRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.PROCEED)
                 .reviewState(ReviewState.OFF)
@@ -195,16 +194,16 @@ class CommentRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -215,7 +214,7 @@ class CommentRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.PROCEED)
                 .reviewState(ReviewState.OFF)
@@ -254,16 +253,16 @@ class CommentRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -274,7 +273,7 @@ class CommentRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.PROCEED)
                 .reviewState(ReviewState.OFF)

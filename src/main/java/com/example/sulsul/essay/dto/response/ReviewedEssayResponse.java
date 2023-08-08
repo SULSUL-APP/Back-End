@@ -3,6 +3,8 @@ package com.example.sulsul.essay.dto.response;
 import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.essay.entity.Essay;
+import com.example.sulsul.review.dto.response.ReviewResponse;
+import com.example.sulsul.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -10,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class NotReviewedEssayResponse extends EssayResponse {
+public class ReviewedEssayResponse extends EssayResponse {
 
     @Schema(description = "문의사항", example = "첨삭 잘 부탁드립니다.")
     private final String inquiry;
@@ -26,8 +28,11 @@ public class NotReviewedEssayResponse extends EssayResponse {
     @Schema(description = "댓글 리스트")
     private final List<CommentResponse> comments = new ArrayList<>();
 
-    public NotReviewedEssayResponse(Essay essay, String studentFilePath,
-                                    String teacherFilePath, List<Comment> comments) {
+    @Schema(description = "첨삭 리뷰")
+    private final ReviewResponse review;
+
+    public ReviewedEssayResponse(Essay essay, String studentFilePath, String teacherFilePath,
+                                 List<Comment> comments, Review review) {
         super(essay);
         this.inquiry = essay.getInquiry();
         this.studentFilePath = studentFilePath;
@@ -35,5 +40,6 @@ public class NotReviewedEssayResponse extends EssayResponse {
         comments.stream()
                 .map(CommentResponse::new)
                 .forEach(comment -> this.comments.add(comment));
+         this.review = new ReviewResponse(review);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.sulsul.review.dto.response;
 
+import com.example.sulsul.essay.dto.response.EmptyResponse;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.user.dto.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,4 +1,4 @@
-package com.example.sulsul.file.FileController;
+package com.example.sulsul.file.controller;
 
 import com.example.sulsul.file.dto.FileUploadRequest;
 import com.example.sulsul.file.service.FileService;

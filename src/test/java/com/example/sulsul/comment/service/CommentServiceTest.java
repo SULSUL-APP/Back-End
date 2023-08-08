@@ -61,7 +61,7 @@ class CommentServiceTest {
                 () -> assertThat(comments.get(1).getUser().getEmail()).isEqualTo("sulsul@gmail.com"),
                 () -> assertThat(comments.get(0).getEssay().getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(comments.get(0).getEssay().getExamYear()).isEqualTo("2022"),
-                () -> assertThat(comments.get(0).getEssay().getEType()).isEqualTo("수리"),
+                () -> assertThat(comments.get(0).getEssay().getEssayType()).isEqualTo("수리"),
                 () -> assertThat(comments.get(0).getEssay().getEssayState()).isEqualTo(EssayState.PROCEED),
                 () -> assertThat(comments.get(0).getEssay().getReviewState()).isEqualTo(ReviewState.OFF)
         );
@@ -87,7 +87,7 @@ class CommentServiceTest {
                 () -> assertThat(comment.getUser().getEmail()).isEqualTo("sulsul@gmail.com"),
                 () -> assertThat(comment.getEssay().getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(comment.getEssay().getExamYear()).isEqualTo("2022"),
-                () -> assertThat(comment.getEssay().getEType()).isEqualTo("수리")
+                () -> assertThat(comment.getEssay().getEssayType()).isEqualTo("수리")
         );
     }
 
@@ -112,7 +112,7 @@ class CommentServiceTest {
                 () -> assertThat(comment.getUser().getEmail()).isEqualTo("sulsul@gmail.com"),
                 () -> assertThat(comment.getEssay().getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(comment.getEssay().getExamYear()).isEqualTo("2022"),
-                () -> assertThat(comment.getEssay().getEType()).isEqualTo("수리")
+                () -> assertThat(comment.getEssay().getEssayType()).isEqualTo("수리")
         );
     }
 

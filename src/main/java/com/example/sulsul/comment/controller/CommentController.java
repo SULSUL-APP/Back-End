@@ -133,7 +133,6 @@ public class CommentController {
     public ResponseEntity<?> deleteComment(@Parameter(description = "삭제할 댓글의 id")
                                            @PathVariable Long commentId) {
         commentService.deleteComment(commentId);
-        String message = "댓글 삭제 성공";
-        return new ResponseEntity<>(new DeleteSuccessResponse(message), HttpStatus.OK);
+        return new ResponseEntity<>(new DeleteSuccessResponse(), HttpStatus.OK);
     }
 }

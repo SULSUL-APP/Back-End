@@ -13,3 +13,27 @@ spring:
   sql:
     init:
       mode: never
+
+cloud:
+  aws:
+    s3:
+      bucket: ${BUCKET}
+    credentials:
+      accessKey: ${ACCESS_KEY}
+      secretKey: ${SECRET_KEY}
+    region:
+      static: ${REGION}
+      auto: false
+    stack:
+      auto: false
+
+s3:
+  host:
+    name: https://${BUCKET}.s3.${REGION}.amazonaws.com/
+
+domain:
+  name: http://www.localhost:8081
+
+logging:
+  level:
+    com.amazonaws.util.EC2MetadataUtils: error
