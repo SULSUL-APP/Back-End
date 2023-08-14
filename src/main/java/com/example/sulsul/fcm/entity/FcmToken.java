@@ -1,4 +1,4 @@
-package com.example.sulsul.fcmtoken.entity;
+package com.example.sulsul.fcm.entity;
 
 import com.example.sulsul.common.BaseEntity;
 import com.example.sulsul.user.entity.User;
@@ -36,7 +36,10 @@ public class FcmToken extends BaseEntity {
     public FcmToken(Long id, User user, String fcmToken) {
         this.id = id;
         this.user = user;
-        this.fcmToken =fcmToken;
+        this.fcmToken = fcmToken;
     }
 
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 }

@@ -36,5 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-### yml ###
-/src/main/resources/application-dev.yml
+### FCM ###
+src/main/resources/fcm/*.json

@@ -23,7 +23,7 @@ public class TeacherProfileService {
     }
 
     public List<TeacherProfile> getProfileList(EType eType){
-        return teacherProfileRepository.findByTeacher_EType(eType);
+        return teacherProfileRepository.findByTeacher_EssayType(eType);
     }
 
     public void createTeacherProfile(User user, TeacherProfileRequest teacherProfileRequest){

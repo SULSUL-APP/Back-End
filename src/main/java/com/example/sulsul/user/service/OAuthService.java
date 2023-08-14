@@ -52,6 +52,6 @@ public class OAuthService {
      * 회원가입 직후 필수 추가 정보를 입력하였는지 확인한다. 모두 입력하였다면 true 를 반환한다.
      */
     public boolean initDataInput(User user) {
-        return (user.getUType() != null && user.getEType() != null);
+        return (user.getUserType() != null && user.getEssayType() != null);
     }
 }

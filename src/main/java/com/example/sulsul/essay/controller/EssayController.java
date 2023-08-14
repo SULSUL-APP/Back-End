@@ -1,6 +1,8 @@
 package com.example.sulsul.essay.controller;
 
+import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.EssayState;
+import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.request.RejectRequest;
@@ -12,7 +14,12 @@ import com.example.sulsul.exception.essay.InvalidRejectDetailException;
 import com.example.sulsul.exception.essay.TeacherCreateEssayException;
 import com.example.sulsul.exception.file.EmptyEssayFileException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
+import com.example.sulsul.fcm.FcmMessageService;
+import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.service.FileService;
+import com.example.sulsul.notification.entity.NotiBody;
+import com.example.sulsul.notification.entity.NotiTitle;
+import com.example.sulsul.notification.service.NotificationService;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,6 +49,8 @@ public class EssayController {
 
     private final EssayService essayService;
     private final FileService fileService;
+    private final FcmMessageService fcmMessageService;
+    private final NotificationService notificationService;
 
     @Operation(summary = "첨삭요청 (학생)", description = "profileId에 해당하는 강사에게 첨삭을 요청한다.")
     @ApiResponses({
@@ -74,22 +83,34 @@ public class EssayController {
             throw new InvalidEssayCreateException(errorMap);
         }
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 2L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
-                .id(userId)
-                .uType(UType.STUDENT)
+                .id(2L)
+                .name("김경근")
+                .email("sulsul@gmail.com")
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
+                .loginType(LoginType.KAKAO)
                 .build();
         // 학생 유저만 첨삭요청 가능
-        if (loginedUser.getUType().equals(UType.TEACHER)) {
+        if (loginedUser.getUserType().equals(UType.TEACHER)) {
             throw new TeacherCreateEssayException(loginedUser.getId());
         }
         // 첨삭 엔티티 생성
         Essay essay = essayService.createEssay(profileId, loginedUser, request);
         // 첨삭 파일 업로드
-        fileService.uploadEssayFile(loginedUser, essay, request.getEssayFile());
+        File file = fileService.uploadEssayFile(loginedUser, essay, request.getEssayFile());
+        String filePath = file.getFilePath();
+
+        // 첨삭요청 알림 전송
+//        User target = essay.getTeacher();
+//        String title = NotiTitle.REQUEST.getTitle();
+//        String studentName = loginedUser.getName();
+//        String body = NotiBody.REQUEST.getDetail(studentName);
+//        notificationService.saveEssayNotification(title, body, target, essay);
+//        fcmMessageService.sendToOne(target, title, body);
+
         // 첨삭요청 응답 생성
-        RequestEssayResponse essayResponse =
-                (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(essay.getId());
+        RequestEssayResponse essayResponse = new RequestEssayResponse(essay, filePath);
         // 첨삭 요청 완료: 201 CREATED
         return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
     }
@@ -120,14 +141,23 @@ public class EssayController {
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
-                .uType(UType.TEACHER)
+                .userType(UType.TEACHER)
                 .build();
         // 첨삭 엔티티 조회
         Essay essay = essayService.getEssayById(essayId);
         // 강사 첨삭 파일 업로드
         fileService.uploadEssayFile(loginedUser, essay, essayFile);
-        ProceedEssayResponse essayResponse =
-                (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
+        ProceedEssayResponse essayResponse = essayService.getProceedEssay(essayId);
+
+        // 첨삭파일 업로드 알림 전송
+//        User student = essay.getStudent();
+//        User teacher = essay.getTeacher();
+//        String teacherName = teacher.getName();
+//        String title = NotiTitle.FILE.getTitle();
+//        String body = NotiBody.FILE.getDetail(teacherName);
+//        notificationService.saveEssayNotification(title, body, student, essay);
+//        fcmMessageService.sendToOne(student, title, body);
+
         // 강사 첨삭 파일 업로드 완료: 201 CREATED
         return new ResponseEntity<>(essayResponse, HttpStatus.CREATED);
     }
@@ -149,7 +179,7 @@ public class EssayController {
         Long userId = 1L; // 임시로 생성한 유저 id;
         User loginedUser = User.builder()
                 .id(userId)
-                .uType(UType.STUDENT)
+                .userType(UType.STUDENT)
                 .build();
         // 첨삭요청 목록 조회
         List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.REQUEST);
@@ -239,15 +269,14 @@ public class EssayController {
     @GetMapping("/essay/request/{essayId}")
     public ResponseEntity<?> getRequestEssay(@Parameter(description = "조회할 첨삭의 id")
                                              @PathVariable Long essayId) {
-        RequestEssayResponse essayResponse =
-                (RequestEssayResponse) essayService.getEssayResponseWithStudentFile(essayId);
+        RequestEssayResponse essayResponse = essayService.getEssayRequest(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
     @Operation(summary = "거절된 첨삭 개별조회", description = "거절된 첨삭을 개별조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RejectEssayResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RejectedEssayResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -258,8 +287,7 @@ public class EssayController {
     @GetMapping("/essay/reject/{essayId}")
     public ResponseEntity<?> getRejectEssay(@Parameter(description = "조회할 첨삭의 id")
                                             @PathVariable Long essayId) {
-        RejectEssayResponse essayResponse =
-                (RejectEssayResponse) essayService.getEssayResponseWithStudentFile(essayId);
+        RejectedEssayResponse essayResponse = essayService.getEssayReject(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
@@ -277,15 +305,14 @@ public class EssayController {
     @GetMapping("/essay/proceed/{essayId}")
     public ResponseEntity<?> getProceedEssay(@Parameter(description = "조회할 첨삭의 id")
                                              @PathVariable Long essayId) {
-        ProceedEssayResponse essayResponse =
-                (ProceedEssayResponse) essayService.getEssayResponseWithFilePaths(essayId);
+        ProceedEssayResponse essayResponse = essayService.getProceedEssay(essayId);
         return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
     @Operation(summary = "완료된 첨삭 개별조회", description = "완료된 첨삭을 개별조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(oneOf = {CompleteEssayResponse.class, NotReviewedEssayResponse.class}))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(oneOf = {ReviewedEssayResponse.class, CompletedEssayResponse.class}))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -296,18 +323,21 @@ public class EssayController {
     @GetMapping("/essay/complete/{essayId}")
     public ResponseEntity<?> getCompleteEssay(@Parameter(description = "조회할 첨삭의 id")
                                               @PathVariable Long essayId) {
-        EssayResponse essayResponse = essayService.getEssayResponseWithFilePaths(essayId);
-        boolean reviewed = essayService.checkEssayReviewState(essayId);
-        if (reviewed) {
-            return new ResponseEntity<>((CompleteEssayResponse) essayResponse, HttpStatus.OK);
+        Essay essay = essayService.getEssayById(essayId);
+        // 리뷰가 작성된 경우
+        if (essay.isReviewed()) {
+            ReviewedEssayResponse essayResponse = essayService.getReviewedEssay(essayId);
+            return new ResponseEntity<>(essayResponse, HttpStatus.OK);
         }
-        return new ResponseEntity<>((NotReviewedEssayResponse) essayResponse, HttpStatus.OK);
+        // 리뷰가 아직 작성되지 않은 경우
+        CompletedEssayResponse essayResponse = essayService.getCompleteEssay(essayId);
+        return new ResponseEntity<>(essayResponse, HttpStatus.OK);
     }
 
     @Operation(summary = "첨삭요청 수락", description = "첨삭요청을 수락한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AcceptEssayResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -319,16 +349,23 @@ public class EssayController {
     public ResponseEntity<?> acceptEssay(@Parameter(description = "수락할 첨삭요청의 id")
                                          @PathVariable Long essayId) {
         Essay essay = essayService.acceptEssay(essayId);
-        String message = "첨삭요청이 수락되었습니다.";
 
-        // TODO: 첨삭요청 수락 알림 전송 로직
-        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
+        // 첨삭요청 수락 알림 전송
+//        User student = essay.getStudent();
+//        User teacher = essay.getTeacher();
+//        String teacherName = teacher.getName();
+//        String title = NotiTitle.ACCEPT.getTitle();
+//        String body = NotiBody.ACCEPT.getDetail(teacherName);
+//        notificationService.saveEssayNotification(title, body, student, essay);
+//        fcmMessageService.sendToOne(student, title, body);
+
+        return new ResponseEntity<>(new AcceptEssayResponse(essay), HttpStatus.OK);
     }
 
     @Operation(summary = "첨삭요청 거절", description = "첨삭요청을 거절한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RejectEssayResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -351,16 +388,23 @@ public class EssayController {
         }
 
         Essay essay = essayService.rejectEssay(essayId, rejectRequest);
-        String message = "첨삭요청이 거절되었습니다.";
 
-        // TODO: 첨삭요청 거절 알림 전송 로직
-        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
+        // 첨삭요청 거절 알림 전송
+//        User student = essay.getStudent();
+//        User teacher = essay.getTeacher();
+//        String teacherName = teacher.getName();
+//        String title = NotiTitle.REJECT.getTitle();
+//        String body = NotiBody.REJECT.getDetail(teacherName);
+//        notificationService.saveEssayNotification(title, body, student, essay);
+//        fcmMessageService.sendToOne(student, title, body);
+
+        return new ResponseEntity<>(new RejectEssayResponse(essay), HttpStatus.OK);
     }
 
     @Operation(summary = "진행중인 첨삭 완료", description = "진행중인 첨삭요청을 완료한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeEssayStateResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CompleteEssayResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -372,9 +416,16 @@ public class EssayController {
     public ResponseEntity<?> completeEssay(@Parameter(description = "완료할 첨삭의 id")
                                            @PathVariable Long essayId) {
         Essay essay = essayService.completeEssay(essayId);
-        String message = "첨삭이 완료되었습니다.";
 
-        // TODO: 첨삭완료 알림 전송 로직
-        return new ResponseEntity<>(new ChangeEssayStateResponse(message, essay), HttpStatus.OK);
+        // 첨삭완료 알림 전송
+//        User student = essay.getStudent();
+//        User teacher = essay.getTeacher();
+//        String teacherName = teacher.getName();
+//        String title = NotiTitle.COMPLETE.getTitle();
+//        String body = NotiBody.COMPLETE.getDetail(teacherName);
+//        notificationService.saveEssayNotification(title, body, student, essay);
+//        fcmMessageService.sendToOne(student, title, body);
+
+        return new ResponseEntity<>(new CompleteEssayResponse(essay), HttpStatus.OK);
     }
 }

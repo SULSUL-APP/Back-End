@@ -33,14 +33,15 @@ public class CommentService {
                 .user(user)
                 .detail(request.getDetail())
                 .build();
+
         return commentRepository.save(comment);
     }
 
-    public Comment updateComment(Long commentId, CommentRequest commentRequest) {
+    public Comment updateComment(Long commentId, CommentRequest request) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
 
-        comment.updateDetail(commentRequest.getDetail());
+        comment.updateDetail(request.getDetail());
         return commentRepository.save(comment);
     }
 

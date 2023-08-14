@@ -6,11 +6,6 @@ spring:
     activate:
       on-profile: dev
 
-#  datasource:
-#    url: jdbc:h2:tcp://localhost/~/sulsul
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${URL}
@@ -24,7 +19,7 @@ spring:
 
   jpa:
     hibernate:
-        ddl-auto: none
+        ddl-auto: create
 #        ddl-auto: create
 #        ddl-auto: update
 
@@ -60,6 +55,10 @@ cloud:
 s3:
   host:
     name: https://${BUCKET}.s3.${REGION}.amazonaws.com/
+
+fcm:
+  key:
+    path: fcm/sulsul-firebase-admin-sdk.json
 
 domain:
   name: http://www.localhost:8081

@@ -35,16 +35,16 @@ class ReviewRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -55,7 +55,7 @@ class ReviewRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.COMPLETE)
                 .reviewState(ReviewState.OFF)
@@ -80,7 +80,7 @@ class ReviewRepositoryTest {
                 () -> assertThat(saved.getScore()).isEqualTo(5),
                 () -> assertThat(saved.getEssay().getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(saved.getEssay().getExamYear()).isEqualTo("2022"),
-                () -> assertThat(saved.getEssay().getEType()).isEqualTo("수리"),
+                () -> assertThat(saved.getEssay().getEssayType()).isEqualTo("수리"),
                 () -> assertThat(saved.getStudent().getName()).isEqualTo("김경근"),
                 () -> assertThat(saved.getStudent().getEmail()).isEqualTo("sulsul@gmail.com"),
                 () -> assertThat(saved.getTeacher().getName()).isEqualTo("임탁균"),
@@ -94,16 +94,16 @@ class ReviewRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -114,7 +114,7 @@ class ReviewRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.COMPLETE)
                 .reviewState(ReviewState.OFF)
@@ -144,24 +144,24 @@ class ReviewRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User s2 = User.builder()
                 .name("류동완")
                 .email("sulsul@g.hongik.ac.kr")
-                .uType(UType.STUDENT)
-                .eType(EType.SOCIETY)
+                .userType(UType.STUDENT)
+                .essayType(EType.SOCIETY)
                 .loginType(LoginType.APPLE)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -173,7 +173,7 @@ class ReviewRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.COMPLETE)
                 .reviewState(ReviewState.OFF)

@@ -35,24 +35,24 @@ class EssayRepositoryTest {
         User s1 = User.builder()
                 .name("김경근")
                 .email("sulsul@gmail.com")
-                .uType(UType.STUDENT)
-                .eType(EType.NATURE)
+                .userType(UType.STUDENT)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .build();
 
         User s2 = User.builder()
                 .name("류동완")
                 .email("sulsul@g.hongik.ac.kr")
-                .uType(UType.STUDENT)
-                .eType(EType.SOCIETY)
+                .userType(UType.STUDENT)
+                .essayType(EType.SOCIETY)
                 .loginType(LoginType.APPLE)
                 .build();
 
         User t1 = User.builder()
                 .name("임탁균")
                 .email("sulsul@naver.com")
-                .uType(UType.TEACHER)
-                .eType(EType.NATURE)
+                .userType(UType.TEACHER)
+                .essayType(EType.NATURE)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다. 화이링")
                 .build();
@@ -60,8 +60,8 @@ class EssayRepositoryTest {
         User t2 = User.builder()
                 .name("전용수")
                 .email("smc@gmail.com")
-                .uType(UType.TEACHER)
-                .eType(EType.SOCIETY)
+                .userType(UType.TEACHER)
+                .essayType(EType.SOCIETY)
                 .loginType(LoginType.KAKAO)
                 .catchPhrase("항상 최선을 다하겠습니다.")
                 .build();
@@ -97,7 +97,7 @@ class EssayRepositoryTest {
         Essay essay = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.REQUEST)
                 .reviewState(ReviewState.OFF)
@@ -110,7 +110,7 @@ class EssayRepositoryTest {
         assertAll(
                 () -> assertThat(foundEssay.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(foundEssay.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(foundEssay.getEType()).isEqualTo("수리"),
+                () -> assertThat(foundEssay.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(foundEssay.getEssayState()).isEqualTo(EssayState.REQUEST),
                 () -> assertThat(foundEssay.getReviewState()).isEqualTo(ReviewState.OFF),
                 () -> assertThat(foundEssay.getStudent()).isEqualTo(s1),
@@ -127,7 +127,7 @@ class EssayRepositoryTest {
         Essay essay = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.REQUEST)
                 .reviewState(ReviewState.OFF)
@@ -141,7 +141,7 @@ class EssayRepositoryTest {
         assertAll(
                 () -> assertThat(foundEssay.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(foundEssay.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(foundEssay.getEType()).isEqualTo("수리"),
+                () -> assertThat(foundEssay.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(foundEssay.getEssayState()).isEqualTo(EssayState.REQUEST),
                 () -> assertThat(foundEssay.getReviewState()).isEqualTo(ReviewState.OFF),
                 () -> assertThat(foundEssay.getStudent()).isEqualTo(s1),
@@ -159,7 +159,7 @@ class EssayRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.REQUEST)
                 .reviewState(ReviewState.OFF)
@@ -170,7 +170,7 @@ class EssayRepositoryTest {
         Essay essay2 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2023")
-                .eType("인문사회")
+                .essayType("인문사회")
                 .inquiry("2023년 인문 첨삭 부탁드립니다.")
                 .essayState(EssayState.REQUEST)
                 .reviewState(ReviewState.OFF)
@@ -200,7 +200,7 @@ class EssayRepositoryTest {
         Essay essay1 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.REQUEST)
                 .reviewState(ReviewState.OFF)
@@ -211,7 +211,7 @@ class EssayRepositoryTest {
         Essay essay2 = Essay.builder()
                 .univ("홍익대")
                 .examYear("2023")
-                .eType("인문사회")
+                .essayType("인문사회")
                 .inquiry("2023년 인문 첨삭 부탁드립니다.")
                 .essayState(EssayState.REQUEST)
                 .reviewState(ReviewState.OFF)
@@ -240,7 +240,7 @@ class EssayRepositoryTest {
         Essay essay = Essay.builder()
                 .univ("홍익대")
                 .examYear("2022")
-                .eType("수리")
+                .essayType("수리")
                 .inquiry("2022년 수리논술 3번 문제까지 첨삭 부탁드립니다.")
                 .essayState(EssayState.REQUEST)
                 .reviewState(ReviewState.OFF)
@@ -257,7 +257,7 @@ class EssayRepositoryTest {
         assertAll(
                 () -> assertThat(foundEssay.getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(foundEssay.getExamYear()).isEqualTo("2022"),
-                () -> assertThat(foundEssay.getEType()).isEqualTo("수리"),
+                () -> assertThat(foundEssay.getEssayType()).isEqualTo("수리"),
                 () -> assertThat(foundEssay.getEssayState()).isEqualTo(EssayState.PROCEED),
                 () -> assertThat(foundEssay.getReviewState()).isEqualTo(ReviewState.OFF),
                 () -> assertThat(foundEssay.getStudent()).isEqualTo(s1),

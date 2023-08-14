@@ -1,9 +1,6 @@
 package com.example.sulsul.exceptionhandler;
 
-import com.example.sulsul.exception.AccessNotAllowedException;
-import com.example.sulsul.exception.BadInputException;
-import com.example.sulsul.exception.ResourceNotFoundException;
-import com.example.sulsul.exception.S3FileException;
+import com.example.sulsul.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,6 +44,17 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(S3FileException.class)
     public ResponseEntity<ErrorResponse> s3ExceptionHandler(S3FileException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(e.getCode())
+                .messages(e.getMessage())
+                .errors(e.getErrors())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(FcmMessageException.class)
+    public ResponseEntity<ErrorResponse> fcmMessageExceptionHandler(FcmMessageException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(e.getCode())
                 .messages(e.getMessage())

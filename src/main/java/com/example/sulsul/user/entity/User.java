@@ -36,17 +36,16 @@ public class User extends BaseEntity {
     private String catchPhrase;
 
     @Enumerated(EnumType.STRING)
-    private UType uType;
+    private UType userType;
 
     @Enumerated(EnumType.STRING)
-    private EType eType;
+    private EType essayType;
 
     @Enumerated(EnumType.STRING)
-    private DType dType = DType.AVAILABLE;
+    private DType userState;
 
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
-
 
     public void updateName(String name) {
         this.name = name;
@@ -57,15 +56,18 @@ public class User extends BaseEntity {
     }
 
     public void updateUType(UType uType) {
-        this.uType = uType;
+        this.userType = uType;
     }
 
     public void updateEType(EType eType) {
-        this.eType = eType;
+        this.essayType = eType;
     }
 
     public void updateDType(DType dType) {
-        this.dType = dType;
+        this.userState = dType;
     }
 
+    public boolean isTeacher() {
+        return userType.equals(UType.TEACHER);
+    }
 }

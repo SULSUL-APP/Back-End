@@ -58,7 +58,7 @@ class ReviewServiceTest {
                 () -> assertThat(review.getDetail()).isEqualTo("리뷰 작성 테스트"),
                 () -> assertThat(review.getEssay().getUniv()).isEqualTo("홍익대"),
                 () -> assertThat(review.getEssay().getExamYear()).isEqualTo("2022"),
-                () -> assertThat(review.getEssay().getEType()).isEqualTo("수리"),
+                () -> assertThat(review.getEssay().getEssayType()).isEqualTo("수리"),
                 () -> assertThat(review.getEssay().getReviewState()).isEqualTo(ReviewState.ON),
                 () -> assertThat(review.getStudent().getName()).isEqualTo("김경근"),
                 () -> assertThat(review.getStudent().getEmail()).isEqualTo("sulsul@gmail.com"),

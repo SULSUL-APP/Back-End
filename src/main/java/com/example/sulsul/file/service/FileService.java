@@ -36,7 +36,6 @@ public class FileService {
     private String hostName;
 
     private final AmazonS3 amazonS3;
-    private final AmazonS3Client amazonS3Client;
     private final FileRepository fileRepository;
 
     /**
@@ -96,10 +95,10 @@ public class FileService {
     @Transactional
     public File uploadEssayFile(User uploader, Essay essay, MultipartFile essayFile) {
         // 기존에 업로드한 첨삭파일이 있으면 삭제
-        if (uploader.getUType().equals(UType.STUDENT)) {
+        if (uploader.getUserType().equals(UType.STUDENT)) {
             fileRepository.getStudentEssayFile(essay.getId(), uploader.getId())
                     .ifPresent(file -> deleteFile(file.getFilePath()));
-        } else if (uploader.getUType().equals(UType.TEACHER)) {
+        } else if (uploader.getUserType().equals(UType.TEACHER)) {
             fileRepository.getTeacherEssayFile(essay.getId(), uploader.getId())
                     .ifPresent(file -> deleteFile(file.getFilePath()));
         }

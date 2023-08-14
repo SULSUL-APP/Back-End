@@ -81,7 +81,7 @@ public class TeacherProfileController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/profiles/social")
+    @GetMapping("/profiles/nature")
     public ResponseEntity<?> getNatureProfileList() {
 
         List<TeacherProfile> profiles = teacherProfileService.getProfileList(EType.NATURE);

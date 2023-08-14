@@ -14,5 +14,5 @@ public interface TeacherProfileRepository extends JpaRepository<TeacherProfile, 
 
     Optional<TeacherProfile> findByTeacher(User user);
 
-    List<TeacherProfile> findByTeacher_EType(EType eType);
+    List<TeacherProfile> findByTeacher_EssayType(EType eType);
 }
