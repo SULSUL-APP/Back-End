@@ -38,3 +38,6 @@ out/
 
 ### FCM ###
 src/main/resources/fcm/*.json
+
+### Security ###
+src/main/resources/application-security.yml
