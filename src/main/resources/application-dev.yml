@@ -7,10 +7,10 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:h2:tcp://localhost/~/sulsul
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${URL}
+    username: ${USERNAME}
+    password: ${USERPASSWORD}
 
   servlet:
     multipart:
@@ -19,7 +19,7 @@ spring:
 
   jpa:
     hibernate:
-        ddl-auto: none
+        ddl-auto: create
 #        ddl-auto: create
 #        ddl-auto: update
 
