@@ -1,5 +1,6 @@
 package com.example.sulsul.teacherprofile.entity;
 
+import com.example.sulsul.teacherprofile.dto.request.TeacherProfileRequest;
 import com.example.sulsul.user.entity.User;
 import lombok.*;
 
@@ -23,19 +24,19 @@ public class TeacherProfile {
     @ManyToOne(fetch = FetchType.LAZY)
     private User teacher;
 
-    @Column()
+    @Column(length = 1000)
     private String careerDetail;
 
-    @Column()
+    @Column(length = 1000)
     private String introDetail;
 
     @Column()
     private String price;
 
-    @Column()
+    @Column(length = 1000)
     private String possibleUniv;
 
-    @Column()
+    @Column(length = 1000)
     private String otherDetail; // 기타 사항
 
     @Column()
@@ -77,4 +78,11 @@ public class TeacherProfile {
         this.otherDetail = otherDetail;
     }
 
+    public void updateTeacherProfile(TeacherProfileRequest teacherProfileRequest) {
+        this.careerDetail = teacherProfileRequest.getCareerDetail();
+        this.introDetail = teacherProfileRequest.getIntroDetail();
+        this.price = teacherProfileRequest.getPrice();
+        this.possibleUniv = teacherProfileRequest.getPossibleUniv();
+        this.otherDetail = teacherProfileRequest.getOtherDetail();
+    }
 }

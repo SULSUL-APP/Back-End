@@ -1,5 +1,5 @@
 package com.example.sulsul.common.type;
 
 public enum LoginType {
-    KAKAO, APPLE
+    KAKAO, APPLE, GOOGLE
 }
