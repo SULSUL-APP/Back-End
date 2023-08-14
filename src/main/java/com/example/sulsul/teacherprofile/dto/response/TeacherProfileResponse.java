@@ -19,7 +19,7 @@ public class TeacherProfileResponse {
     private final String catchPhrase;
 
     //profile
-    @Schema(description = "프로필 아이디", example = "1")
+    @Schema(description = "프로필 id", example = "1")
     private final Long id;
 
     @Schema(description = "강사 약력 및 학력", example = "강사 프로필 약력 및 학력 예시")
@@ -43,10 +43,10 @@ public class TeacherProfileResponse {
     @Schema(description = "완료한 첨삭 개수", example = "강사가 진행한 총 첨삭 개수")
     private final Integer completedCount;
 
-    public TeacherProfileResponse(User user, TeacherProfile teacherProfile) {
-        this.name = user.getName();
-        this.url = user.getProfileImage();
-        this.catchPhrase = user.getCatchPhrase();
+    public TeacherProfileResponse(TeacherProfile teacherProfile) {
+        this.name = teacherProfile.getTeacher().getName();
+        this.url = teacherProfile.getTeacher().getProfileImage();
+        this.catchPhrase = teacherProfile.getTeacher().getCatchPhrase();
         this.id = teacherProfile.getId();
         this.careerDetail = teacherProfile.getCareerDetail();
         this.introDetail = teacherProfile.getIntroDetail();
