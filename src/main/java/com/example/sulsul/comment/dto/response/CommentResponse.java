@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
+@Schema(description = "단일 댓글 데이터")
 public class CommentResponse {
 
     @Schema(description = "댓글 아이디", example = "1")
