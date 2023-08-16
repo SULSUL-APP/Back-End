@@ -1,3 +1,5 @@
 spring:
   profiles:
-    default: dev
+    include:
+      - dev
+      - security
