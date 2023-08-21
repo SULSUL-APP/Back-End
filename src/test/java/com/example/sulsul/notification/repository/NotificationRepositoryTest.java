@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -32,7 +35,7 @@ class NotificationRepositoryTest {
 
     @Test
     @DisplayName("알림조회 테스트")
-    void findEssayNotificationByUserTest() {
+    void 알림조회_테스트() {
         // given
         User s1 = DemoDataFactory.createStudent1(1L);
         User t1 = DemoDataFactory.createTeacher1(2L);
@@ -78,5 +81,23 @@ class NotificationRepositoryTest {
                 () -> assertThat(n2.getTitle()).isEqualTo("첨삭거절 알림"),
                 () -> assertThat(n2.getBody()).isEqualTo(tname + "님이 첨삭요청을 거절했습니다.")
         );
+    }
+
+    @Test
+    void 알림생성일_계산_테스트() {
+        //2023-08-22T01:09:37.327784300
+        LocalDateTime end = LocalDateTime.now();
+        LocalDateTime start0 = LocalDateTime.of(2023, 8, 12, 1, 9, 37, 327784300);
+        LocalDateTime start1 = LocalDateTime.of(2023, 8, 12, 12, 32, 22, 3333);
+        LocalDateTime start2 = LocalDateTime.of(2023, 7, 12, 12, 32, 22, 3333);
+        LocalDateTime start3 = LocalDateTime.of(2022, 11, 12, 12, 32, 22, 3333);
+        long between0 = ChronoUnit.DAYS.between(start0, end);
+        long between1 = ChronoUnit.DAYS.between(start1, end);
+        long between2 = ChronoUnit.DAYS.between(start2, end);
+        long between3 = ChronoUnit.DAYS.between(start3, end);
+        System.out.println("between0 = " + between0);
+        System.out.println("between1 = " + between1);
+        System.out.println("between2 = " + between2);
+        System.out.println("between3 = " + between3);
     }
 }
