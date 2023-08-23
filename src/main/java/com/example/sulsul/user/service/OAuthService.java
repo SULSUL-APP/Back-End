@@ -2,21 +2,15 @@ package com.example.sulsul.user.service;
 
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.UType;
-import com.example.sulsul.config.auth.JwtProvider;
+import com.example.sulsul.config.security.JwtProvider;
 import com.example.sulsul.user.dto.request.OauthDto;
 import com.example.sulsul.user.dto.request.SignUpDto;
 import com.example.sulsul.user.dto.response.LoginResponseDto;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.oauth2.Oauth2UserFactory;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @Transactional

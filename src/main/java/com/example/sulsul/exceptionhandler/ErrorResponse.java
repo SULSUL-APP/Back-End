@@ -8,6 +8,7 @@ import java.util.Map;
 
 @Getter
 public class ErrorResponse {
+
     @Schema(description = "에러 코드", example = "COMMENT_02")
     private final String code;
 
