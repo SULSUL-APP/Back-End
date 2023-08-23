@@ -2,8 +2,8 @@ insert into users(
     user_id,
     name,
     email,
-    u_type,
-    e_type,
+    user_type,
+    essay_type,
     login_type
 ) values (1, '김경근', 'sulsul@gmail.com', 'STUDENT', 'NATURE', 'KAKAO');
 
@@ -11,8 +11,8 @@ insert into users(
     user_id,
     name,
     email,
-    u_type,
-    e_type,
+    user_type,
+    essay_type,
     login_type,
     catch_phrase
 ) values (2, '임탁균', 'sulsul@naver.com', 'TEACHER', 'NATURE', 'APPLE', '화이링');
@@ -20,7 +20,7 @@ insert into users(
 insert into essays(
     essay_id,
     univ,
-    e_type,
+    essay_type,
     exam_year,
     essay_state,
     inquiry,

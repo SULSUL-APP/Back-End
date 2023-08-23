@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
+@Schema(description = "단일 첨삭 데이터")
 public class EssayResponse {
 
     @Schema(description = "첨삭 id", example = "1")

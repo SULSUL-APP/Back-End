@@ -13,7 +13,7 @@ public class CommonExceptionHandler {
     public ResponseEntity<ErrorResponse> badInputExceptionHandler(BadInputException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(e.getCode())
-                .messages(e.getMessage())
+                .message(e.getMessage())
                 .errors(e.getErrors())
                 .build();
 
@@ -24,7 +24,7 @@ public class CommonExceptionHandler {
     public ResponseEntity<ErrorResponse> resourceNotFoundExceptionHandler(ResourceNotFoundException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(e.getCode())
-                .messages(e.getMessage())
+                .message(e.getMessage())
                 .errors(e.getErrors())
                 .build();
 
@@ -35,7 +35,7 @@ public class CommonExceptionHandler {
     public ResponseEntity<ErrorResponse> accessNotAllowedExceptionHandler(AccessNotAllowedException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(e.getCode())
-                .messages(e.getMessage())
+                .message(e.getMessage())
                 .errors(e.getErrors())
                 .build();
 
@@ -46,7 +46,7 @@ public class CommonExceptionHandler {
     public ResponseEntity<ErrorResponse> s3ExceptionHandler(S3FileException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(e.getCode())
-                .messages(e.getMessage())
+                .message(e.getMessage())
                 .errors(e.getErrors())
                 .build();
 
@@ -57,7 +57,7 @@ public class CommonExceptionHandler {
     public ResponseEntity<ErrorResponse> fcmMessageExceptionHandler(FcmMessageException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(e.getCode())
-                .messages(e.getMessage())
+                .message(e.getMessage())
                 .errors(e.getErrors())
                 .build();
 

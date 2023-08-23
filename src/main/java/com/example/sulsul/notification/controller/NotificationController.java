@@ -5,6 +5,8 @@ import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.fcm.FcmMessageService;
 import com.example.sulsul.notification.dto.CommonNotiRequest;
 import com.example.sulsul.notification.dto.CommonNotiResponse;
+import com.example.sulsul.notification.dto.NotiGroupResponse;
+import com.example.sulsul.notification.entity.Notification;
 import com.example.sulsul.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,12 +19,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Notification", description = "알림 관련 API")
@@ -62,7 +66,26 @@ public class NotificationController {
 
         // 전체알림 전송
         notificationService.saveCommonNotification(title, body);
-        fcmMessageService.sendToAll(title, body);
+        //fcmMessageService.sendToAll(title, body);
         return new ResponseEntity<>(new CommonNotiResponse(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "유저별 알림 조회", description = "알림을 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommonNotiResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/noti")
+    public ResponseEntity<?> getNotifications() {
+        // 로그인한 유저의 id값을 가져오는 로직
+        long userId = 1L;
+        List<Notification> notifications = notificationService.getEssayNotifications(userId);
+        return new ResponseEntity<>(new NotiGroupResponse(notifications), HttpStatus.OK);
     }
 }

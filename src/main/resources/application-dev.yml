@@ -19,14 +19,14 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
     properties:
       hibernate:
         format_sql: true
 
     # ddl-auto 과정에서 더미데이터 생성
-    #    defer-datasource-initialization: true
+#        defer-datasource-initialization: true
     defer-datasource-initialization: false
   sql:
     init:
