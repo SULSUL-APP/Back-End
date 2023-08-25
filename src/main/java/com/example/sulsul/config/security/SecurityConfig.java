@@ -22,10 +22,10 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-
-    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
+//    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+//
+//    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+//    private final CustomOAuth2UserService customOAuth2UserService;
 
     private static final String[] swagger = {
             "/v2/api-docs",
@@ -54,26 +54,28 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(swagger).permitAll()
-                .antMatchers(HttpMethod.GET, "/classes/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/classes/filters/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/profile/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/auth/reissuance").permitAll()
-                .antMatchers("/auth/reissuance").permitAll()
+                .antMatchers(HttpMethod.GET, "/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/**").permitAll()
                 .antMatchers("/login/**").permitAll()
                 .anyRequest().authenticated()
+
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .clearAuthentication(true)
 
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(new CustomAccessDeniedHandler())
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
 
-                .and()
-                .oauth2Login()
-                .successHandler(oAuth2AuthenticationSuccessHandler)
-                .failureHandler(oAuth2AuthenticationFailureHandler)
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService)
-                .and()
+//                .and()
+//                .oauth2Login()
+//                .successHandler(oAuth2AuthenticationSuccessHandler)
+//                .failureHandler(oAuth2AuthenticationFailureHandler)
+//                .userInfoEndpoint()
+//                .userService(customOAuth2UserService)
+//                .and()
 
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

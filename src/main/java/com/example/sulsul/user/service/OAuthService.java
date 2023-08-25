@@ -2,7 +2,7 @@ package com.example.sulsul.user.service;
 
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.UType;
-import com.example.sulsul.config.security.JwtProvider;
+import com.example.sulsul.config.jwt.JwtTokenProvider;
 import com.example.sulsul.user.dto.request.OauthDto;
 import com.example.sulsul.user.dto.request.SignUpDto;
 import com.example.sulsul.user.dto.response.LoginResponseDto;
@@ -12,20 +12,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class OAuthService {
 
-    private final JwtProvider jwtProvider;
+    private final JwtTokenProvider jwtTokenProvider;
     private final Oauth2UserFactory oauth2UserFactory;
 
     public LoginResponseDto socialLogin(OauthDto oauthDto) {
 
         User user = oauth2UserFactory.getOauth2User(oauthDto);
-
-        String accessToken = jwtProvider.createAccessToken(user);
-        String refreshToken = jwtProvider.createRefreshToken(user);
+        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), new Date());
+        String refreshToken = jwtTokenProvider.createRefreshToken(new Date());
         boolean initData = initDataInput(user);
         //note : 소셜로그인 정보에 추가정보 기입 유무 포함.
 
