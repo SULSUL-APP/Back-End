@@ -35,6 +35,13 @@ public class SecurityConfig {
             "/webjars/**"
     };
 
+    private final String[] GET_PERMIT_API_URL = {
+            "/**"
+    };
+    private final String[] POST_PERMIT_API_URL = {
+            "/**"
+    };
+
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
 
@@ -54,9 +61,8 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(swagger).permitAll()
-                .antMatchers(HttpMethod.GET, "/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/**").permitAll()
-                .antMatchers("/login/**").permitAll()
+                .antMatchers(HttpMethod.GET, GET_PERMIT_API_URL).permitAll()
+                .antMatchers(HttpMethod.POST, POST_PERMIT_API_URL).permitAll()
                 .anyRequest().authenticated()
 
                 .and()
