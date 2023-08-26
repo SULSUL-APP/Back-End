@@ -27,6 +27,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String registrationId = userRequest.
                 getClientRegistration().getRegistrationId();
+
         String userNameAttributeName = userRequest.
                 getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
@@ -42,6 +43,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = userRepository.findByEmail(attributes.getEmail())
                 .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
                 .orElse(attributes.toEntity());
+
+        log.info("[카카오 유저 등록] user_id: {}", user.getId());
 
         return userRepository.save(user);
     }
