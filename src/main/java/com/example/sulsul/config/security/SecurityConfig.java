@@ -1,6 +1,7 @@
 package com.example.sulsul.config.security;
 
 import com.example.sulsul.config.jwt.JwtAuthenticationFilter;
+import com.example.sulsul.config.oauth.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

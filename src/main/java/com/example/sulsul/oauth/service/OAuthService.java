@@ -1,4 +1,4 @@
-package com.example.sulsul.user.service;
+package com.example.sulsul.oauth.service;
 
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.UType;

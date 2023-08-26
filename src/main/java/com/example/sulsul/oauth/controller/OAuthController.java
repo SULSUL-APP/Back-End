@@ -1,10 +1,10 @@
-package com.example.sulsul.user.controller;
+package com.example.sulsul.oauth.controller;
 
 import com.example.sulsul.user.dto.request.OauthDto;
 import com.example.sulsul.user.dto.request.SignUpDto;
 import com.example.sulsul.user.dto.response.LoginResponseDto;
 import com.example.sulsul.user.entity.User;
-import com.example.sulsul.user.service.OAuthService;
+import com.example.sulsul.oauth.service.OAuthService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
