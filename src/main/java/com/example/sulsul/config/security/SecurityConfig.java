@@ -22,10 +22,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-//    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-//
-//    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-//    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     private static final String[] swagger = {
             "/v2/api-docs",
@@ -67,7 +64,7 @@ public class SecurityConfig {
 
                 .and()
                 .logout()
-                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
                 .clearAuthentication(true)
 
                 .and()
@@ -75,13 +72,11 @@ public class SecurityConfig {
                 .accessDeniedHandler(new CustomAccessDeniedHandler())
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
 
-//                .and()
-//                .oauth2Login()
-//                .successHandler(oAuth2AuthenticationSuccessHandler)
-//                .failureHandler(oAuth2AuthenticationFailureHandler)
-//                .userInfoEndpoint()
-//                .userService(customOAuth2UserService)
-//                .and()
+                .and()
+                .oauth2Login()
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
 
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
