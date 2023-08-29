@@ -4,6 +4,7 @@ package com.example.sulsul.config.security;
 토큰으로 사용될 유저 정보와 권한을 저장
  */
 
+import com.example.sulsul.config.oauth.OAuthAttributes;
 import com.example.sulsul.user.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,13 +18,13 @@ import java.util.Map;
 public class CustomUserDetails implements UserDetails, OAuth2User {
 
     private final User user;
-    private Map<String, Object> attributes;
+    private OAuthAttributes attributes;
 
     public CustomUserDetails(User user) {
         this.user = user;
     }
 
-    public CustomUserDetails(User user, Map<String, Object> attributes) {
+    public CustomUserDetails(User user, OAuthAttributes attributes) {
         this.user = user;
         this.attributes = attributes;
     }

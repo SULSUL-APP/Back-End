@@ -1,5 +1,8 @@
 package com.example.sulsul.config.oauth;
 
+import com.example.sulsul.config.security.CustomUserDetails;
+import com.example.sulsul.exception.user.UserNotFoundException;
+import com.example.sulsul.user.entity.Role;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,18 +36,33 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
+        log.info("[OAuthAttributes] Account: {}", attributes);
+
         User user = saveOrUpdate(attributes);
 
-        return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getUserRole().getKey())),
-                attributes.getAttributes(), attributes.getNameAttributeKey());
+        return new CustomUserDetails(user, attributes);
     }
 
     private User saveOrUpdate(OAuthAttributes attributes) {
-        User user = userRepository.findByEmail(attributes.getEmail())
-                .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
-                .orElse(attributes.toEntity());
 
-        log.info("[카카오 유저 등록] user_id: {}", user.getId());
+        log.info("[카카오 attributes] kakakAccont: {}", attributes);
+
+//        User user = userRepository.findByEmail(attributes.getEmail())
+//                .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
+//                .orElse(attributes.toEntity());
+
+        User user;
+        if(userRepository.existsByEmail(attributes.getEmail())) {
+            user = userRepository.findByEmail(attributes.getEmail()).orElseThrow(
+                    () -> new UserNotFoundException()
+            );
+            log.info("[카카오 유저 등록 확인] user_id: {}", user.getId());
+
+        } else {
+//            user = attributes.toEntity();
+            user = User.builder().name(attributes.getName()).email(attributes.getEmail()).profileImage(attributes.getPicture()).userRole(Role.GUEST).build();
+            log.info("[카카오 유저 등록] user_id: {}", user.getId());
+        }
 
         return userRepository.save(user);
     }

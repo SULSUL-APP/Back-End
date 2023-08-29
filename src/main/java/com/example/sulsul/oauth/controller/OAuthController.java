@@ -24,20 +24,20 @@ public class OAuthController {
     private final OAuthService oAuthService;
 
 
-    @PostMapping(value = "/login/oauth")
-    public ResponseEntity<LoginResponseDto> oauth2Login(@RequestBody OauthDto oauthDto) {
-        LoginResponseDto loginResponseDto = oAuthService.socialLogin(oauthDto);
-        return ResponseEntity.ok().body(loginResponseDto);
-        //note : LoginResponse 에 추가정보 기입 유무 정보 포함.
-    }
-
-    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> signUpUser(
-            @ModelAttribute @Valid SignUpDto signUpDto,
-            @Parameter(hidden = true) @AuthenticationPrincipal User user
-    ) {
-        oAuthService.signUpData(user, signUpDto);
-        return ResponseEntity.noContent().build();
-    }
+//    @PostMapping(value = "/login/oauth")
+//    public ResponseEntity<LoginResponseDto> oauth2Login(@RequestBody OauthDto oauthDto) {
+//        LoginResponseDto loginResponseDto = oAuthService.socialLogin(oauthDto);
+//        return ResponseEntity.ok().body(loginResponseDto);
+//        //note : LoginResponse 에 추가정보 기입 유무 정보 포함.
+//    }
+//
+//    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<Void> signUpUser(
+//            @ModelAttribute @Valid SignUpDto signUpDto,
+//            @Parameter(hidden = true) @AuthenticationPrincipal User user
+//    ) {
+//        oAuthService.signUpData(user, signUpDto);
+//        return ResponseEntity.noContent().build();
+//    }
 
 }
