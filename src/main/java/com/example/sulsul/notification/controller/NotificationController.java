@@ -73,7 +73,7 @@ public class NotificationController {
     @Operation(summary = "유저별 알림 조회", description = "알림을 조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommonNotiResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotiGroupResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
