@@ -47,6 +47,21 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role userRole;
+
+    public User update(String name, String picture) {
+        this.name = name;
+        this.profileImage = picture;
+
+        return this;
+    }
+
+    public void updateUserRole(Role userRole) {
+        this.userRole = userRole;
+    }
+
     public void updateName(String name) {
         this.name = name;
     }
