@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
@@ -70,7 +71,7 @@ public class JwtTokenProvider {
 
         String accessToken = Jwts.builder()
                 .setClaims(claims)
-                .setIssuer("Dansup")
+                .setIssuer("sulsul")
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -86,7 +87,7 @@ public class JwtTokenProvider {
 
         String refreshToken = Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setIssuer("Dansup")
+                .setIssuer("sulsul")
                 .setExpiration(new Date(now.getTime() + refreshValidTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
@@ -142,4 +143,28 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * AccessToken + RefreshToken 헤더에 실어서 보내기
+     */
+    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        setAccessTokenHeader(response, accessToken);
+        setRefreshTokenHeader(response, refreshToken);
+        log.info("Access Token, Refresh Token 헤더 설정 완료");
+    }
+
+    /**
+     * AccessToken 헤더 설정
+     */
+    public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
+        response.setHeader("AccessHeader", accessToken);
+    }
+
+    /**
+     * RefreshToken 헤더 설정
+     */
+    public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
+        response.setHeader("RefreshHeader", refreshToken);
+    }
 }

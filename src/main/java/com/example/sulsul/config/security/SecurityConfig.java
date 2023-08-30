@@ -2,6 +2,8 @@ package com.example.sulsul.config.security;
 
 import com.example.sulsul.config.jwt.JwtAuthenticationFilter;
 import com.example.sulsul.config.oauth.CustomOAuth2UserService;
+import com.example.sulsul.config.oauth.OAuth2AuthenticationFailureHandler;
+import com.example.sulsul.config.oauth.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +26,8 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     private static final String[] swagger = {
             "/v2/api-docs",
@@ -75,8 +79,9 @@ public class SecurityConfig {
 
                 .and()
                 .oauth2Login()
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService)
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler)
+                .userInfoEndpoint().userService(customOAuth2UserService)
                 .and()
 
                 .and()
