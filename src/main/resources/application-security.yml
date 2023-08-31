@@ -1,0 +1,8 @@
+jwt:
+  secret: ${JWT_SECRET}
+
+spring:
+  security:
+    user:
+      name: user
+      password: ${TEMP_PW}
