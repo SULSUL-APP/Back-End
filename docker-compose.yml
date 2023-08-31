@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  springboot:
+    image: "junek3/sulsul-server"
+    environment:
+      - RDS_HOSTNAME=${RDS_HOSTNAME}
+      - RDS_USERNAME=${RDS_USERNAME}
+      - RDS_PASSWORD=${RDS_PASSWORD}
+      - RDS_DB_NAME=${RDS_DB_NAME}
+      - RDS_PORT=${RDS_PORT}
+    restart: "always"
+
+  nginx:
+    image: "junek3/sulsul-nginx"
+    ports:
+      - "80:80"
+    restart: "always"

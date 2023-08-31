@@ -2,15 +2,24 @@ server:
   port: 8080
 
 spring:
+  config:
+    use-legacy-processing: true
+
+  include:
+    - security
+    - oauth
+    - s3
+    - fcm
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mariadb://${rds.hostname}:${rds.port}/${rds.db.name}?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://${rds.hostname}:${rds.port}/${rds.db.name}?allowPublicKeyRetrieval=true&useSSL=false
     username: ${rds.username}
     password: ${rds.password}
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
