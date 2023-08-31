@@ -2,7 +2,8 @@ package com.example.sulsul.config;
 
 import com.example.sulsul.exception.fcm.FcmInitException;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.*;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.InputStream;
 import java.util.List;
 
-//@Configuration
+@Configuration
 public class FcmConfig {
 
     @Value("${fcm.key.path}")
