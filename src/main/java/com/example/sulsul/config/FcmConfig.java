@@ -7,13 +7,12 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
 import java.util.List;
 
-@Configuration
+//@Configuration
 public class FcmConfig {
 
     @Value("${fcm.key.path}")
