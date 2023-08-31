@@ -22,7 +22,7 @@ jobs:
         run: |
           cd ./src/main/resources
           mkdir -p fcm && cd fcm
-          echo ${{ secrets.FCM_ADMIN_SDK }} >> ./sulsul-1c69a-firebase-adminsdk-eccp7-b17f75a0da.json
+          echo "${{ secrets.FCM_ADMIN_SDK }}" >> ./sulsul-1c69a-firebase-adminsdk-eccp7-b17f75a0da.json
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
