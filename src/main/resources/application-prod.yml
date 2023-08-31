@@ -1,16 +1,16 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${URL}
-    username: ${USERNAME}
-    password: ${USERPASSWORD}
+    url: jdbc:mariadb://${rds.hostname}:${rds.port}/${rds.db.name}?allowPublicKeyRetrieval=true&useSSL=false
+    username: ${rds.username}
+    password: ${rds.password}
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -21,6 +21,4 @@ springdoc:
 
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.type: trace
     com.amazonaws.util.EC2MetadataUtils: error # Failed to connect to service endpoint 에러 무시

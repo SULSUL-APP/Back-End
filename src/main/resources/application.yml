@@ -4,3 +4,5 @@ spring:
       - dev
       - security
       - oauth
+      - s3
+      - fcm
