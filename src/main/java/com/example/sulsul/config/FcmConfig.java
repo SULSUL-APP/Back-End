@@ -30,6 +30,7 @@ public class FcmConfig {
         System.out.println("resource = " + resource.getFilename());
 
         try (InputStream stream = resource.getInputStream()) {
+            System.out.println("try문 시작");
             FirebaseApp firebaseApp = null;
             List<FirebaseApp> firebaseApps = FirebaseApp.getApps();
 
@@ -42,25 +43,36 @@ public class FcmConfig {
                 sb.append(line);
                 sb.append('\n');
             }
+            System.out.println(sb);
 
             // 중복 초기화 방지
             if (firebaseApps != null && !firebaseApps.isEmpty()) {
+
                 for (FirebaseApp app : firebaseApps) {
                     if (app.getName().equals(FirebaseApp.DEFAULT_APP_NAME)) {
                         firebaseApp = app;
                     }
                 }
             } else {
+
+                System.out.println("else문 시작");
+
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(stream))
                         .build();
 
+                String projectId = options.getProjectId();
+                System.out.println("======projectId = " + projectId);
+
                 firebaseApp = FirebaseApp.initializeApp(options);
             }
 
+            System.out.println("=========firebaseApp = " + firebaseApp);
             return FirebaseMessaging.getInstance(firebaseApp);
 
         } catch (Exception e) {
+            String message = e.getMessage();
+            System.out.println("==========message = " + message);
             throw new FcmInitException();
         }
     }
