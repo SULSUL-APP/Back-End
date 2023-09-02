@@ -16,7 +16,7 @@ import java.util.List;
 @Configuration
 public class FcmConfig {
 
-    @Value("${fcm.key.path}")
+    @Value("${fcm.key}")
     private String credential;
 
     @Bean

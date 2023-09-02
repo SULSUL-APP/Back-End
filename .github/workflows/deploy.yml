@@ -18,13 +18,13 @@ jobs:
           java-version: '11'
           distribution: 'zulu'
 
-      - name: Create fcm admin sdk file
-        run: |
-          cd ./src/main/resources
-          mkdir -p fcm && cd fcm
-          echo "${{ secrets.FCM_ADMIN_SDK }}" >> ./sulsul-1c69a-firebase-adminsdk-eccp7-b17f75a0da.json
-          sudo chmod 777 ./sulsul-1c69a-firebase-adminsdk-eccp7-b17f75a0da.json
-        shell: bash
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "sulsul-firebase-admin-sdk.json"
+          json: ${{ secrets.FCM_ADMIN_SDK }}
+          dir: './src/main/resources'
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
