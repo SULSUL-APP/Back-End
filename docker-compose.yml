@@ -16,7 +16,7 @@ services:
       - S3_ACCESS_KEY=${S3_ACCESS_KEY}
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - REGION=${REGION}
-    restart: "always"
+    restart: "no"
 
   nginx:
     image: "junek3/sulsul-nginx"
