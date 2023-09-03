@@ -32,9 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter  {
             throws ServletException, IOException {
 
         String token = jwtTokenProvider.resolveToken(request);
-        log.info("[doFilterInternal] token 값 추출 완료: token : {}", token);
-
-        log.info("[doFilterInternal] token 값 유효성 체크 시작");
+//        log.info("[doFilterInternal] token 값 추출 완료: token : {}", token);
+//
+//        log.info("[doFilterInternal] token 값 유효성 체크 시작");
 
         try {
             if (token != null && jwtTokenProvider.validateToken(token)) {
