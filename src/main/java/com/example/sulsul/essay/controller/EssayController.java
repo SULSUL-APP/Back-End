@@ -17,8 +17,6 @@ import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.fcm.FcmMessageService;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.service.FileService;
-import com.example.sulsul.notification.entity.NotiBody;
-import com.example.sulsul.notification.entity.NotiTitle;
 import com.example.sulsul.notification.service.NotificationService;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,7 +69,7 @@ public class EssayController {
                                          @ModelAttribute @Valid CreateEssayRequest request,
                                          BindingResult bindingResult) {
         // 첨삭 파일 여부 검증
-        if (request.getEssayFile().isEmpty()) {
+        if (request.getEssayFile() == null || request.getEssayFile().isEmpty()) {
             throw new EmptyEssayFileException();
         }
         // 입력값 유효성 검사
@@ -134,7 +132,7 @@ public class EssayController {
                                                     @Parameter(description = "첨부할 첨삭파일")
                                                     @RequestParam("essayFile") MultipartFile essayFile) {
         // 첨삭 파일 여부 검증
-        if (essayFile.isEmpty()) {
+        if (essayFile == null || essayFile.isEmpty()) {
             throw new EmptyEssayFileException();
         }
         // 로그인 되어 있는 유저 객체를 가져오는 로직

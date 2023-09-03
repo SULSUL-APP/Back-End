@@ -1,23 +1,25 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
-  profiles:
-    include:
-      - security
-      - oauth
-      - s3
-      - fcm
+  config:
+    use-legacy-processing: true
+
+  include:
+    - security
+    - oauth
+    - s3
+    - fcm
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${URL}
-    username: ${USERNAME}
-    password: ${USERPASSWORD}
+    url: jdbc:mysql://${rds.hostname}:${rds.port}/${rds.db.name}?allowPublicKeyRetrieval=true&useSSL=false
+    username: ${rds.username}
+    password: ${rds.password}
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
@@ -28,6 +30,4 @@ springdoc:
 
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.type: trace
     com.amazonaws.util.EC2MetadataUtils: error # Failed to connect to service endpoint 에러 무시
