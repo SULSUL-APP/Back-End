@@ -1,7 +1,5 @@
 package com.example.sulsul.exception;
 
-import com.example.sulsul.exception.BaseException;
-
 import java.util.Map;
 
 public class BadInputException extends BaseException {
