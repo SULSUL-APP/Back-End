@@ -6,15 +6,12 @@ import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.dto.response.DeleteSuccessResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.service.CommentService;
-import com.example.sulsul.common.type.UType;
-import com.example.sulsul.essay.entity.Essay;
+import com.example.sulsul.config.security.CustomUserDetails;
 import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.exception.comment.InvalidCommentCreateException;
 import com.example.sulsul.exception.comment.InvalidCommentUpdateException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.fcm.FcmMessageService;
-import com.example.sulsul.notification.entity.NotiBody;
-import com.example.sulsul.notification.entity.NotiTitle;
 import com.example.sulsul.notification.service.NotificationService;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -79,6 +77,7 @@ public class CommentController {
     public ResponseEntity<?> createComment(@Parameter(description = "댓글을 작성할 첨삭의 id")
                                            @PathVariable Long essayId,
                                            @Valid @RequestBody CommentRequest commentRequest,
+                                           @AuthenticationPrincipal CustomUserDetails loginedUser,
                                            BindingResult bindingResult) {
         // 댓글 내용 유효성 검사
         if (bindingResult.hasErrors()) {
@@ -90,13 +89,9 @@ public class CommentController {
         }
 
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 1L; // 임시로 생성한 유저 id;
-        User loginedUser = User.builder()
-                .id(userId)
-                .build();
-
+        User user = loginedUser.getUser();
         // 댓글 생성
-        Comment comment = commentService.createComment(essayId, loginedUser, commentRequest);
+        Comment comment = commentService.createComment(essayId, user, commentRequest);
 
         // 댓글작성 알림전송
 //        Essay essay = essayService.getEssayById(essayId);

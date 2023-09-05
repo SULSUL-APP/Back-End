@@ -1,5 +1,6 @@
 package com.example.sulsul.notification.controller;
 
+import com.example.sulsul.config.security.CustomUserDetails;
 import com.example.sulsul.exception.notification.InvalidCommonNotiRequestException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.fcm.FcmMessageService;
@@ -8,6 +9,7 @@ import com.example.sulsul.notification.dto.CommonNotiResponse;
 import com.example.sulsul.notification.dto.NotiGroupResponse;
 import com.example.sulsul.notification.entity.Notification;
 import com.example.sulsul.notification.service.NotificationService;
+import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,9 +85,11 @@ public class NotificationController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/noti")
-    public ResponseEntity<?> getNotifications() {
-        // 로그인한 유저의 id값을 가져오는 로직
-        long userId = 1L;
+    public ResponseEntity<?> getNotifications(@AuthenticationPrincipal CustomUserDetails loginedUser) {
+        // 로그인 되어 있는 유저 객체를 가져오는 로직
+        User user = loginedUser.getUser();
+        long userId = user.getId();
+        // 유저별 알림 조회
         List<Notification> notifications = notificationService.getEssayNotifications(userId);
         return new ResponseEntity<>(new NotiGroupResponse(notifications), HttpStatus.OK);
     }
