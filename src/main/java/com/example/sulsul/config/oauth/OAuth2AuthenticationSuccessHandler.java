@@ -1,6 +1,7 @@
 package com.example.sulsul.config.oauth;
 
 import com.example.sulsul.config.jwt.JwtTokenProvider;
+import com.example.sulsul.config.jwt.dto.JwtTokenDto;
 import com.example.sulsul.config.security.CustomUserDetails;
 import com.example.sulsul.exception.user.UserNotFoundException;
 import com.example.sulsul.user.entity.Role;
@@ -34,12 +35,12 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
     }
 
     private void loginSuccess(HttpServletResponse response, CustomUserDetails oAuth2User) throws IOException {
-        String accessToken = tokenProvider.createAccessToken(oAuth2User.getUsername(), new Date());
-        String refreshToken = tokenProvider.createRefreshToken(new Date());
-        response.addHeader("Bearer_AccessToken", "Bearer " + accessToken);
-        response.addHeader("Bearer_RefreshToken", "Bearer " + refreshToken);
+
+        JwtTokenDto jwtTokenDto = tokenProvider.createJwtToken(oAuth2User.getUsername());
+        response.addHeader("Bearer_AccessToken", "Bearer " + jwtTokenDto.getAccessToken());
+        response.addHeader("Bearer_RefreshToken", "Bearer " + jwtTokenDto.getRefreshToken());
         response.setHeader("isGuest", isGuest(oAuth2User.getUsername()));
-        tokenProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        tokenProvider.sendAccessAndRefreshToken(response, jwtTokenDto.getAccessToken(), jwtTokenDto.getRefreshToken());
     }
 
     private String isGuest(String email) {
