@@ -1,9 +1,8 @@
 package com.example.sulsul.essay.controller;
 
-import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.EssayState;
-import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.common.type.UType;
+import com.example.sulsul.config.security.CustomUserDetails;
 import com.example.sulsul.essay.dto.request.CreateEssayRequest;
 import com.example.sulsul.essay.dto.request.RejectRequest;
 import com.example.sulsul.essay.dto.response.*;
@@ -30,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -67,6 +67,7 @@ public class EssayController {
     public ResponseEntity<?> createEssay(@Parameter(description = "첨삭을 요청할 강사의 id")
                                          @PathVariable Long profileId,
                                          @ModelAttribute @Valid CreateEssayRequest request,
+                                         @AuthenticationPrincipal CustomUserDetails loginedUser,
                                          BindingResult bindingResult) {
         // 첨삭 파일 여부 검증
         if (request.getEssayFile() == null || request.getEssayFile().isEmpty()) {
@@ -81,22 +82,15 @@ public class EssayController {
             throw new InvalidEssayCreateException(errorMap);
         }
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        User loginedUser = User.builder()
-                .id(2L)
-                .name("김경근")
-                .email("sulsul@gmail.com")
-                .userType(UType.STUDENT)
-                .essayType(EType.NATURE)
-                .loginType(LoginType.KAKAO)
-                .build();
+        User user = loginedUser.getUser();
         // 학생 유저만 첨삭요청 가능
-        if (loginedUser.getUserType().equals(UType.TEACHER)) {
-            throw new TeacherCreateEssayException(loginedUser.getId());
+        if (user.getUserType().equals(UType.TEACHER)) {
+            throw new TeacherCreateEssayException(user.getId());
         }
         // 첨삭 엔티티 생성
-        Essay essay = essayService.createEssay(profileId, loginedUser, request);
+        Essay essay = essayService.createEssay(profileId, user, request);
         // 첨삭 파일 업로드
-        File file = fileService.uploadEssayFile(loginedUser, essay, request.getEssayFile());
+        File file = fileService.uploadEssayFile(user, essay, request.getEssayFile());
         String filePath = file.getFilePath();
 
         // 첨삭요청 알림 전송
@@ -130,21 +124,19 @@ public class EssayController {
     public ResponseEntity<?> uploadTeacherEssayFile(@Parameter(description = "파일을 첨부할 첨삭의 id")
                                                     @PathVariable Long essayId,
                                                     @Parameter(description = "첨부할 첨삭파일")
-                                                    @RequestParam("essayFile") MultipartFile essayFile) {
+                                                    @RequestParam("essayFile") MultipartFile essayFile,
+                                                    @AuthenticationPrincipal CustomUserDetails loginedUser) {
         // 첨삭 파일 여부 검증
         if (essayFile == null || essayFile.isEmpty()) {
             throw new EmptyEssayFileException();
         }
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 1L; // 임시로 생성한 유저 id;
-        User loginedUser = User.builder()
-                .id(userId)
-                .userType(UType.TEACHER)
-                .build();
+        User user = loginedUser.getUser();
+
         // 첨삭 엔티티 조회
         Essay essay = essayService.getEssayById(essayId);
         // 강사 첨삭 파일 업로드
-        fileService.uploadEssayFile(loginedUser, essay, essayFile);
+        fileService.uploadEssayFile(user, essay, essayFile);
         ProceedEssayResponse essayResponse = essayService.getProceedEssay(essayId);
 
         // 첨삭파일 업로드 알림 전송
@@ -172,15 +164,11 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/request")
-    public ResponseEntity<?> getRequestEssays() {
+    public ResponseEntity<?> getRequestEssays(@AuthenticationPrincipal CustomUserDetails loginedUser) {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 1L; // 임시로 생성한 유저 id;
-        User loginedUser = User.builder()
-                .id(userId)
-                .userType(UType.STUDENT)
-                .build();
+        User user = loginedUser.getUser();
         // 첨삭요청 목록 조회
-        List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.REQUEST);
+        List<Essay> essays = essayService.getEssaysByUser(user, EssayState.REQUEST);
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
@@ -196,14 +184,11 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/proceed")
-    public ResponseEntity<?> getProceedEssays() {
+    public ResponseEntity<?> getProceedEssays(@AuthenticationPrincipal CustomUserDetails loginedUser) {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 1L; // 임시로 생성한 유저 id;
-        User loginedUser = User.builder()
-                .id(userId)
-                .build();
+        User user = loginedUser.getUser();
         // 진행중인 첨삭목록 조회
-        List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.PROCEED);
+        List<Essay> essays = essayService.getEssaysByUser(user, EssayState.PROCEED);
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
@@ -219,14 +204,11 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/reject")
-    public ResponseEntity<?> getRejectEssays() {
+    public ResponseEntity<?> getRejectEssays(@AuthenticationPrincipal CustomUserDetails loginedUser) {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 1L; // 임시로 생성한 유저 id;
-        User loginedUser = User.builder()
-                .id(userId)
-                .build();
+        User user = loginedUser.getUser();
         // 거절된 첨삭목록 조회
-        List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.REJECT);
+        List<Essay> essays = essayService.getEssaysByUser(user, EssayState.REJECT);
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 
@@ -242,14 +224,11 @@ public class EssayController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/essay/complete")
-    public ResponseEntity<?> getCompleteEssays() {
+    public ResponseEntity<?> getCompleteEssays(@AuthenticationPrincipal CustomUserDetails loginedUser) {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        Long userId = 1L; // 임시로 생성한 유저 id;
-        User loginedUser = User.builder()
-                .id(userId)
-                .build();
+        User user = loginedUser.getUser();
         // 완료된 첨삭목록 조회
-        List<Essay> essays = essayService.getEssaysByUser(loginedUser, EssayState.COMPLETE);
+        List<Essay> essays = essayService.getEssaysByUser(user, EssayState.COMPLETE);
         return new ResponseEntity<>(new EssayGroupResponse(essays), HttpStatus.OK);
     }
 

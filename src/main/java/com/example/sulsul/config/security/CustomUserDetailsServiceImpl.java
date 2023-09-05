@@ -1,6 +1,5 @@
 package com.example.sulsul.config.security;
 
-import com.example.sulsul.exception.BaseException;
 import com.example.sulsul.exception.user.UserNotFoundException;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
@@ -22,6 +21,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
     @Override
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("[CustomUserDetailsServiceImpl] loadUserByUsername -> username: {}", username);
+        log.info("[CustomUserDetailsServiceImpl] 실행되는지 확인=====================");
 
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UserNotFoundException());

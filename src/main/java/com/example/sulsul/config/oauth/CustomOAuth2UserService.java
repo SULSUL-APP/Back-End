@@ -7,15 +7,11 @@ import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Slf4j
 @Service
@@ -52,7 +48,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 //                .orElse(attributes.toEntity());
 
         User user;
-        if(userRepository.existsByEmail(attributes.getEmail())) {
+        if (userRepository.existsByEmail(attributes.getEmail())) {
             user = userRepository.findByEmail(attributes.getEmail()).orElseThrow(
                     UserNotFoundException::new
             );
@@ -60,7 +56,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         } else {
 //            user = attributes.toEntity();
-            user = User.builder().name(attributes.getName()).email(attributes.getEmail()).profileImage(attributes.getPicture()).userRole(Role.GUEST).build();
+            user = User.builder()
+                    .name(attributes.getName())
+                    .email(attributes.getEmail())
+                    .profileImage(attributes.getPicture())
+                    .userRole(Role.GUEST)
+                    .build();
             log.info("[카카오 유저 등록] user_id: {}", user.getId());
         }
 
