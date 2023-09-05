@@ -56,7 +56,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userRepository.findByEmail(attributes.getEmail()).orElseThrow(
                     UserNotFoundException::new
             );
+
+            user.update(attributes.getName(), attributes.getPicture());
             log.info("[카카오 유저 등록 확인] user_id: {}", user.getId());
+            log.info("[카카오 유저 등록 확인] user_profile_url: {}", user.getProfileImage());
 
         } else {
 //            user = attributes.toEntity();

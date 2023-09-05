@@ -36,17 +36,21 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
     private void loginSuccess(HttpServletResponse response, CustomUserDetails oAuth2User) throws IOException {
         String accessToken = tokenProvider.createAccessToken(oAuth2User.getUsername(), new Date());
         String refreshToken = tokenProvider.createRefreshToken(new Date());
-        response.addHeader("BearerAccessHeader", "Bearer " + accessToken);
-        response.addHeader("BearerRefreshHeader", "Bearer " + refreshToken);
-
+        response.addHeader("Bearer_AccessToken", "Bearer " + accessToken);
+        response.addHeader("Bearer_RefreshToken", "Bearer " + refreshToken);
+        response.setHeader("isGuest", isGuest(oAuth2User.getUsername()));
         tokenProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
     }
 
-    private boolean isGuest(String email) {
+    private String isGuest(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new UserNotFoundException()
+                UserNotFoundException::new
         );
 
-        return user.getUserRole().equals(Role.GUEST);
+
+        if(user.getUserRole().equals(Role.GUEST))
+            return "ture";
+        else
+            return "false";
     }
 }

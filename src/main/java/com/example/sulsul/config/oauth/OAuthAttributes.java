@@ -20,14 +20,14 @@ public class OAuthAttributes {
     private String email;
     private String picture;
 
-    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey,
-                           String name, String email, String picture) {
-        this.attributes = attributes;
-        this.nameAttributeKey = nameAttributeKey;
-        this.name = name;
-        this.email = email;
-        this.picture = picture;
-    }
+//    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey,
+//                           String name, String email, String picture) {
+//        this.attributes = attributes;
+//        this.nameAttributeKey = nameAttributeKey;
+//        this.name = name;
+//        this.email = email;
+//        this.picture = picture;
+//    }
 
     public static OAuthAttributes of(String registrationId, String userNameAttributeName,
                                      Map<String, Object> attributes) {
