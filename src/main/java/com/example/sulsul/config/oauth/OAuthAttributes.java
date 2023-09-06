@@ -2,6 +2,7 @@ package com.example.sulsul.config.oauth;
 
 import com.example.sulsul.user.entity.Role;
 import com.example.sulsul.user.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import java.util.Map;
 @Builder
 @Getter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class OAuthAttributes {
     private Map<String, Object> attributes;
     private String nameAttributeKey;
