@@ -1,17 +1,8 @@
 package com.example.sulsul.oauth.service;
 
-import com.example.sulsul.common.type.EType;
-import com.example.sulsul.common.type.UType;
-import com.example.sulsul.config.jwt.JwtTokenProvider;
-import com.example.sulsul.user.dto.request.OauthDto;
-import com.example.sulsul.user.dto.request.SignUpDto;
-import com.example.sulsul.user.dto.response.LoginResponseDto;
-import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
 
 @Service
 @Transactional

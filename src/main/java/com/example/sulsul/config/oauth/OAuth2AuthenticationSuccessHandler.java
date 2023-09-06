@@ -31,7 +31,9 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
         log.info("OAuth2 Login 성공!");
         CustomUserDetails oAuth2User = (CustomUserDetails) authentication.getPrincipal();
         loginSuccess(response, oAuth2User);
-        log.info("response Header: {}", response.getHeader("BearerAccessHeader"));
+        log.info("response Bearer_AccessToken: {}", response.getHeader("Bearer_AccessToken"));
+        log.info("response Bearer_RefreshToken: {}", response.getHeader("Bearer_RefreshToken"));
+        log.info("response isGuest: {}", response.getHeader("isGuest"));
     }
 
     private void loginSuccess(HttpServletResponse response, CustomUserDetails oAuth2User) throws IOException {

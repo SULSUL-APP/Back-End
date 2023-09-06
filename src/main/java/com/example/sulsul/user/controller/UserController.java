@@ -27,7 +27,7 @@ import java.io.IOException;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/users", produces = "application/json")
+@RequestMapping(value = "/users")
 @Tag(name = "Users", description = "유저 관련 API")
 public class UserController {
 
@@ -45,8 +45,10 @@ public class UserController {
     })
     @PostMapping(value = "/sign-up")
     public ResponseEntity<Void> signUp(@CurrentUser User user,
-                                       @RequestBody SignUpDto signUpDto) {
+                                       @RequestBody(required = false) SignUpDto signUpDto) {
 
+        log.info("[SignUpDto]: {}", signUpDto.getUType());
+        log.info("[SignUpDto]: {}", signUpDto.getEType());
         log.info("[현재 로그인한 유저]: {}", user.getEmail());
         userService.signUp(user, signUpDto);
 

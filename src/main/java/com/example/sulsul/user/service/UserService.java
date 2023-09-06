@@ -7,9 +7,11 @@ import com.example.sulsul.user.dto.request.SignUpDto;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -25,7 +27,12 @@ public class UserService {
      */
     public void signUp(User user, SignUpDto signUpDto) {
 
+        log.info("user 정보 : {}", user);
+        log.info("user 정보 : {}", user.getName());
+        log.info("입력받은 EType 정보 : {}", signUpDto.getEType());
         user.updateEType(EType.valueOf(signUpDto.getEType()));
+        log.info("user 정보 : {}", user);
+        log.info("user 정보 : {}", user.getName());
         user.updateUType(UType.valueOf(signUpDto.getUType()));
 
         userRepository.save(user);
