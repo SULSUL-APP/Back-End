@@ -3,6 +3,7 @@ package com.example.sulsul.user.service;
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.user.dto.request.SignUpRequest;
+import com.example.sulsul.user.entity.Role;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ public class UserService {
 
         user.updateEType(EType.valueOf(signUpRequest.getEssayType()));
         user.updateUType(UType.valueOf(signUpRequest.getUserType()));
+        user.updateUserRole(Role.USER);
+
         userRepository.save(user);
     }
 }

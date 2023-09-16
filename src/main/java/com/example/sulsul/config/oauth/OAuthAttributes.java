@@ -1,5 +1,7 @@
 package com.example.sulsul.config.oauth;
 
+import com.example.sulsul.common.type.DType;
+import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.user.entity.Role;
 import com.example.sulsul.user.entity.User;
 import lombok.AllArgsConstructor;
@@ -21,6 +23,7 @@ public class OAuthAttributes {
     private String name;
     private String email;
     private String picture;
+    private LoginType loginType;
 
 //    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey,
 //                           String name, String email, String picture) {
@@ -72,6 +75,7 @@ public class OAuthAttributes {
                 .picture((String) kakaoProfile.get("profile_image_url"))
                 .attributes(kakaoAccount)
                 .nameAttributeKey(userNameAttributeName)
+                .loginType(LoginType.KAKAO)
                 .build();
     }
 
@@ -81,6 +85,8 @@ public class OAuthAttributes {
                 .email(email)
                 .profileImage(picture)
                 .userRole(Role.GUEST)
+                .loginType(loginType)
+                .userState(DType.AVAILABLE)
                 .build();
     }
 
@@ -92,6 +98,7 @@ public class OAuthAttributes {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", picture='" + picture + '\'' +
+                ", loginType='" + loginType + '\'' +
                 '}';
     }
 }
