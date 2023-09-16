@@ -1,11 +1,11 @@
-package com.example.sulsul.user.dto;
+package com.example.sulsul.user.dto.response;
 
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
-public class UserResponse {
+public class LoginResponse {
 
     @Schema(description = "유저 아이디", example = "1")
     private final Long id;
@@ -26,7 +26,7 @@ public class UserResponse {
     @Schema(description = "첨삭 타입", example = "NATURE", allowableValues = {"NATURE", "SOCIAL"})
     private final String essayType;
 
-    public UserResponse(User user) {
+    public LoginResponse(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();

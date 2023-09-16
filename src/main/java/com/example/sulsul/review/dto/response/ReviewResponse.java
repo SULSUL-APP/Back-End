@@ -1,8 +1,7 @@
 package com.example.sulsul.review.dto.response;
 
-import com.example.sulsul.essay.dto.response.EmptyResponse;
 import com.example.sulsul.review.entity.Review;
-import com.example.sulsul.user.dto.UserResponse;
+import com.example.sulsul.user.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -19,12 +18,12 @@ public class ReviewResponse {
     public final Integer score;
 
     @Schema(description = "리뷰 작성자")
-    private final UserResponse writer;
+    private final LoginResponse writer;
 
     public ReviewResponse(Review review) {
         this.id = review.getId();
         this.detail = review.getDetail();
         this.score = review.getScore();
-        this.writer = new UserResponse(review.getStudent());
+        this.writer = new LoginResponse(review.getStudent());
     }
 }

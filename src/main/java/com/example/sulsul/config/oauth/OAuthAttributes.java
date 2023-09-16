@@ -1,7 +1,10 @@
 package com.example.sulsul.config.oauth;
 
+import com.example.sulsul.common.type.DType;
+import com.example.sulsul.common.type.LoginType;
 import com.example.sulsul.user.entity.Role;
 import com.example.sulsul.user.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,21 +16,23 @@ import java.util.Map;
 @Builder
 @Getter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class OAuthAttributes {
     private Map<String, Object> attributes;
     private String nameAttributeKey;
     private String name;
     private String email;
     private String picture;
+    private LoginType loginType;
 
-    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey,
-                           String name, String email, String picture) {
-        this.attributes = attributes;
-        this.nameAttributeKey = nameAttributeKey;
-        this.name = name;
-        this.email = email;
-        this.picture = picture;
-    }
+//    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey,
+//                           String name, String email, String picture) {
+//        this.attributes = attributes;
+//        this.nameAttributeKey = nameAttributeKey;
+//        this.name = name;
+//        this.email = email;
+//        this.picture = picture;
+//    }
 
     public static OAuthAttributes of(String registrationId, String userNameAttributeName,
                                      Map<String, Object> attributes) {
@@ -59,7 +64,7 @@ public class OAuthAttributes {
         Map<String, Object> kakaoProfile = (Map<String, Object>)kakaoAccount.get("profile");
 
         String email = (String) kakaoAccount.get("email");
-
+        log.info("[카카오 kakaoProfile] : {}", kakaoProfile);
         log.info("[카카오 attributes] kakaoAccount: {}", kakaoAccount);
         log.info("[카카오 유저 정보] email: {}", email);
         log.info("[카카오 유저 정보] userNameAttributeName: {}", userNameAttributeName);
@@ -70,6 +75,7 @@ public class OAuthAttributes {
                 .picture((String) kakaoProfile.get("profile_image_url"))
                 .attributes(kakaoAccount)
                 .nameAttributeKey(userNameAttributeName)
+                .loginType(LoginType.KAKAO)
                 .build();
     }
 
@@ -79,6 +85,20 @@ public class OAuthAttributes {
                 .email(email)
                 .profileImage(picture)
                 .userRole(Role.GUEST)
+                .loginType(loginType)
+                .userState(DType.AVAILABLE)
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return "OAuthAttributes{" +
+                "attributes=" + attributes +
+                ", nameAttributeKey='" + nameAttributeKey + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", picture='" + picture + '\'' +
+                ", loginType='" + loginType + '\'' +
+                '}';
     }
 }
