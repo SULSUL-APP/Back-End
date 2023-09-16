@@ -61,7 +61,7 @@ public class OAuthAttributes {
         Map<String, Object> kakaoProfile = (Map<String, Object>)kakaoAccount.get("profile");
 
         String email = (String) kakaoAccount.get("email");
-
+        log.info("[카카오 kakaoProfile] : {}", kakaoProfile);
         log.info("[카카오 attributes] kakaoAccount: {}", kakaoAccount);
         log.info("[카카오 유저 정보] email: {}", email);
         log.info("[카카오 유저 정보] userNameAttributeName: {}", userNameAttributeName);
@@ -82,5 +82,16 @@ public class OAuthAttributes {
                 .profileImage(picture)
                 .userRole(Role.GUEST)
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return "OAuthAttributes{" +
+                "attributes=" + attributes +
+                ", nameAttributeKey='" + nameAttributeKey + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", picture='" + picture + '\'' +
+                '}';
     }
 }

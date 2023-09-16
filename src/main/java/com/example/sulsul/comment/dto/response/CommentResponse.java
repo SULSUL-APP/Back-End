@@ -1,7 +1,7 @@
 package com.example.sulsul.comment.dto.response;
 
 import com.example.sulsul.comment.entity.Comment;
-import com.example.sulsul.user.dto.UserResponse;
+import com.example.sulsul.user.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -16,11 +16,11 @@ public class CommentResponse {
     private final String detail;
 
     @Schema(description = "댓글 작성자")
-    private final UserResponse writer;
+    private final LoginResponse writer;
 
     public CommentResponse(Comment comment) {
         this.id = comment.getId();
         this.detail = comment.getDetail();
-        this.writer = new UserResponse(comment.getUser());
+        this.writer = new LoginResponse(comment.getUser());
     }
 }

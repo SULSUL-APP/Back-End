@@ -1,8 +1,8 @@
 package com.example.sulsul.essay.dto.response;
 
 import com.example.sulsul.essay.entity.Essay;
-import com.example.sulsul.user.dto.StudentResponse;
-import com.example.sulsul.user.dto.TeacherResponse;
+import com.example.sulsul.user.dto.response.StudentResponse;
+import com.example.sulsul.user.dto.response.TeacherResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
