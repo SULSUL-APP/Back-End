@@ -1,9 +1,11 @@
 package com.example.sulsul.user.service;
 
+import com.example.sulsul.common.type.DType;
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.UType;
 import com.example.sulsul.user.dto.request.PutMyPageRequest;
 import com.example.sulsul.user.dto.request.SignUpRequest;
+import com.example.sulsul.user.dto.response.CommonResponse;
 import com.example.sulsul.user.dto.response.StudentResponse;
 import com.example.sulsul.user.dto.response.TeacherResponse;
 import com.example.sulsul.user.entity.Role;
@@ -76,5 +78,16 @@ public class UserService {
         userRepository.save(user);
 
         return new TeacherResponse(user);
+    }
+
+    /**
+     * @param user 탈퇴시킬 회원.
+     */
+    public CommonResponse deleteUser(User user) {
+
+        user.updateDType(DType.DELETE);
+        userRepository.save(user);
+
+        return new CommonResponse();
     }
 }

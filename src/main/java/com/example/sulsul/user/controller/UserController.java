@@ -93,4 +93,23 @@ public class UserController {
         else
             return new ResponseEntity<>(userService.putStudentMyPage(user, putMyPageRequest), HttpStatus.OK);
     }
+
+    @Operation(summary = "회원 탈퇴", description = "유저를 탈퇴시킨다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "CREATED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping(value = "/delete")
+    public ResponseEntity<?> deleteUser(@CurrentUser User user) {
+
+        log.info("[현재 로그인한 유저]: {}", user.getEmail());
+
+        return new ResponseEntity<>(userService.deleteUser(user), HttpStatus.OK);
+    }
 }
