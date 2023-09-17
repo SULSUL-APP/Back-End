@@ -1,6 +1,6 @@
 package com.example.sulsul.config.jwt;
 
-import com.example.sulsul.exception.BaseException;
+import com.example.sulsul.exception.jwt.ExpiredTokenException;
 import com.example.sulsul.exception.jwt.TokenNotValidException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ JWT 토큰으로 인증하고 SecurityContextHolder에 추가하는 필터를 �
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter  {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -33,7 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter  {
 
         String token = jwtTokenProvider.resolveToken(request);
 //        log.info("[doFilterInternal] token 값 추출 완료: token : {}", token);
-//
 //        log.info("[doFilterInternal] token 값 유효성 체크 시작");
 
         try {
@@ -42,12 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter  {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.info("[doFilterInternal] token 값 유효성 체크 완료");
             }
-        } catch (BaseException e) {
+        } catch (TokenNotValidException exception) {
             log.info("[doFilterInternal] token 값 유효성 체크 실패");
-            handle(response, new TokenNotValidException());
+            handle(response, exception);
+        } catch (ExpiredTokenException exception) {
+//            log.info("[doFilterInternal] token 값 유효성 체크 실패");
+            handle(response, exception);
         }
 
         filterChain.doFilter(request, response);
     }
-
 }

@@ -2,10 +2,9 @@ package com.example.sulsul.user.controller;
 
 import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
-import com.example.sulsul.review.dto.response.ReviewGroupResponse;
 import com.example.sulsul.user.dto.request.PutMyPageRequest;
-import com.example.sulsul.user.dto.response.LoginResponse;
 import com.example.sulsul.user.dto.request.SignUpRequest;
+import com.example.sulsul.user.dto.response.LoginResponse;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
     @Operation(summary = "Guest 유저에 대한 추가 회원가입", description = "Guest 유저에 대해 추가 정보를 작성한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED",
@@ -65,7 +65,7 @@ public class UserController {
 
         log.info("[현재 로그인한 유저]: {}", user.getEmail());
 
-        if(user.isTeacher())
+        if (user.isTeacher())
             return new ResponseEntity<>(userService.getTeacherMyPage(user), HttpStatus.OK);
         else
             return new ResponseEntity<>(userService.getStudentMyPage(user), HttpStatus.OK);
@@ -88,7 +88,7 @@ public class UserController {
 
         log.info("[현재 로그인한 유저]: {}", user.getEmail());
 
-        if(user.isTeacher())
+        if (user.isTeacher())
             return new ResponseEntity<>(userService.putTeacherMyPage(user, putMyPageRequest), HttpStatus.OK);
         else
             return new ResponseEntity<>(userService.putStudentMyPage(user, putMyPageRequest), HttpStatus.OK);

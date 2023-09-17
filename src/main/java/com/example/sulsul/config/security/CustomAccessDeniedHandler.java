@@ -1,8 +1,7 @@
 package com.example.sulsul.config.security;
 
-import com.example.sulsul.exception.jwt.AccessDenied;
+import com.example.sulsul.exception.jwt.AccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
@@ -19,13 +18,12 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException {
+                       org.springframework.security.access.AccessDeniedException accessDeniedException) throws IOException {
 
         log.info("[handle] 접근이 막혔을 경우 에러 throw");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
-        response.getWriter().print(new AccessDenied());
+        response.getWriter().print(new AccessDeniedException().getMessage());
     }
-
 }
