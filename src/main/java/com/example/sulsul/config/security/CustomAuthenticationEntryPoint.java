@@ -1,6 +1,6 @@
 package com.example.sulsul.config.security;
 
-import com.example.sulsul.exception.user.UserNotFoundException;
+import com.example.sulsul.exception.auth.NotAuthenticatedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -25,11 +25,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
-        response.getWriter().print(new UserNotFoundException());
-
-        // dto 전송방식이 아니어도 바로 error를 전송하는 방식도 가능함
-        //response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-
+        response.getWriter().print(new NotAuthenticatedException().getMessage());
     }
-
 }

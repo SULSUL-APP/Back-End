@@ -1,4 +1,4 @@
-package com.example.sulsul.refreshtoken.entity;
+package com.example.sulsul.refreshtoken;
 
 import com.example.sulsul.user.entity.User;
 import lombok.AccessLevel;
@@ -27,14 +27,7 @@ public class RefreshToken {
     @Column(nullable = false)
     private String refreshToken;
 
-
     public RefreshToken(User user, String refreshToken) {
-        this.user = user;
-        this.refreshToken = refreshToken;
-    }
-
-    public RefreshToken(Long id, User user, String refreshToken) {
-        this.id = id;
         this.user = user;
         this.refreshToken = refreshToken;
     }

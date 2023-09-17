@@ -21,6 +21,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
-        response.getWriter().print(response.getHeader("BearerAccessHeader"));
+//        response.getWriter().print(response.getHeader("AccessHeader"));
+        response.getWriter().print(response.getHeader("소셜로그인 실패"));
     }
 }
