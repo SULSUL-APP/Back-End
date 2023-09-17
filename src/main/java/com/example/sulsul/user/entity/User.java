@@ -70,6 +70,8 @@ public class User extends BaseEntity {
         this.catchPhrase = catchPhrase;
     }
 
+    public void updateEmail(String email) { this.email = email; }
+
     public void updateUType(UType uType) {
         this.userType = uType;
     }
