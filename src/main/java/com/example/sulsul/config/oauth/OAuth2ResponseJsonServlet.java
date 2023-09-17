@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-@WebServlet(name = "responseJsonServlet", urlPatterns = "/response-json")
+@WebServlet(name = "responseJsonServlet")
 public class OAuth2ResponseJsonServlet extends HttpServlet {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
