@@ -2,6 +2,7 @@ package com.example.sulsul.user.service;
 
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.UType;
+import com.example.sulsul.user.dto.request.PutMyPageRequest;
 import com.example.sulsul.user.dto.request.SignUpRequest;
 import com.example.sulsul.user.dto.response.StudentResponse;
 import com.example.sulsul.user.dto.response.TeacherResponse;
@@ -46,6 +47,33 @@ public class UserService {
      * @param user 마이페이지를 조회할 선생 정보.
      */
     public TeacherResponse getTeacherMyPage(User user) {
+
+        return new TeacherResponse(user);
+    }
+
+    /**
+     * @param user 마이페이지를 수정할 학생 정보.
+     */
+    public StudentResponse putStudentMyPage(User user, PutMyPageRequest putMyPageRequest) {
+
+        user.updateEType(EType.getEType(putMyPageRequest.getEssayType()));
+        user.updateEmail(putMyPageRequest.getEmail());
+
+        userRepository.save(user);
+
+        return new StudentResponse(user);
+    }
+
+    /**
+     * @param user 마이페이지를 수정할 선생 정보.
+     */
+    public TeacherResponse putTeacherMyPage(User user, PutMyPageRequest putMyPageRequest) {
+
+        user.updateEType(EType.getEType(putMyPageRequest.getEssayType()));
+        user.updateCatchPhrase(putMyPageRequest.getCatchPhrase());
+        user.updateEmail(putMyPageRequest.getEmail());
+
+        userRepository.save(user);
 
         return new TeacherResponse(user);
     }
