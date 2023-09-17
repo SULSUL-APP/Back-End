@@ -9,6 +9,7 @@ import com.example.sulsul.config.security.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,6 +38,14 @@ public class SecurityConfig {
             "/swagger-*/**",
             "/webjars/**"
     };
+
+    private final String[] GET_PERMIT_API_URL = {
+            "/refresh"
+    };
+    private final String[] POST_PERMIT_API_URL = {
+            "/refresh"
+    };
+
     private final LogoutHandler logoutService;
 
     @Bean
@@ -58,6 +67,8 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(SWAGGER_URL).permitAll()
+                .antMatchers(HttpMethod.GET, GET_PERMIT_API_URL).permitAll()
+//                .antMatchers(HttpMethod.POST, POST_PERMIT_API_URL).permitAll()
                 .anyRequest().authenticated()
 
                 .and()
