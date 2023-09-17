@@ -158,13 +158,13 @@ public class JwtTokenProvider {
      * AccessToken 헤더 설정
      */
     public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-        response.setHeader("AccessToken", accessToken);
+        response.setHeader("AccessToken", "Bearer " + accessToken);
     }
 
     /**
      * RefreshToken 헤더 설정
      */
     public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-        response.setHeader("RefreshToken", refreshToken);
+        response.setHeader("RefreshToken", "Bearer " + refreshToken);
     }
 }
