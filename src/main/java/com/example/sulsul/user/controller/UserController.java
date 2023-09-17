@@ -3,6 +3,7 @@ package com.example.sulsul.user.controller;
 import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.review.dto.response.ReviewGroupResponse;
+import com.example.sulsul.user.dto.request.PutMyPageRequest;
 import com.example.sulsul.user.dto.response.LoginResponse;
 import com.example.sulsul.user.dto.request.SignUpRequest;
 import com.example.sulsul.user.entity.User;
@@ -68,5 +69,47 @@ public class UserController {
             return new ResponseEntity<>(userService.getTeacherMyPage(user), HttpStatus.OK);
         else
             return new ResponseEntity<>(userService.getStudentMyPage(user), HttpStatus.OK);
+    }
+
+    @Operation(summary = "마이페이지 수정", description = "유저의 마이페이지를 수정한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "CREATED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping(value = "/mypage")
+    public ResponseEntity<?> putMyPage(@CurrentUser User user,
+                                       @RequestBody PutMyPageRequest putMyPageRequest) {
+
+        log.info("[현재 로그인한 유저]: {}", user.getEmail());
+
+        if(user.isTeacher())
+            return new ResponseEntity<>(userService.putTeacherMyPage(user, putMyPageRequest), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(userService.putStudentMyPage(user, putMyPageRequest), HttpStatus.OK);
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "유저를 탈퇴시킨다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "CREATED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping(value = "/delete")
+    public ResponseEntity<?> deleteUser(@CurrentUser User user) {
+
+        log.info("[현재 로그인한 유저]: {}", user.getEmail());
+
+        return new ResponseEntity<>(userService.deleteUser(user), HttpStatus.OK);
     }
 }
