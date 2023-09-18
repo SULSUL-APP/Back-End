@@ -6,6 +6,8 @@ import com.example.sulsul.config.security.CustomUserDetails;
 import com.example.sulsul.config.security.CustomUserDetailsServiceImpl;
 import com.example.sulsul.exception.jwt.ExpiredTokenException;
 import com.example.sulsul.exception.jwt.TokenNotValidException;
+import com.example.sulsul.exception.refresh.InvalidRefreshTokenException;
+import com.example.sulsul.exception.refresh.RefreshTokenExpiredException;
 import com.example.sulsul.user.entity.User;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +36,8 @@ public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String secretKey;
-    //    private final long tokenValidTime = 1000L * 60 * 60;    // 액세스 토큰 유효 시간 60분
-    private final long tokenValidTime = 1000L * 10;    // 테스트를 위해 액세스 토큰 유효 시간을 10초로 설정
+    private final long tokenValidTime = 1000L * 60 * 60;    // 액세스 토큰 유효 시간 60분
+    //    private final long tokenValidTime = 1000L * 10;    // 테스트를 위해 액세스 토큰 유효 시간을 10초로 설정
     private final long refreshValidTime = 1000L * 60 * 60 * 24 * 14;    // 리프레쉬 토큰 유효 시간 2주
 
     // 객체 초기화 -> secretKey를 Base64로 인코딩
@@ -199,6 +201,23 @@ public class JwtTokenProvider {
         }
     }
 
+    public boolean validateRefreshToken(String refreshToken) {
+        return this.getRefreshTokenClaims(refreshToken) != null;
+    }
+
+    public Claims getRefreshTokenClaims(String refreshToken) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
+        } catch (MalformedJwtException e) {
+            throw new InvalidRefreshTokenException();
+        } catch (ExpiredJwtException e) {
+            throw new RefreshTokenExpiredException();
+        }
+    }
+
     /**
      * 만료된 토큰의 claims 반환
      */
@@ -210,6 +229,8 @@ public class JwtTokenProvider {
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims(); // 만료된 경우에도 claims 반환가능
+        } catch (MalformedJwtException e) {
+            throw new TokenNotValidException();
         }
         return null;
     }
