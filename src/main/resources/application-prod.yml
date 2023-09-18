@@ -10,6 +10,7 @@ spring:
     - oauth
     - s3
     - fcm
+    - redis
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
