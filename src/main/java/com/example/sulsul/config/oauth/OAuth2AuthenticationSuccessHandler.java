@@ -38,14 +38,14 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
         loginSuccess(response, oAuth2User);
         log.info("response Bearer_AccessToken: {}", response.getHeader("AccessToken"));
         log.info("response Bearer_RefreshToken: {}", response.getHeader("RefreshToken"));
-        log.info("response isGuest: {}", response.getHeader("isGuest"));
     }
 
     private void loginSuccess(HttpServletResponse response, CustomUserDetails oAuth2User) throws IOException, ServletException {
 
         // refresh token이 존재하는 경우 delete
+        // 동작안되는 상태
         User user = oAuth2User.getUser();
-        refreshTokenRepository.findByUser(user)
+        refreshTokenRepository.findByUserId(user.getId())
                 .ifPresent(refreshTokenRepository::delete);
 
         JwtTokenDto jwtTokenDto = tokenProvider.createJwtToken(oAuth2User.getUsername());
@@ -53,7 +53,7 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
 
         // refresh token 엔티티 저장
         String refreshToken = jwtTokenDto.getRefreshToken();
-        RefreshToken refreshTokenEntity = new RefreshToken(oAuth2User.getUser(), refreshToken);
+        RefreshToken refreshTokenEntity = new RefreshToken(user.getId(), refreshToken);
         refreshTokenRepository.save(refreshTokenEntity);
 
         tokenProvider.sendAccessAndRefreshToken(response, jwtTokenDto.getAccessToken(), refreshToken);
