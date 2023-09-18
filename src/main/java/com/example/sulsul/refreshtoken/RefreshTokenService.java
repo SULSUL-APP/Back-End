@@ -2,16 +2,13 @@ package com.example.sulsul.refreshtoken;
 
 import com.example.sulsul.config.jwt.JwtTokenProvider;
 import com.example.sulsul.config.jwt.dto.JwtTokenDto;
-import com.example.sulsul.config.security.CustomUserDetails;
-import com.example.sulsul.exception.refresh.InvalidRefreshTokenException;
-import com.example.sulsul.exception.refresh.RefreshTokenExpiredException;
+import com.example.sulsul.exception.refresh.RefreshTokenMismatchException;
 import com.example.sulsul.exception.refresh.RefreshTokenNotFoundException;
-import com.example.sulsul.exception.refresh.RefreshTokenVerificationException;
+import com.example.sulsul.exception.user.UserNotFoundException;
+import com.example.sulsul.user.entity.User;
+import com.example.sulsul.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,51 +20,45 @@ import java.util.Date;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-
-    @Value("${jwt.secret}")
-    private String SECRET_KEY;
 
     /**
      * user의 refreshToken이 맞다면 accessToken을 재발급한다.
-     * refreshToken의 만료일이 3일 이내라면 refreshToken 을 재발급한다.
+     * refreshToken의 만료일이 3일 이내라면 refreshToken을 재발급한다.
      *
-     * @param user         로그인한 유저
      * @param refreshToken 유저의 refreshToken
      * @return TokenDto 반환
      */
     @Transactional
-    public JwtTokenDto refresh(CustomUserDetails user, String refreshToken) {
-
+    public JwtTokenDto refresh(String refreshToken, Claims claims) {
         JwtTokenDto tokensDto = new JwtTokenDto();
-        Claims claims;
-        try {
-            System.out.println(refreshToken);
-            claims = Jwts.parser()
-                    .setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(refreshToken)
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new RefreshTokenExpiredException();
-        } catch (Exception e) {
-            throw new InvalidRefreshTokenException();
-        }
+        String email = claims.getSubject();
 
-        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser(user.getUser())
+        // subject로 유저정보 조회, 해당유저가 없다면 예외처리
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        // 유저의 refreshToken 조회
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser(user)
                 .orElseThrow(RefreshTokenNotFoundException::new);
 
+        // 유저의 refreshToken이 맞는지 확인
         if (!refreshTokenEntity.getRefreshToken().equals(refreshToken)) {
-            throw new RefreshTokenVerificationException();
+            throw new RefreshTokenMismatchException();
         }
 
-        String email = user.getUser().getEmail();
+        // accessToken 재발급
         String accessToken = jwtTokenProvider.createAccessToken(email, new Date());
         tokensDto.setAccessToken(accessToken);
 
-        long expiration = claims.getExpiration().getTime();
+        // refresh 토큰 만료일 계산
+        long expiration = jwtTokenProvider.getTokenClaims(refreshToken)
+                .getExpiration().getTime();
         long now = new Date().getTime();
         long diffTime = expiration - now;
 
+        // 1일 이내에 만료된다면 refreshToken 재발급
         if (diffTime < 86400000) {
             String newRefreshToken = jwtTokenProvider.createRefreshToken(new Date());
             refreshTokenEntity.updateRefreshToken(newRefreshToken);

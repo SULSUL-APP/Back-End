@@ -1,11 +1,14 @@
 package com.example.sulsul.refreshtoken;
 
+import com.example.sulsul.config.jwt.JwtTokenProvider;
 import com.example.sulsul.config.jwt.dto.JwtTokenDto;
-import com.example.sulsul.config.security.CustomUserDetails;
+import com.example.sulsul.exception.jwt.NotExpiredTokenException;
+import com.example.sulsul.exception.jwt.TokenNotFoundException;
+import com.example.sulsul.exception.refresh.InvalidRefreshTokenException;
 import com.example.sulsul.exception.refresh.RefreshTokenNotFoundException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,8 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 public class RefreshTokenController {
 
     private final RefreshTokenService refreshTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken의 유효기간이 3일 이내인 경우 RefreshToken도 재발급한다.")
     @ApiResponses({
@@ -39,19 +42,34 @@ public class RefreshTokenController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/refresh")
-    public ResponseEntity<?> refresh(@Parameter(hidden = true)
-                                     @AuthenticationPrincipal CustomUserDetails user,
-                                     HttpServletRequest request) {
+    @GetMapping(value = "/refresh")
+    public ResponseEntity<?> refresh(HttpServletRequest request) {
 
+        // access token 추출
+        String accessToken = jwtTokenProvider.resolveToken(request);
+        if (accessToken == null) {
+            throw new TokenNotFoundException();
+        }
+
+        // expired access token인지 확인
+        Claims claims = jwtTokenProvider.getExpiredTokenClaims(accessToken);
+        if (claims == null) {
+            throw new NotExpiredTokenException();
+        }
+
+        // refresh token 추출 후 유효성 검사
         String refreshToken = request.getHeader("RefreshToken");
         if (refreshToken == null) {
             throw new RefreshTokenNotFoundException();
         }
+        if (!jwtTokenProvider.validate(refreshToken)) {
+            throw new InvalidRefreshTokenException();
+        }
 
-        JwtTokenDto tokensDto = refreshTokenService.refresh(user, refreshToken);
+        // 토큰 재발급
+        JwtTokenDto tokensDto = refreshTokenService.refresh(refreshToken, claims);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + tokensDto.getAccessToken());
+        headers.set("AccessToken", "Bearer " + tokensDto.getAccessToken());
 
         String newRefreshToken = tokensDto.getRefreshToken();
         if (newRefreshToken != null) {
