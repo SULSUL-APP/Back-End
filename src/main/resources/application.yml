@@ -31,3 +31,6 @@ logging:
   level:
     org.hibernate.SQL: debug
     com.amazonaws.util.EC2MetadataUtils: error # Failed to connect to service endpoint 에러 무시
+
+domain:
+  name: http://www.localhost:8081
