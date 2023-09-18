@@ -1,9 +1,11 @@
-package com.example.sulsul.config.security;
+package com.example.sulsul.config;
 
 import com.example.sulsul.config.jwt.JwtAuthenticationFilter;
 import com.example.sulsul.config.oauth.CustomOAuth2UserService;
 import com.example.sulsul.config.oauth.OAuth2AuthenticationFailureHandler;
 import com.example.sulsul.config.oauth.OAuth2AuthenticationSuccessHandler;
+import com.example.sulsul.config.security.CustomAccessDeniedHandler;
+import com.example.sulsul.config.security.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +13,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,21 +32,21 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-
-    private static final String[] swagger = {
-            "/v2/api-docs",
-            "/swagger-resources/**",
-            "/swagger-ui.html",
-            "/swagger/**",
+    private static final String[] SWAGGER_URL = {
+            "/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-*/**",
             "/webjars/**"
     };
 
     private final String[] GET_PERMIT_API_URL = {
-            "/**"
+            "/refresh"
     };
     private final String[] POST_PERMIT_API_URL = {
-            "/**"
+            "/refresh"
     };
+
+    private final LogoutHandler logoutService;
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
@@ -62,17 +66,18 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeRequests()
-                .antMatchers(swagger).permitAll()
+                .antMatchers(SWAGGER_URL).permitAll()
                 .antMatchers(HttpMethod.GET, GET_PERMIT_API_URL).permitAll()
-                .antMatchers(HttpMethod.POST, POST_PERMIT_API_URL).permitAll()
+//                .antMatchers(HttpMethod.POST, POST_PERMIT_API_URL).permitAll()
                 .anyRequest().authenticated()
 
                 .and()
-                .logout()
-                .logoutSuccessUrl("/")
-                .clearAuthentication(true)
+                .logout(logoutConfig -> {
+                    logoutConfig.logoutUrl("/auth/logout")
+                            .addLogoutHandler(logoutService)
+                            .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
+                })
 
-                .and()
                 .exceptionHandling()
                 .accessDeniedHandler(new CustomAccessDeniedHandler())
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
@@ -87,7 +92,6 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-
     }
 
     @Bean
@@ -104,5 +108,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 }

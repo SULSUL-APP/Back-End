@@ -1,6 +1,6 @@
 package com.example.sulsul.notification.controller;
 
-import com.example.sulsul.config.security.CustomUserDetails;
+import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.exception.notification.InvalidCommonNotiRequestException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.fcm.FcmMessageService;
@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -85,9 +84,8 @@ public class NotificationController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/noti")
-    public ResponseEntity<?> getNotifications(@AuthenticationPrincipal CustomUserDetails loginedUser) {
+    public ResponseEntity<?> getNotifications(@CurrentUser User user) {
         // 로그인 되어 있는 유저 객체를 가져오는 로직
-        User user = loginedUser.getUser();
         long userId = user.getId();
         // 유저별 알림 조회
         List<Notification> notifications = notificationService.getEssayNotifications(userId);

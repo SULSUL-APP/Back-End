@@ -42,6 +42,28 @@ public class CommonExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> authenticationExceptionHandler(AuthenticationException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(e.getCode())
+                .message(e.getMessage())
+                .errors(e.getErrors())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<ErrorResponse> authorizationExceptionHandler(AuthorizationException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(e.getCode())
+                .message(e.getMessage())
+                .errors(e.getErrors())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(S3FileException.class)
     public ResponseEntity<ErrorResponse> s3ExceptionHandler(S3FileException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()

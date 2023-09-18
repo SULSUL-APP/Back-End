@@ -4,8 +4,9 @@ package com.example.sulsul.config.jwt;
 import com.example.sulsul.config.jwt.dto.JwtTokenDto;
 import com.example.sulsul.config.security.CustomUserDetails;
 import com.example.sulsul.config.security.CustomUserDetailsServiceImpl;
-import com.example.sulsul.exception.BaseException;
+import com.example.sulsul.exception.jwt.ExpiredTokenException;
 import com.example.sulsul.exception.jwt.TokenNotValidException;
+import com.example.sulsul.user.entity.User;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +34,8 @@ public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String secretKey;
-
-    private final long tokenValidTime = 1000L * 60 * 60;    // 액세스 토큰 유효 시간 60분
-
+    //    private final long tokenValidTime = 1000L * 60 * 60;    // 액세스 토큰 유효 시간 60분
+    private final long tokenValidTime = 1000L * 10;    // 테스트를 위해 액세스 토큰 유효 시간을 10초로 설정
     private final long refreshValidTime = 1000L * 60 * 60 * 24 * 14;    // 리프레쉬 토큰 유효 시간 2주
 
     // 객체 초기화 -> secretKey를 Base64로 인코딩
@@ -103,15 +103,25 @@ public class JwtTokenProvider {
         CustomUserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserEmail(token));
 
         log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails User Email : {}", userDetails.getUsername());
+        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
+    }
 
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    // JWT 토큰으로 유저 정보 조회
+    public User getUserFromAccessToken(String token) {
+        return userDetailsService.loadUserByUsername(getUserEmail(token))
+                .getUser();
     }
 
     // JWT 토큰에서 회원 이메일 추출
     private String getUserEmail(String token) {
         log.info("[getUserEmail] 토큰 기반 회원 구별 정보 추출");
 
-        String email = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+        String email = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+
         log.info("[getUserEmail] 토큰 기반 회원 구별 정보 추출 완료, Email : {}", email);
 
         return email;
@@ -122,8 +132,8 @@ public class JwtTokenProvider {
 
         String authorization = request.getHeader("Authorization");
 
-        if(authorization != null) {
-            String token = authorization.split(" ")[1].trim();
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            String token = authorization.substring(7);
             log.info("[resolveToken] HTTP 헤더에서 Token 값 추출 완료: {}", token);
             return token;
         }
@@ -131,16 +141,19 @@ public class JwtTokenProvider {
         return null;
     }
 
-    // JWT 토큰의 유효성 + 만료일 체크
-    public boolean validateToken(String token) {
+    // JWT 토큰의 유효성 + 만료일 체크 (old)
+    public boolean validateToken(String token) throws TokenNotValidException {
         log.info("[validateToken] 토큰 유효 체크 시작");
 
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
-        } catch (BaseException e) {
-            throw new TokenNotValidException();
+            Jwts.parser().setSigningKey(secretKey)
+                    .parseClaimsJws(token);
+
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredTokenException();
         }
+
+        return true;
     }
 
     /**
@@ -165,6 +178,39 @@ public class JwtTokenProvider {
      * RefreshToken 헤더 설정
      */
     public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-        response.setHeader("RefreshToken", "Bearer " + refreshToken);
+        response.setHeader("RefreshToken", refreshToken);
+    }
+
+    /**
+     * JWT 토큰의 유효성 + 만료일 체크 (new)
+     */
+    public boolean validate(String token) {
+        return this.getTokenClaims(token) != null;
+    }
+
+    public Claims getTokenClaims(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    /**
+     * 만료된 토큰의 claims 반환
+     */
+    public Claims getExpiredTokenClaims(String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims(); // 만료된 경우에도 claims 반환가능
+        }
+        return null;
     }
 }

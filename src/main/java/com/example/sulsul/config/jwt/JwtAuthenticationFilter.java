@@ -1,7 +1,5 @@
 package com.example.sulsul.config.jwt;
 
-import com.example.sulsul.exception.BaseException;
-import com.example.sulsul.exception.jwt.TokenNotValidException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -15,15 +13,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.example.sulsul.config.jwt.JwtExceptionHandler.handle;
-
 /*
 JWT 토큰으로 인증하고 SecurityContextHolder에 추가하는 필터를 가진 클래스
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter  {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -33,21 +29,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter  {
 
         String token = jwtTokenProvider.resolveToken(request);
 //        log.info("[doFilterInternal] token 값 추출 완료: token : {}", token);
-//
 //        log.info("[doFilterInternal] token 값 유효성 체크 시작");
 
+        /*
         try {
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.info("[doFilterInternal] token 값 유효성 체크 완료");
             }
-        } catch (BaseException e) {
-            log.info("[doFilterInternal] token 값 유효성 체크 실패");
-            handle(response, new TokenNotValidException());
+        } catch (TokenNotValidException exception) {
+            JwtExceptionHandler.handle(response, exception);
+        } catch (ExpiredTokenException exception) {
+            JwtExceptionHandler.handle(response, exception);
+        }
+         */
+
+        if (jwtTokenProvider.validate(token)) {
+            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
     }
-
 }
