@@ -3,6 +3,8 @@ package com.example.sulsul.user.service;
 import com.example.sulsul.common.type.DType;
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.UType;
+import com.example.sulsul.teacherprofile.entity.TeacherProfile;
+import com.example.sulsul.teacherprofile.repository.TeacherProfileRepository;
 import com.example.sulsul.user.dto.request.PutMyPageRequest;
 import com.example.sulsul.user.dto.request.SignUpRequest;
 import com.example.sulsul.user.dto.response.CommonResponse;
@@ -15,13 +17,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
-
+    private final TeacherProfileRepository teacherProfileRepository;
     /**
      * 초기 데이터는 Name, Email, ProfileImage.
      * 유저의 타입과 분야에 대한 추가정보를 받아서 추가 회원가입을 진행한다.
@@ -33,6 +37,11 @@ public class UserService {
         user.updateEType(EType.valueOf(signUpRequest.getEssayType()));
         user.updateUType(UType.valueOf(signUpRequest.getUserType()));
         user.updateUserRole(Role.USER);
+
+        if(Objects.equals(signUpRequest.getUserType(), UType.TEACHER.getValue())){
+            TeacherProfile teacherProfile = new TeacherProfile(user, 0.0, 0);
+            teacherProfileRepository.save(teacherProfile);
+        }
 
         userRepository.save(user);
     }

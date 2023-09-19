@@ -3,6 +3,7 @@ package com.example.sulsul.teacherprofile.entity;
 import com.example.sulsul.teacherprofile.dto.request.TeacherProfileRequest;
 import com.example.sulsul.user.entity.User;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 
@@ -21,7 +22,7 @@ public class TeacherProfile {
     private Long id;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     private User teacher;
 
     @Column(length = 1000)
@@ -78,11 +79,20 @@ public class TeacherProfile {
         this.otherDetail = otherDetail;
     }
 
-    public void updateTeacherProfile(TeacherProfileRequest teacherProfileRequest) {
+
+    public TeacherProfile(User user, Double reviewScore, Integer completedCount) {
+        this.teacher = user;
+        this.reviewScore = reviewScore;
+        this.completedCount = completedCount;
+    }
+
+    public TeacherProfile updateTeacherProfile(TeacherProfileRequest teacherProfileRequest) {
         this.careerDetail = teacherProfileRequest.getCareerDetail();
         this.introDetail = teacherProfileRequest.getIntroDetail();
         this.price = teacherProfileRequest.getPrice();
         this.possibleUniv = teacherProfileRequest.getPossibleUniv();
         this.otherDetail = teacherProfileRequest.getOtherDetail();
+
+        return this;
     }
 }

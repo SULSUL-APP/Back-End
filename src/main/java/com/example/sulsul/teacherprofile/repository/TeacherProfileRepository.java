@@ -10,8 +10,6 @@ import java.util.Optional;
 
 public interface TeacherProfileRepository extends JpaRepository<TeacherProfile, Long> {
 
-    Optional<TeacherProfile> findById(Long teacherProfileId);
-
     Optional<TeacherProfile> findByTeacher(User user);
 
     List<TeacherProfile> findByTeacher_EssayType(EType eType);

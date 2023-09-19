@@ -38,7 +38,6 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
         loginSuccess(response, oAuth2User);
         log.info("response Bearer_AccessToken: {}", response.getHeader("AccessToken"));
         log.info("response Bearer_RefreshToken: {}", response.getHeader("RefreshToken"));
-        log.info("response isGuest: {}", response.getHeader("isGuest"));
     }
 
     private void loginSuccess(HttpServletResponse response, CustomUserDetails oAuth2User) throws IOException, ServletException {

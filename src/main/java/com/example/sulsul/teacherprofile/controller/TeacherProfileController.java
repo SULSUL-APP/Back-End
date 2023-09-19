@@ -1,5 +1,6 @@
 package com.example.sulsul.teacherprofile.controller;
 
+import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.review.dto.response.ReviewGroupResponse;
@@ -31,6 +32,25 @@ import java.util.List;
 public class TeacherProfileController {
 
     private final TeacherProfileService teacherProfileService;
+
+    @Operation(summary = "나의(강사) 프로필 조회", description = "나의 강사 프로필을 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "CREATED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/profiles/myProfile")
+    public ResponseEntity<?> getMyProfile(@CurrentUser User user) {
+
+        TeacherProfile teacherProfile = teacherProfileService.getTeacherProfile(user);
+
+        return new ResponseEntity<>(new TeacherProfileResponse(teacherProfile), HttpStatus.OK);
+    }
 
     @Operation(summary = "강사 프로필 조회", description = "profileId에 해당하는 강사 프로필을 조회한다.")
     @ApiResponses({
@@ -101,7 +121,7 @@ public class TeacherProfileController {
     })
     @PutMapping("/profiles/{profileId}")
     public ResponseEntity<?> createTeacherProfile(@Parameter(description = "프로필을 수정할 강사 자신")
-                                                  @AuthenticationPrincipal User user,
+                                                  @CurrentUser User user,
                                                   @Parameter(description = "수정한 프로필 내용")
                                                   @RequestBody TeacherProfileRequest teacherProfileRequest) {
 
