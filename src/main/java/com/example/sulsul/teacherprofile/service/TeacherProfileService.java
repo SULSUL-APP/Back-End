@@ -44,4 +44,22 @@ public class TeacherProfileService {
         TeacherProfile teacherProfile = getTeacherProfile(user).updateTeacherProfile(teacherProfileRequest);
         teacherProfileRepository.save(teacherProfile);
     }
+
+    public void regradeTeacherProfile(Integer score, User teacher){
+
+        TeacherProfile teacherProfile = teacherProfileRepository.findByTeacher(teacher)
+                .orElseThrow(()->new TeacherProfileNotFoundException(teacher.getId()));
+
+        log.info("완료된 첨삭수 : {}", teacherProfile.getCompletedCount());
+        Double sum = Double.parseDouble(teacherProfile.getReviewScore()) * teacherProfile.getCompletedCount() + score;
+        teacherProfile.addCompletedCount();
+
+        log.info("최신 반영 완료된 첨삭수 : {}", teacherProfile.getCompletedCount());
+
+        Double Average = sum / teacherProfile.getCompletedCount();
+        String reviewAverage = String.format("%.1f", Average);
+
+        teacherProfile.updateReviewScore(reviewAverage);
+        teacherProfileRepository.save(teacherProfile);
+    }
 }

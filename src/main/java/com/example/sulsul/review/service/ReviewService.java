@@ -7,6 +7,7 @@ import com.example.sulsul.exception.essay.EssayNotFoundException;
 import com.example.sulsul.review.dto.request.ReviewRequest;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.review.repository.ReviewRepository;
+import com.example.sulsul.teacherprofile.service.TeacherProfileService;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class ReviewService {
 
     private final EssayRepository essayRepository;
     private final ReviewRepository reviewRepository;
+    private final TeacherProfileService teacherProfileService;
 
     public Review createReview(Long essayId, User student, ReviewRequest request) {
         Essay essay = essayRepository.findById(essayId)
@@ -36,6 +38,9 @@ public class ReviewService {
         // 첨삭리뷰 여부 update
         essay.updateReviewState(ReviewState.ON);
         essayRepository.save(essay);
+
+        // 강사 리뷰 평점, 완료된 첨삭 수 update
+        teacherProfileService.regradeTeacherProfile(request.getScore(), essay.getTeacher());
 
         return reviewRepository.save(review);
     }

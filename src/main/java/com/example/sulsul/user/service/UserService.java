@@ -39,7 +39,7 @@ public class UserService {
         user.updateUserRole(Role.USER);
 
         if(Objects.equals(signUpRequest.getUserType(), UType.TEACHER.getValue())){
-            TeacherProfile teacherProfile = new TeacherProfile(user, 0.0, 0);
+            TeacherProfile teacherProfile = new TeacherProfile(user, "0.0", 0);
             teacherProfileRepository.save(teacherProfile);
         }
 

@@ -1,5 +1,6 @@
 package com.example.sulsul.teacherprofile.entity;
 
+import com.example.sulsul.common.BaseEntity;
 import com.example.sulsul.teacherprofile.dto.request.TeacherProfileRequest;
 import com.example.sulsul.user.entity.User;
 import lombok.*;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @Table(name = "teacher_profiles")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class TeacherProfile {
+public class TeacherProfile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +42,7 @@ public class TeacherProfile {
     private String otherDetail; // 기타 사항
 
     @Column()
-    private Double reviewScore;
+    private String reviewScore;
 
     @Column()
     private Integer completedCount;
@@ -55,7 +56,7 @@ public class TeacherProfile {
         this.completedCount += 1;
     }
 
-    public void updateReviewScore(Double reviewScore) {
+    public void updateReviewScore(String reviewScore) {
         this.reviewScore = reviewScore;
     }
 
@@ -80,7 +81,7 @@ public class TeacherProfile {
     }
 
 
-    public TeacherProfile(User user, Double reviewScore, Integer completedCount) {
+    public TeacherProfile(User user, String reviewScore, Integer completedCount) {
         this.teacher = user;
         this.reviewScore = reviewScore;
         this.completedCount = completedCount;
