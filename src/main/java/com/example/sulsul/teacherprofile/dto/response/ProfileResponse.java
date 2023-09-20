@@ -15,7 +15,7 @@ public class ProfileResponse {
     private final String url;
 
     @Schema(description = "평점", example = "리뷰를 통한 평점")
-    private final Double reviewScore;
+    private final String reviewScore;
 
     public ProfileResponse(TeacherProfile teacherProfile) {
         this.name = teacherProfile.getTeacher().getName();
