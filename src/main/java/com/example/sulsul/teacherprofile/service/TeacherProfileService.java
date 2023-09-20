@@ -7,6 +7,7 @@ import com.example.sulsul.teacherprofile.dto.request.TeacherProfileRequest;
 import com.example.sulsul.teacherprofile.dto.response.ProfileListResponse;
 import com.example.sulsul.teacherprofile.entity.TeacherProfile;
 import com.example.sulsul.teacherprofile.repository.TeacherProfileRepository;
+import org.springframework.data.domain.PageRequest;
 import com.example.sulsul.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +33,11 @@ public class TeacherProfileService {
     }
 
     public ProfileListResponse getProfileList(EType eType){
+
+        PageRequest page = PageRequest.of(0, 5);
+
         List<TeacherProfile> profileList =  teacherProfileRepository.findByTeacher_EssayType(eType);
-        List<TeacherProfile> newProfileList = teacherProfileRepository.findTop5ByOrderByCreatedDateDesc();
+        List<TeacherProfile> newProfileList = teacherProfileRepository.findNewTeacherProfiles(eType, page);
 
         return new ProfileListResponse(profileList, newProfileList);
     }
