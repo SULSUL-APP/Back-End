@@ -1,6 +1,6 @@
 package com.example.sulsul.review.controller;
 
-import com.example.sulsul.config.security.CustomUserDetails;
+import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.exception.review.InvalidReviewCreateException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.review.dto.request.ReviewRequest;
@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -49,9 +48,9 @@ public class ReviewController {
     })
     @PostMapping("/essay/{essayId}/reviews")
     public ResponseEntity<?> createReview(@Parameter(description = "리뷰를 작성할 첨삭의 id")
-                                          @PathVariable Long essayId,
+                                              @PathVariable Long essayId,
                                           @Valid @RequestBody ReviewRequest reviewRequest,
-                                          @AuthenticationPrincipal CustomUserDetails loginedUser,
+                                          @CurrentUser User user,
                                           BindingResult bindingResult) {
         // 리뷰 내용 유효성 검사
         if (bindingResult.hasErrors()) {
@@ -62,8 +61,6 @@ public class ReviewController {
             throw new InvalidReviewCreateException(errorMap);
         }
 
-        // 로그인 되어 있는 유저 객체를 가져오는 로직
-        User user = loginedUser.getUser();
         Review review = reviewService.createReview(essayId, user, reviewRequest);
         return new ResponseEntity<>(new ReviewResponse(review), HttpStatus.CREATED);
     }

@@ -6,7 +6,7 @@ import com.example.sulsul.comment.dto.response.CommentResponse;
 import com.example.sulsul.comment.dto.response.DeleteSuccessResponse;
 import com.example.sulsul.comment.entity.Comment;
 import com.example.sulsul.comment.service.CommentService;
-import com.example.sulsul.config.security.CustomUserDetails;
+import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.exception.comment.InvalidCommentCreateException;
 import com.example.sulsul.exception.comment.InvalidCommentUpdateException;
@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -75,9 +74,9 @@ public class CommentController {
     })
     @PostMapping("/essay/{essayId}/comments")
     public ResponseEntity<?> createComment(@Parameter(description = "댓글을 작성할 첨삭의 id")
-                                           @PathVariable Long essayId,
+                                               @PathVariable Long essayId,
                                            @Valid @RequestBody CommentRequest commentRequest,
-                                           @AuthenticationPrincipal CustomUserDetails loginedUser,
+                                           @CurrentUser User user,
                                            BindingResult bindingResult) {
         // 댓글 내용 유효성 검사
         if (bindingResult.hasErrors()) {
@@ -88,8 +87,6 @@ public class CommentController {
             throw new InvalidCommentCreateException(errorMap);
         }
 
-        // 로그인 되어 있는 유저 객체를 가져오는 로직
-        User user = loginedUser.getUser();
         // 댓글 생성
         Comment comment = commentService.createComment(essayId, user, commentRequest);
 

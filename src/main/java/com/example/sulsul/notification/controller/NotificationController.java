@@ -85,10 +85,8 @@ public class NotificationController {
     })
     @GetMapping("/noti")
     public ResponseEntity<?> getNotifications(@CurrentUser User user) {
-        // 로그인 되어 있는 유저 객체를 가져오는 로직
-        long userId = user.getId();
         // 유저별 알림 조회
-        List<Notification> notifications = notificationService.getEssayNotifications(userId);
+        List<Notification> notifications = notificationService.getEssayNotifications(user.getId());
         return new ResponseEntity<>(new NotiGroupResponse(notifications), HttpStatus.OK);
     }
 }
