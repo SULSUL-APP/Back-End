@@ -26,6 +26,7 @@ spring:
         format_sql: true
 
 springdoc:
+  packages-to-exclude: "com.example.sulsul.health"
   swagger-ui:
     path: /api-docs
 
