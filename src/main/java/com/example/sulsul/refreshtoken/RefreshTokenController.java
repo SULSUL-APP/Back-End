@@ -4,7 +4,6 @@ import com.example.sulsul.config.jwt.JwtTokenProvider;
 import com.example.sulsul.config.jwt.dto.JwtTokenDto;
 import com.example.sulsul.exception.jwt.NotExpiredTokenException;
 import com.example.sulsul.exception.jwt.TokenNotFoundException;
-import com.example.sulsul.exception.refresh.InvalidRefreshTokenException;
 import com.example.sulsul.exception.refresh.RefreshTokenNotFoundException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import io.jsonwebtoken.Claims;
@@ -51,20 +50,20 @@ public class RefreshTokenController {
             throw new TokenNotFoundException();
         }
 
-        // expired access token인지 확인
+        // expired access token인지 && 유효한 access token인지 검사
         Claims claims = jwtTokenProvider.getExpiredTokenClaims(accessToken);
         if (claims == null) {
             throw new NotExpiredTokenException();
         }
 
-        // refresh token 추출 후 유효성 검사
+        // refresh token 추출
         String refreshToken = request.getHeader("RefreshToken");
         if (refreshToken == null) {
             throw new RefreshTokenNotFoundException();
         }
-        if (!jwtTokenProvider.validate(refreshToken)) {
-            throw new InvalidRefreshTokenException();
-        }
+
+        // refresh token이 만료되었는지 && 유효한지 검사
+        jwtTokenProvider.validateRefreshToken(refreshToken);
 
         // 토큰 재발급
         JwtTokenDto tokensDto = refreshTokenService.refresh(refreshToken, claims);

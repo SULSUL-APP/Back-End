@@ -1,34 +1,20 @@
 package com.example.sulsul.refreshtoken;
 
-import com.example.sulsul.user.entity.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-
-@Entity
-@Getter
-@Table(name = "refresh_tokens")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RedisHash(value = "refreshToken", timeToLive = 60 * 60 * 24 * 14)
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "refresh_token_id")
-    private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @NotBlank(message = "Refresh 토큰 값은 필수입니다.")
-    @Column(nullable = false)
     private String refreshToken;
 
-    public RefreshToken(User user, String refreshToken) {
-        this.user = user;
+    @Indexed
+    private Long userId;
+
+    public RefreshToken(Long userId, String refreshToken) {
+        this.userId = userId;
         this.refreshToken = refreshToken;
     }
 
@@ -36,4 +22,11 @@ public class RefreshToken {
         this.refreshToken = refreshToken;
     }
 
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
 }

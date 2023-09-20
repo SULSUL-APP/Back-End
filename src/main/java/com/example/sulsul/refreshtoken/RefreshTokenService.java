@@ -25,7 +25,7 @@ public class RefreshTokenService {
 
     /**
      * user의 refreshToken이 맞다면 accessToken을 재발급한다.
-     * refreshToken의 만료일이 3일 이내라면 refreshToken을 재발급한다.
+     * refreshToken의 만료일이 1일 이내라면 refreshToken을 재발급한다.
      *
      * @param refreshToken 유저의 refreshToken
      * @return TokenDto 반환
@@ -40,7 +40,7 @@ public class RefreshTokenService {
                 .orElseThrow(UserNotFoundException::new);
 
         // 유저의 refreshToken 조회
-        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser(user)
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getId())
                 .orElseThrow(RefreshTokenNotFoundException::new);
 
         // 유저의 refreshToken이 맞는지 확인

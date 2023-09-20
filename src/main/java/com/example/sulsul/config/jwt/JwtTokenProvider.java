@@ -6,6 +6,8 @@ import com.example.sulsul.config.security.CustomUserDetails;
 import com.example.sulsul.config.security.CustomUserDetailsServiceImpl;
 import com.example.sulsul.exception.jwt.ExpiredTokenException;
 import com.example.sulsul.exception.jwt.TokenNotValidException;
+import com.example.sulsul.exception.refresh.InvalidRefreshTokenException;
+import com.example.sulsul.exception.refresh.RefreshTokenExpiredException;
 import com.example.sulsul.user.entity.User;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -199,6 +201,23 @@ public class JwtTokenProvider {
         }
     }
 
+    public boolean validateRefreshToken(String refreshToken) {
+        return this.getRefreshTokenClaims(refreshToken) != null;
+    }
+
+    public Claims getRefreshTokenClaims(String refreshToken) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
+        } catch (MalformedJwtException e) {
+            throw new InvalidRefreshTokenException();
+        } catch (ExpiredJwtException e) {
+            throw new RefreshTokenExpiredException();
+        }
+    }
+
     /**
      * 만료된 토큰의 claims 반환
      */
@@ -210,6 +229,8 @@ public class JwtTokenProvider {
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims(); // 만료된 경우에도 claims 반환가능
+        } catch (MalformedJwtException e) {
+            throw new TokenNotValidException();
         }
         return null;
     }

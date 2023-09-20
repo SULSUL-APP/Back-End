@@ -41,11 +41,11 @@ public class SecurityConfig {
 
     private final String[] GET_PERMIT_API_URL = {
             "/",
-            "/refresh"
+            "/refresh",
     };
 
     private final String[] POST_PERMIT_API_URL = {
-            "/refresh"
+            "/refresh",
     };
 
     private final LogoutHandler logoutService;

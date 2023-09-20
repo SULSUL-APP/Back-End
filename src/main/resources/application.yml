@@ -8,6 +8,7 @@ spring:
       - oauth
       - s3
       - fcm
+      - redis
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -29,5 +30,7 @@ springdoc:
 logging:
   level:
     org.hibernate.SQL: debug
-    org.hibernate.type: trace
     com.amazonaws.util.EC2MetadataUtils: error # Failed to connect to service endpoint 에러 무시
+
+domain:
+  name: http://www.localhost:8081
