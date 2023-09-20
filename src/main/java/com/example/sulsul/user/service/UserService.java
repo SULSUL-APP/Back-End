@@ -16,6 +16,7 @@ import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -32,6 +33,7 @@ public class UserService {
      * @param user 추가정보를 입력할 user 정보.
      * @param signUpRequest 추가 회원가입 정보 :  [ 유저 타입, 논술 분야 ].
      */
+    @Transactional
     public void signUp(User user, SignUpRequest signUpRequest) {
 
         user.updateEType(EType.valueOf(signUpRequest.getEssayType()));
@@ -65,6 +67,7 @@ public class UserService {
     /**
      * @param user 마이페이지를 수정할 학생 정보.
      */
+    @Transactional
     public StudentResponse putStudentMyPage(User user, PutMyPageRequest putMyPageRequest) {
 
         user.updateEType(EType.getEType(putMyPageRequest.getEssayType()));
@@ -78,6 +81,7 @@ public class UserService {
     /**
      * @param user 마이페이지를 수정할 선생 정보.
      */
+    @Transactional
     public TeacherResponse putTeacherMyPage(User user, PutMyPageRequest putMyPageRequest) {
 
         user.updateEType(EType.getEType(putMyPageRequest.getEssayType()));
@@ -92,6 +96,7 @@ public class UserService {
     /**
      * @param user 탈퇴시킬 회원.
      */
+    @Transactional
     public CommonResponse deleteUser(User user) {
 
         user.updateDType(DType.DELETE);
