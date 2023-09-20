@@ -1,11 +1,10 @@
 package com.example.sulsul.teacherprofile.service;
 
 import com.example.sulsul.common.type.EType;
-import com.example.sulsul.exception.essay.EssayNotFoundException;
 import com.example.sulsul.exception.profile.ProfileNotFoundException;
 import com.example.sulsul.exception.profile.TeacherProfileNotFoundException;
-import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.teacherprofile.dto.request.TeacherProfileRequest;
+import com.example.sulsul.teacherprofile.dto.response.ProfileListResponse;
 import com.example.sulsul.teacherprofile.entity.TeacherProfile;
 import com.example.sulsul.teacherprofile.repository.TeacherProfileRepository;
 import com.example.sulsul.user.entity.User;
@@ -14,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -33,13 +31,14 @@ public class TeacherProfileService {
                 .orElseThrow(() -> new TeacherProfileNotFoundException(user.getId()));
     }
 
-    public List<TeacherProfile> getProfileList(EType eType){
-        List<TeacherProfile> Lists = teacherProfileRepository.findByTeacher_EssayType(eType);
-        log.info("TeacherProfile Lists : {}", Lists);
-        return Lists;
+    public ProfileListResponse getProfileList(EType eType){
+        List<TeacherProfile> profileList =  teacherProfileRepository.findByTeacher_EssayType(eType);
+        List<TeacherProfile> newProfileList = teacherProfileRepository.findTop5ByOrderByCreatedDateDesc();
+
+        return new ProfileListResponse(profileList, newProfileList);
     }
 
-    public void createTeacherProfile(User user, TeacherProfileRequest teacherProfileRequest){
+    public void updateTeacherProfile(User user, TeacherProfileRequest teacherProfileRequest){
 
         TeacherProfile teacherProfile = getTeacherProfile(user).updateTeacherProfile(teacherProfileRequest);
         teacherProfileRepository.save(teacherProfile);

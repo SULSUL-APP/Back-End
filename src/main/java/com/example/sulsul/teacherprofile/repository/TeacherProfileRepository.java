@@ -13,4 +13,7 @@ public interface TeacherProfileRepository extends JpaRepository<TeacherProfile, 
     Optional<TeacherProfile> findByTeacher(User user);
 
     List<TeacherProfile> findByTeacher_EssayType(EType eType);
+
+    // select * from teacherProfile order by created_at desc limit 5;
+    List<TeacherProfile> findTop5ByOrderByCreatedDateDesc();
 }
