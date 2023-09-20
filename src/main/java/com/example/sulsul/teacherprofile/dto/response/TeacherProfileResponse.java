@@ -38,7 +38,7 @@ public class TeacherProfileResponse {
     private final String otherDetail;
 
     @Schema(description = "평점", example = "리뷰를 통한 평점")
-    private final Double reviewScore;
+    private final String reviewScore;
 
     @Schema(description = "완료한 첨삭 개수", example = "강사가 진행한 총 첨삭 개수")
     private final Integer completedCount;
