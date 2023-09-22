@@ -17,8 +17,9 @@ import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.review.repository.ReviewRepository;
+import com.example.sulsul.teacherprofile.entity.TeacherProfile;
+import com.example.sulsul.teacherprofile.repository.TeacherProfileRepository;
 import com.example.sulsul.user.entity.User;
-import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,17 +31,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EssayService {
 
-    private final UserRepository userRepository;
     private final EssayRepository essayRepository;
     private final FileRepository fileRepository;
     private final CommentRepository commentRepository;
     private final ReviewRepository reviewRepository;
+    private final TeacherProfileRepository teacherProfileRepository;
 
     @Transactional
     public Essay createEssay(Long profileId, User student, CreateEssayRequest request) {
-        // profileId에 해당하는 강사 유저 조회
-        User teacher = userRepository.findById(profileId)
+        // profileId에 해당하는 강사프로필 조회
+        TeacherProfile profile = teacherProfileRepository.findById(profileId)
                 .orElseThrow(() -> new TeacherNotFoundException(profileId));
+        // 강사프로필에 해당하는 강사 조회
+        User teacher = profile.getTeacher();
         Essay essay = request.toEntity(student, teacher); // Essay 엔티티 생성
         return essayRepository.save(essay); // Essay 엔티티 저장
     }

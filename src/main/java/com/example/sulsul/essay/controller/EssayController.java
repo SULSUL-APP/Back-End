@@ -63,8 +63,8 @@ public class EssayController {
     @PostMapping(value = "/profiles/{profileId}/essay",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createEssay(@Parameter(description = "첨삭을 요청할 강사의 id")
-                                             @PathVariable Long profileId,
+    public ResponseEntity<?> createEssay(@Parameter(description = "첨삭을 요청할 강사프로필의 id값")
+                                         @PathVariable Long profileId,
                                          @ModelAttribute @Valid CreateEssayRequest request,
                                          @CurrentUser User user,
                                          BindingResult bindingResult) {
