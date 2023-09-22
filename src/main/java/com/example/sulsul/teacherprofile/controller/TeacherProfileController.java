@@ -61,7 +61,7 @@ public class TeacherProfileController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/profiles/{profileId}")
-    public ResponseEntity<?> getTeacherProfile(@Parameter(description = "프로필을 조회할 강사의 id")
+    public ResponseEntity<?> getTeacherProfile(@Parameter(description = "조회할 프로필의 id값")
                                                @PathVariable Long profileId) {
 
         TeacherProfile teacherProfile = teacherProfileService.getTeacherProfile(profileId);
@@ -117,8 +117,7 @@ public class TeacherProfileController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/profiles")
-    public ResponseEntity<?> updateTeacherProfile(@Parameter(description = "프로필을 수정할 강사 자신")
-                                                  @CurrentUser User user,
+    public ResponseEntity<?> updateTeacherProfile(@CurrentUser User user,
                                                   @Parameter(description = "수정한 프로필 내용")
                                                   @RequestBody TeacherProfileRequest teacherProfileRequest) {
 

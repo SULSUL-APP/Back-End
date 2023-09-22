@@ -99,7 +99,7 @@ public class UserService {
     @Transactional
     public CommonResponse deleteUser(User user) {
 
-        user.updateDType(DType.DELETE);
+        user.delete();
         userRepository.save(user);
 
         return new CommonResponse();
