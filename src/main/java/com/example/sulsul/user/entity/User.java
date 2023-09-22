@@ -57,7 +57,12 @@ public class User extends BaseEntity {
 
         return this;
     }
-
+    public void delete() {
+        this.email = "알수없음";
+        this.profileImage = "http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg";
+        this.name = "알수없음";
+        this.userState = DType.DELETE;
+    }
     public void updateUserRole(Role userRole) {
         this.userRole = userRole;
     }
@@ -78,10 +83,6 @@ public class User extends BaseEntity {
 
     public void updateEType(EType eType) {
         this.essayType = eType;
-    }
-
-    public void updateDType(DType dType) {
-        this.userState = dType;
     }
 
     public boolean isTeacher() {
