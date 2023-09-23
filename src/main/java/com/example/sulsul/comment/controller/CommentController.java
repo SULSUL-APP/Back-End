@@ -10,6 +10,8 @@ import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.essay.service.EssayService;
 import com.example.sulsul.exception.comment.InvalidCommentCreateException;
 import com.example.sulsul.exception.comment.InvalidCommentUpdateException;
+import com.example.sulsul.exception.comment.NotAllowedCommentDeleteException;
+import com.example.sulsul.exception.comment.NotAllowedCommentUpdateException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.fcm.FcmMessageService;
 import com.example.sulsul.notification.service.NotificationService;
@@ -122,9 +124,17 @@ public class CommentController {
     })
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<?> updateComment(@Parameter(description = "수정할 댓글의 id")
-                                           @PathVariable Long commentId,
+                                               @PathVariable Long commentId,
+                                           @CurrentUser User user,
                                            @Valid @RequestBody CommentRequest commentRequest,
                                            BindingResult bindingResult) {
+
+        // 댓글 작성자만 수정할 수 있도록 강제
+        User writer = commentService.getCommentById(commentId).getUser();
+        if (!writer.equals(user)) {
+            throw new NotAllowedCommentUpdateException();
+        }
+
         // 댓글 내용 유효성 검사
         if (bindingResult.hasErrors()) {
             Map<String, String> errorMap = new HashMap<>();
@@ -151,7 +161,15 @@ public class CommentController {
     })
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<?> deleteComment(@Parameter(description = "삭제할 댓글의 id")
+                                               @CurrentUser User user,
                                            @PathVariable Long commentId) {
+
+        // 댓글 작성자만 삭제할 수 있도록 강제
+        User writer = commentService.getCommentById(commentId).getUser();
+        if (!writer.equals(user)) {
+            throw new NotAllowedCommentDeleteException();
+        }
+
         commentService.deleteComment(commentId);
         return new ResponseEntity<>(new DeleteSuccessResponse(), HttpStatus.OK);
     }

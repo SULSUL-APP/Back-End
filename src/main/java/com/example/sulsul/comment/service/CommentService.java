@@ -20,6 +20,11 @@ public class CommentService {
     private final EssayRepository essayRepository;
     private final CommentRepository commentRepository;
 
+    public Comment getCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
+    }
+
     public List<Comment> getComments(Long essayId) {
         return commentRepository.findAllByEssayId(essayId);
     }
