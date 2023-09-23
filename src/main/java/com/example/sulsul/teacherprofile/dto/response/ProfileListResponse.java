@@ -1,7 +1,5 @@
 package com.example.sulsul.teacherprofile.dto.response;
 
-import com.example.sulsul.review.dto.response.ReviewResponse;
-import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.teacherprofile.entity.TeacherProfile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

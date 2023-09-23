@@ -1,6 +1,7 @@
 package com.example.sulsul.review.controller;
 
 import com.example.sulsul.common.CurrentUser;
+import com.example.sulsul.exception.profile.TeacherProfileNotFoundException;
 import com.example.sulsul.exception.review.InvalidReviewCreateException;
 import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.review.dto.request.ReviewRequest;
@@ -8,6 +9,8 @@ import com.example.sulsul.review.dto.response.ReviewGroupResponse;
 import com.example.sulsul.review.dto.response.ReviewResponse;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.review.service.ReviewService;
+import com.example.sulsul.teacherprofile.entity.TeacherProfile;
+import com.example.sulsul.teacherprofile.repository.TeacherProfileRepository;
 import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +37,7 @@ import java.util.Map;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final TeacherProfileRepository teacherProfileRepository;
 
     @Operation(summary = "해당 첨삭에 리뷰 작성", description = "essayId에 해당하는 첨삭에 리뷰를 작성한다.")
     @ApiResponses({
@@ -48,7 +52,7 @@ public class ReviewController {
     })
     @PostMapping("/essay/{essayId}/reviews")
     public ResponseEntity<?> createReview(@Parameter(description = "리뷰를 작성할 첨삭의 id")
-                                              @PathVariable Long essayId,
+                                          @PathVariable Long essayId,
                                           @Valid @RequestBody ReviewRequest reviewRequest,
                                           @CurrentUser User user,
                                           BindingResult bindingResult) {
@@ -65,7 +69,7 @@ public class ReviewController {
         return new ResponseEntity<>(new ReviewResponse(review), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "강사에게 작성된 모든 리뷰 조회", description = "profileId에 해당하는 강사에게 작성된 모든 리뷰를 조회한다.")
+    @Operation(summary = "강사프로필에 작성된 모든 리뷰 조회", description = "profileId에 해당하는 강사프로필에 작성된 모든 리뷰를 조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReviewGroupResponse.class))),
@@ -77,9 +81,14 @@ public class ReviewController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/profiles/{profileId}/reviews")
-    public ResponseEntity<?> getReviews(@Parameter(description = "리뷰를 조회할 강사의 id")
+    public ResponseEntity<?> getReviews(@Parameter(description = "리뷰를 조회할 강사프로필의 id값")
                                         @PathVariable Long profileId) {
-        List<Review> reviews = reviewService.getReviews(profileId);
+
+        TeacherProfile profile = teacherProfileRepository.findById(profileId)
+                .orElseThrow(() -> new TeacherProfileNotFoundException());
+
+        long teacherId = profile.getTeacher().getId();
+        List<Review> reviews = reviewService.getReviews(teacherId);
         return new ResponseEntity<>(new ReviewGroupResponse(reviews), HttpStatus.OK);
     }
 }

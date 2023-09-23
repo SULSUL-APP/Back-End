@@ -4,7 +4,6 @@ import com.example.sulsul.common.BaseEntity;
 import com.example.sulsul.teacherprofile.dto.request.TeacherProfileRequest;
 import com.example.sulsul.user.entity.User;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 
@@ -32,7 +31,7 @@ public class TeacherProfile extends BaseEntity {
     @Column(length = 1000)
     private String introDetail;
 
-    @Column()
+    @Column
     private String price;
 
     @Column(length = 1000)
@@ -41,12 +40,11 @@ public class TeacherProfile extends BaseEntity {
     @Column(length = 1000)
     private String otherDetail; // 기타 사항
 
-    @Column()
+    @Column
     private String reviewScore;
 
-    @Column()
+    @Column
     private Integer completedCount;
-
 
     public boolean isNewTeacher() {
         return completedCount.equals(0);

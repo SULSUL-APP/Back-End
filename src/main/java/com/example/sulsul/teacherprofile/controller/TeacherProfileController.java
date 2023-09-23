@@ -21,8 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Tag(name = "Profile", description = "강사 프로필 관련 API")
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +30,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "나의(강사) 프로필 조회", description = "나의 강사 프로필을 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -41,7 +39,7 @@ public class TeacherProfileController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/profiles/myProfile")
+    @GetMapping("/profiles/myprofile")
     public ResponseEntity<?> getMyProfile(@CurrentUser User user) {
 
         TeacherProfile teacherProfile = teacherProfileService.getTeacherProfile(user);
@@ -51,7 +49,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "강사 프로필 조회", description = "profileId에 해당하는 강사 프로필을 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -71,7 +69,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "인문사회 강사 프로필 리스트 조회", description = "인문사회 강사 프로필 리스트를 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfileListResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -89,7 +87,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "수리과학 강사 프로필 리스트 조회", description = "수리과학 강사 프로필 리스트를 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfileListResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -107,8 +105,8 @@ public class TeacherProfileController {
 
     @Operation(summary = "강사(자신)의 프로필 수정", description = "강사(자신)의 프로필을 수정한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileRequest.class))),
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -121,8 +119,7 @@ public class TeacherProfileController {
                                                   @Parameter(description = "수정한 프로필 내용")
                                                   @RequestBody TeacherProfileRequest teacherProfileRequest) {
 
-        teacherProfileService.updateTeacherProfile(user, teacherProfileRequest);
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        TeacherProfile updated = teacherProfileService.updateTeacherProfile(user, teacherProfileRequest);
+        return new ResponseEntity<>(new TeacherProfileResponse(updated), HttpStatus.OK);
     }
 }

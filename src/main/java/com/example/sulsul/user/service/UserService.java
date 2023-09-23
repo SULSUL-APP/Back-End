@@ -1,8 +1,8 @@
 package com.example.sulsul.user.service;
 
-import com.example.sulsul.common.type.DType;
 import com.example.sulsul.common.type.EType;
 import com.example.sulsul.common.type.UType;
+import com.example.sulsul.refreshtoken.RefreshTokenRepository;
 import com.example.sulsul.teacherprofile.entity.TeacherProfile;
 import com.example.sulsul.teacherprofile.repository.TeacherProfileRepository;
 import com.example.sulsul.user.dto.request.PutMyPageRequest;
@@ -27,10 +27,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final TeacherProfileRepository teacherProfileRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+
     /**
      * 초기 데이터는 Name, Email, ProfileImage.
      * 유저의 타입과 분야에 대한 추가정보를 받아서 추가 회원가입을 진행한다.
-     * @param user 추가정보를 입력할 user 정보.
+     *
+     * @param user          추가정보를 입력할 user 정보.
      * @param signUpRequest 추가 회원가입 정보 :  [ 유저 타입, 논술 분야 ].
      */
     @Transactional
@@ -40,7 +43,7 @@ public class UserService {
         user.updateUType(UType.valueOf(signUpRequest.getUserType()));
         user.updateUserRole(Role.USER);
 
-        if(Objects.equals(signUpRequest.getUserType(), UType.TEACHER.getValue())){
+        if (Objects.equals(signUpRequest.getUserType(), UType.TEACHER.getValue())) {
             TeacherProfile teacherProfile = new TeacherProfile(user, "0.0", 0);
             teacherProfileRepository.save(teacherProfile);
         }
@@ -98,6 +101,10 @@ public class UserService {
      */
     @Transactional
     public CommonResponse deleteUser(User user) {
+
+        // RefreshToken 삭제
+        refreshTokenRepository.findByUserId(user.getId())
+                .ifPresent(refreshToken -> refreshTokenRepository.delete(refreshToken));
 
         user.delete();
         userRepository.save(user);

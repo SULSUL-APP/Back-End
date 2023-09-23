@@ -10,6 +10,8 @@ import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.exception.essay.EssayNotFoundException;
+import com.example.sulsul.exception.essay.InvalidEssayStateChangeException;
+import com.example.sulsul.exception.essay.InvalidEssayStateException;
 import com.example.sulsul.exception.file.FileNotFoundException;
 import com.example.sulsul.exception.review.ReviewNotFoundException;
 import com.example.sulsul.exception.user.TeacherNotFoundException;
@@ -17,8 +19,9 @@ import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.repository.FileRepository;
 import com.example.sulsul.review.entity.Review;
 import com.example.sulsul.review.repository.ReviewRepository;
+import com.example.sulsul.teacherprofile.entity.TeacherProfile;
+import com.example.sulsul.teacherprofile.repository.TeacherProfileRepository;
 import com.example.sulsul.user.entity.User;
-import com.example.sulsul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,25 +33,46 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EssayService {
 
-    private final UserRepository userRepository;
     private final EssayRepository essayRepository;
     private final FileRepository fileRepository;
     private final CommentRepository commentRepository;
     private final ReviewRepository reviewRepository;
+    private final TeacherProfileRepository teacherProfileRepository;
 
     @Transactional
     public Essay createEssay(Long profileId, User student, CreateEssayRequest request) {
-        // profileId에 해당하는 강사 유저 조회
-        User teacher = userRepository.findById(profileId)
+        // profileId에 해당하는 강사프로필 조회
+        TeacherProfile profile = teacherProfileRepository.findById(profileId)
                 .orElseThrow(() -> new TeacherNotFoundException(profileId));
+        // 강사프로필에 해당하는 강사 조회
+        User teacher = profile.getTeacher();
         Essay essay = request.toEntity(student, teacher); // Essay 엔티티 생성
         return essayRepository.save(essay); // Essay 엔티티 저장
     }
 
+    /**
+     * (deprecated) essayId에 해당하는 Essay 엔티티를 조회
+     */
     @Transactional(readOnly = true)
     public Essay getEssayById(Long essayId) {
         return essayRepository.findById(essayId)
                 .orElseThrow(() -> new EssayNotFoundException(essayId));
+    }
+
+    /**
+     * essayId와 essayState에 해당하는 Essay 엔티티를 조회
+     * essayState가 일치하지 않는 경우 InvalidEssayStateException 발생
+     */
+    @Transactional(readOnly = true)
+    public Essay getEssayByIdAndEssyState(Long essayId, EssayState essayState) {
+        Essay essay = essayRepository.findById(essayId)
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
+
+        if (!essay.checkEssayState(essayState)) {
+            throw new InvalidEssayStateException(essayId);
+        }
+
+        return essay;
     }
 
     @Transactional(readOnly = true)
@@ -72,7 +96,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public RequestEssayResponse getEssayRequest(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.REQUEST);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
@@ -83,7 +107,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public RejectedEssayResponse getEssayReject(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.REJECT);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
@@ -103,7 +127,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public ProceedEssayResponse getProceedEssay(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.PROCEED);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로
@@ -119,7 +143,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public CompletedEssayResponse getCompleteEssay(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.COMPLETE);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로
@@ -135,7 +159,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public ReviewedEssayResponse getReviewedEssay(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.COMPLETE);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로
@@ -154,6 +178,12 @@ public class EssayService {
     public Essay acceptEssay(Long essayId) {
         Essay essay = essayRepository.findById(essayId)
                 .orElseThrow(() -> new EssayNotFoundException(essayId));
+
+        // 첨삭요청 상태에서만 진행상태로 변경할 수 있도록 강제
+        if (!essay.checkEssayState(EssayState.REQUEST)) {
+            throw new InvalidEssayStateChangeException(essayId);
+        }
+
         // 첨삭진행 상태로 변경
         essay.updateEssayState(EssayState.PROCEED);
         return essayRepository.save(essay);
@@ -163,6 +193,12 @@ public class EssayService {
     public Essay rejectEssay(Long essayId, RejectRequest rejectRequest) {
         Essay essay = essayRepository.findById(essayId)
                 .orElseThrow(() -> new EssayNotFoundException(essayId));
+
+        // 첨삭요청 상태에서만 거절상태로 변경할 수 있도록 강제
+        if (!essay.checkEssayState(EssayState.REQUEST)) {
+            throw new InvalidEssayStateChangeException(essayId);
+        }
+
         // 첨삭거절 상태로 변경
         essay.updateEssayState(EssayState.REJECT);
         essay.updateRejectDetail(rejectRequest.getRejectDetail());
@@ -173,6 +209,12 @@ public class EssayService {
     public Essay completeEssay(Long essayId) {
         Essay essay = essayRepository.findById(essayId)
                 .orElseThrow(() -> new EssayNotFoundException(essayId));
+
+        // 첨삭진행 상태에서만 첨삭완료 상태로 변경할 수 있도록 강제
+        if (!essay.checkEssayState(EssayState.PROCEED)) {
+            throw new InvalidEssayStateChangeException(essayId);
+        }
+
         // 첨삭완료 상태로 변경
         essay.updateEssayState(EssayState.COMPLETE);
         return essayRepository.save(essay);
