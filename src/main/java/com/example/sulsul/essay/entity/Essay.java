@@ -38,10 +38,10 @@ public class Essay extends BaseEntity {
     @NotBlank(message = "논술 연도는 필수 값입니다.")
     private String examYear;
 
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String inquiry; // 문의사항
 
-    @Column()
+    @Column(length = 1000)
     private String rejectDetail; // 거절사유
 
     @Column(nullable = false)

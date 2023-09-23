@@ -25,7 +25,7 @@ public class FcmToken extends BaseEntity {
     private User user;
 
     @NotBlank(message = "Fcm 토큰 값은 필수입니다.")
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String fcmToken;
 
     public FcmToken(User user, String fcmToken) {

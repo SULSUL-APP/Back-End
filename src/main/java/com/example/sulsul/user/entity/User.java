@@ -31,8 +31,10 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
+    @Column(length = 1000)
     private String profileImage; // 프로필 이미지 경로
 
+    @Column(length = 1000)
     private String catchPhrase;
 
     @Enumerated(EnumType.STRING)
@@ -57,12 +59,14 @@ public class User extends BaseEntity {
 
         return this;
     }
+
     public void delete() {
         this.email = "알수없음";
         this.profileImage = "http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg";
         this.name = "알수없음";
         this.userState = DType.DELETE;
     }
+
     public void updateUserRole(Role userRole) {
         this.userRole = userRole;
     }

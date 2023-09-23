@@ -31,7 +31,7 @@ public class TeacherProfile extends BaseEntity {
     @Column(length = 1000)
     private String introDetail;
 
-    @Column
+    @Column(length = 1000)
     private String price;
 
     @Column(length = 1000)
@@ -57,27 +57,6 @@ public class TeacherProfile extends BaseEntity {
     public void updateReviewScore(String reviewScore) {
         this.reviewScore = reviewScore;
     }
-
-    public void updateCareerDetail(String careerDetail) {
-        this.careerDetail = careerDetail;
-    }
-
-    public void updateIntroDetail(String introDetail) {
-        this.introDetail = introDetail;
-    }
-
-    public void updatePrice(String price) {
-        this.price = price;
-    }
-
-    public void updatePossibleUniv(String possibleUniv) {
-        this.possibleUniv = possibleUniv;
-    }
-
-    public void updateOtherDetail(String otherDetail) {
-        this.otherDetail = otherDetail;
-    }
-
 
     public TeacherProfile(User user, String reviewScore, Integer completedCount) {
         this.teacher = user;

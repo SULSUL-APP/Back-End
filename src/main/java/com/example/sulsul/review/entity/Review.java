@@ -20,7 +20,7 @@ public class Review extends BaseEntity {
     @Column(name = "review_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String detail;
 
     @Column(nullable = false)

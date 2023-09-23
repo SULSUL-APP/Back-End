@@ -20,10 +20,10 @@ public class Notification extends BaseEntity {
     @Column(name = "notification_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String body;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,7 +36,7 @@ public class Notification extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private NotiType notiType;
-    
+
     public Notification(String title, String body) {
         this.title = title;
         this.body = body;
