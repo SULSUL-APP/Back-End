@@ -30,7 +30,7 @@ public class UserController {
 
     @Operation(summary = "Guest 유저에 대한 추가 회원가입", description = "Guest 유저에 대해 추가 정보를 작성한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -51,7 +51,7 @@ public class UserController {
 
     @Operation(summary = "마이페이지 조희", description = "유저의 마이페이지를 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -73,7 +73,7 @@ public class UserController {
 
     @Operation(summary = "마이페이지 수정", description = "유저의 마이페이지를 수정한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -96,7 +96,7 @@ public class UserController {
 
     @Operation(summary = "회원 탈퇴", description = "유저를 탈퇴시킨다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),

@@ -30,7 +30,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "나의(강사) 프로필 조회", description = "나의 강사 프로필을 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -49,7 +49,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "강사 프로필 조회", description = "profileId에 해당하는 강사 프로필을 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -69,7 +69,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "인문사회 강사 프로필 리스트 조회", description = "인문사회 강사 프로필 리스트를 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfileListResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -87,7 +87,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "수리과학 강사 프로필 리스트 조회", description = "수리과학 강사 프로필 리스트를 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfileListResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -105,7 +105,7 @@ public class TeacherProfileController {
 
     @Operation(summary = "강사(자신)의 프로필 수정", description = "강사(자신)의 프로필을 수정한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED",
+            @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileRequest.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
