@@ -17,6 +17,8 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - REGION=${REGION}
     restart: "no"
+    depends_on:
+      - redis
 
   nginx:
     image: "junek3/sulsul-nginx"
@@ -26,8 +28,6 @@ services:
 
   redis:
     image: "redis:7.2"
-    container_name: "redis"
-    hostname: "redis"
     ports:
       - "6379:6379"
-    restart: "always"
+    restart: "no"
