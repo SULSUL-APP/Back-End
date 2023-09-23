@@ -26,5 +26,8 @@ services:
 
   redis:
     image: "redis:7.2"
-    command: [ "redis-server", "--bind", "redis", "--port", "6379" ]
+    container_name: "redis"
+    hostname: "redis"
+    ports:
+      - "6379:6379"
     restart: "always"
