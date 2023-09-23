@@ -10,6 +10,7 @@ import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.exception.essay.EssayNotFoundException;
+import com.example.sulsul.exception.essay.InvalidEssayStateChangeException;
 import com.example.sulsul.exception.essay.InvalidEssayStateException;
 import com.example.sulsul.exception.file.FileNotFoundException;
 import com.example.sulsul.exception.review.ReviewNotFoundException;
@@ -177,6 +178,12 @@ public class EssayService {
     public Essay acceptEssay(Long essayId) {
         Essay essay = essayRepository.findById(essayId)
                 .orElseThrow(() -> new EssayNotFoundException(essayId));
+
+        // 첨삭요청 상태에서만 진행상태로 변경할 수 있도록 강제
+        if (!essay.checkEssayState(EssayState.REQUEST)) {
+            throw new InvalidEssayStateChangeException(essayId);
+        }
+
         // 첨삭진행 상태로 변경
         essay.updateEssayState(EssayState.PROCEED);
         return essayRepository.save(essay);
@@ -186,6 +193,12 @@ public class EssayService {
     public Essay rejectEssay(Long essayId, RejectRequest rejectRequest) {
         Essay essay = essayRepository.findById(essayId)
                 .orElseThrow(() -> new EssayNotFoundException(essayId));
+
+        // 첨삭요청 상태에서만 거절상태로 변경할 수 있도록 강제
+        if (!essay.checkEssayState(EssayState.REQUEST)) {
+            throw new InvalidEssayStateChangeException(essayId);
+        }
+
         // 첨삭거절 상태로 변경
         essay.updateEssayState(EssayState.REJECT);
         essay.updateRejectDetail(rejectRequest.getRejectDetail());
@@ -196,6 +209,12 @@ public class EssayService {
     public Essay completeEssay(Long essayId) {
         Essay essay = essayRepository.findById(essayId)
                 .orElseThrow(() -> new EssayNotFoundException(essayId));
+
+        // 첨삭진행 상태에서만 첨삭완료 상태로 변경할 수 있도록 강제
+        if (!essay.checkEssayState(EssayState.PROCEED)) {
+            throw new InvalidEssayStateChangeException(essayId);
+        }
+
         // 첨삭완료 상태로 변경
         essay.updateEssayState(EssayState.COMPLETE);
         return essayRepository.save(essay);
