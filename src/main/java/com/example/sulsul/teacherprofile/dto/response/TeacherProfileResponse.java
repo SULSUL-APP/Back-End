@@ -1,14 +1,12 @@
 package com.example.sulsul.teacherprofile.dto.response;
 
 import com.example.sulsul.teacherprofile.entity.TeacherProfile;
-import com.example.sulsul.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
 public class TeacherProfileResponse {
 
-    //user
     @Schema(description = "강사 이름", example = "임탁균")
     private final String name;
 

@@ -47,10 +47,10 @@ public class TeacherProfileService {
     }
 
     @Transactional
-    public void updateTeacherProfile(User user, TeacherProfileRequest teacherProfileRequest) {
+    public TeacherProfile updateTeacherProfile(User user, TeacherProfileRequest teacherProfileRequest) {
 
         TeacherProfile teacherProfile = getTeacherProfile(user).updateTeacherProfile(teacherProfileRequest);
-        teacherProfileRepository.save(teacherProfile);
+        return teacherProfileRepository.save(teacherProfile);
     }
 
     @Transactional

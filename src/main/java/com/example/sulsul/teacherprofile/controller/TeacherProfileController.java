@@ -106,7 +106,7 @@ public class TeacherProfileController {
     @Operation(summary = "강사(자신)의 프로필 수정", description = "강사(자신)의 프로필을 수정한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileRequest.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherProfileResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -119,8 +119,7 @@ public class TeacherProfileController {
                                                   @Parameter(description = "수정한 프로필 내용")
                                                   @RequestBody TeacherProfileRequest teacherProfileRequest) {
 
-        teacherProfileService.updateTeacherProfile(user, teacherProfileRequest);
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        TeacherProfile updated = teacherProfileService.updateTeacherProfile(user, teacherProfileRequest);
+        return new ResponseEntity<>(new TeacherProfileResponse(updated), HttpStatus.OK);
     }
 }
