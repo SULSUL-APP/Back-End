@@ -10,6 +10,7 @@ import com.example.sulsul.essay.dto.response.*;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.essay.repository.EssayRepository;
 import com.example.sulsul.exception.essay.EssayNotFoundException;
+import com.example.sulsul.exception.essay.InvalidEssayStateException;
 import com.example.sulsul.exception.file.FileNotFoundException;
 import com.example.sulsul.exception.review.ReviewNotFoundException;
 import com.example.sulsul.exception.user.TeacherNotFoundException;
@@ -48,10 +49,29 @@ public class EssayService {
         return essayRepository.save(essay); // Essay 엔티티 저장
     }
 
+    /**
+     * (deprecated) essayId에 해당하는 Essay 엔티티를 조회
+     */
     @Transactional(readOnly = true)
     public Essay getEssayById(Long essayId) {
         return essayRepository.findById(essayId)
                 .orElseThrow(() -> new EssayNotFoundException(essayId));
+    }
+
+    /**
+     * essayId와 essayState에 해당하는 Essay 엔티티를 조회
+     * essayState가 일치하지 않는 경우 InvalidEssayStateException 발생
+     */
+    @Transactional(readOnly = true)
+    public Essay getEssayByIdAndEssyState(Long essayId, EssayState essayState) {
+        Essay essay = essayRepository.findById(essayId)
+                .orElseThrow(() -> new EssayNotFoundException(essayId));
+
+        if (!essay.checkEssayState(essayState)) {
+            throw new InvalidEssayStateException(essayId);
+        }
+
+        return essay;
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +95,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public RequestEssayResponse getEssayRequest(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.REQUEST);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
@@ -86,7 +106,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public RejectedEssayResponse getEssayReject(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.REJECT);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String filePath = getStudentFilePath(essayId, studentId); // 첨삭파일이 위치한 s3 경로
@@ -106,7 +126,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public ProceedEssayResponse getProceedEssay(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.PROCEED);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로
@@ -122,7 +142,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public CompletedEssayResponse getCompleteEssay(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.COMPLETE);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로
@@ -138,7 +158,7 @@ public class EssayService {
     @Transactional(readOnly = true)
     public ReviewedEssayResponse getReviewedEssay(Long essayId) {
         // essayId에 해당하는 첨삭 조회
-        Essay essay = getEssayById(essayId);
+        Essay essay = getEssayByIdAndEssyState(essayId, EssayState.COMPLETE);
         Long studentId = essay.getStudent().getId();
         // 학생이 올린 첨삭파일 조회
         String studentFilePath = getStudentFilePath(essayId, studentId); // 학생이 올린 첨삭파일의 s3 경로

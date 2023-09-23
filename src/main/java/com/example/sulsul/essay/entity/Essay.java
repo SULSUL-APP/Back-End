@@ -74,4 +74,7 @@ public class Essay extends BaseEntity {
         this.rejectDetail = rejectDetail;
     }
 
+    public boolean checkEssayState(EssayState essayState) {
+        return this.essayState.equals(essayState);
+    }
 }

@@ -129,7 +129,7 @@ public class EssayController {
         }
 
         // 첨삭 엔티티 조회
-        Essay essay = essayService.getEssayById(essayId);
+        Essay essay = essayService.getEssayByIdAndEssyState(essayId, EssayState.PROCEED);
         // 강사 첨삭 파일 업로드
         fileService.uploadEssayFile(user, essay, essayFile);
         ProceedEssayResponse essayResponse = essayService.getProceedEssay(essayId);
@@ -287,7 +287,7 @@ public class EssayController {
     @GetMapping("/essay/complete/{essayId}")
     public ResponseEntity<?> getCompleteEssay(@Parameter(description = "조회할 첨삭의 id")
                                               @PathVariable Long essayId) {
-        Essay essay = essayService.getEssayById(essayId);
+        Essay essay = essayService.getEssayByIdAndEssyState(essayId, EssayState.COMPLETE);
         // 리뷰가 작성된 경우
         if (essay.isReviewed()) {
             ReviewedEssayResponse essayResponse = essayService.getReviewedEssay(essayId);
