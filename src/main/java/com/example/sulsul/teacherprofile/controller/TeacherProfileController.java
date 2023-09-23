@@ -21,8 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Tag(name = "Profile", description = "강사 프로필 관련 API")
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class TeacherProfileController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/profiles/myProfile")
+    @GetMapping("/profiles/myprofile")
     public ResponseEntity<?> getMyProfile(@CurrentUser User user) {
 
         TeacherProfile teacherProfile = teacherProfileService.getTeacherProfile(user);
