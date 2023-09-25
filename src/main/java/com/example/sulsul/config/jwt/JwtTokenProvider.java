@@ -33,10 +33,10 @@ public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String secretKey;
-    //    private final long accessValidTime = 1000L * 60 * 60;    // 액세스 토큰 유효 시간 60분
-    private final long accessValidTime = 1000L * 10;    // 테스트를 위해 액세스 토큰 유효 시간을 10초로 설정
-    //    private final long refreshValidTime = 1000L * 60 * 60 * 24 * 14;    // 리프레쉬 토큰 유효 시간 2주
-    private final long refreshValidTime = 1000L * 10;   // 테스트를 위해 리프레쉬 토큰 유효 시간을 10초로 설정
+    private final long accessValidTime = 1000L * 60 * 60;    // 액세스 토큰 유효 시간 60분
+    //    private final long accessValidTime = 1000L * 10;    // 테스트를 위해 액세스 토큰 유효 시간을 10초로 설정
+    private final long refreshValidTime = 1000L * 60 * 60 * 24 * 14;    // 리프레쉬 토큰 유효 시간 2주
+    //    private final long refreshValidTime = 1000L * 10;   // 테스트를 위해 리프레쉬 토큰 유효 시간을 10초로 설정
 
     /**
      * secretKey를 Base64로 인코딩
