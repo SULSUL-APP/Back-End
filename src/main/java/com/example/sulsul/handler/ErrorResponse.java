@@ -1,4 +1,4 @@
-package com.example.sulsul.exceptionhandler;
+package com.example.sulsul.handler;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

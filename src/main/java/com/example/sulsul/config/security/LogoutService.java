@@ -26,7 +26,7 @@ public class LogoutService implements LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse response,
                        Authentication authentication) {
 
-        String accessToken = jwtTokenProvider.resolveToken(request);
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
         User user = jwtTokenProvider.getUserFromAccessToken(accessToken);
         RefreshToken storedToken = refreshTokenRepository.findByUserId(user.getId())
                 .orElseThrow(RefreshTokenNotFoundException::new);

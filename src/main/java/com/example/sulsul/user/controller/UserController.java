@@ -1,7 +1,7 @@
 package com.example.sulsul.user.controller;
 
 import com.example.sulsul.common.CurrentUser;
-import com.example.sulsul.exceptionhandler.ErrorResponse;
+import com.example.sulsul.handler.ErrorResponse;
 import com.example.sulsul.user.dto.request.PutMyPageRequest;
 import com.example.sulsul.user.dto.request.SignUpRequest;
 import com.example.sulsul.user.dto.response.LoginResponse;

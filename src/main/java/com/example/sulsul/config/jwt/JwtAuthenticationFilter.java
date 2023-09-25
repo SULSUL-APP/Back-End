@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/*
-JWT 토큰으로 인증하고 SecurityContextHolder에 추가하는 필터를 가진 클래스
+/**
+ * JWT 토큰으로 인증하고 SecurityContextHolder에 추가하는 필터를 가진 클래스
  */
 @Slf4j
 @Component
@@ -27,27 +27,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = jwtTokenProvider.resolveToken(request);
-//        log.info("[doFilterInternal] token 값 추출 완료: token : {}", token);
-//        log.info("[doFilterInternal] token 값 유효성 체크 시작");
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        log.info("[JwtAuthenticationFilter] AccessToken 값 추출 완료: {}", accessToken);
 
-        /*
         try {
-            if (token != null && jwtTokenProvider.validateToken(token)) {
-                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            // AccessToken이 만료된 경우 GET /refresh로 재발급
+            // GET /refresh에서 RefreshToken도 만료된 것을 확인하면 강제 로그아웃 요청
+            if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("[doFilterInternal] token 값 유효성 체크 완료");
             }
-        } catch (TokenNotValidException exception) {
-            JwtExceptionHandler.handle(response, exception);
-        } catch (ExpiredTokenException exception) {
-            JwtExceptionHandler.handle(response, exception);
-        }
-         */
-
-        if (jwtTokenProvider.validate(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (Exception e) {
+            request.setAttribute("exception", e);
         }
 
         filterChain.doFilter(request, response);

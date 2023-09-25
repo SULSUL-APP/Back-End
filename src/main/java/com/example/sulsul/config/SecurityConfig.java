@@ -5,7 +5,6 @@ import com.example.sulsul.config.oauth.CustomOAuth2UserService;
 import com.example.sulsul.config.oauth.OAuth2AuthenticationFailureHandler;
 import com.example.sulsul.config.oauth.OAuth2AuthenticationSuccessHandler;
 import com.example.sulsul.config.security.CustomAccessDeniedHandler;
-import com.example.sulsul.config.security.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -29,6 +29,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthenticationEntryPoint entryPoint;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
@@ -74,15 +75,15 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
 
                 .and()
-                .logout(logoutConfig -> {
-                    logoutConfig.logoutUrl("/auth/logout")
-                            .addLogoutHandler(logoutService)
-                            .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
-                })
+                .logout()
+                .logoutUrl("/auth/logout")
+                .addLogoutHandler(logoutService)
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
 
+                .and()
                 .exceptionHandling()
+                .authenticationEntryPoint(entryPoint)
                 .accessDeniedHandler(new CustomAccessDeniedHandler())
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
 
                 .and()
                 .oauth2Login()

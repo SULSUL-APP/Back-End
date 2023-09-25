@@ -24,8 +24,8 @@ public class RefreshTokenService {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * user의 refreshToken이 맞다면 accessToken을 재발급한다.
-     * refreshToken의 만료일이 1일 이내라면 refreshToken을 재발급한다.
+     * user의 RefreshToken이 맞다면 AccessToken을 재발급한다.
+     * RefreshToken의 만료일이 1일 이내라면 RefreshToken을 재발급한다.
      *
      * @param refreshToken 유저의 refreshToken
      * @return TokenDto 반환
@@ -39,26 +39,26 @@ public class RefreshTokenService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
-        // 유저의 refreshToken 조회
+        // 유저의 RefreshToken 조회
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getId())
                 .orElseThrow(RefreshTokenNotFoundException::new);
 
-        // 유저의 refreshToken이 맞는지 확인
+        // 유저의 RefreshToken이 맞는지 확인
         if (!refreshTokenEntity.getRefreshToken().equals(refreshToken)) {
             throw new RefreshTokenMismatchException();
         }
 
-        // accessToken 재발급
+        // AccessToken 재발급
         String accessToken = jwtTokenProvider.createAccessToken(email, new Date());
         tokensDto.setAccessToken(accessToken);
 
-        // refresh 토큰 만료일 계산
-        long expiration = jwtTokenProvider.getTokenClaims(refreshToken)
+        // Refresh 토큰 만료일 계산
+        long expiration = jwtTokenProvider.getRefreshTokenClaims(refreshToken)
                 .getExpiration().getTime();
         long now = new Date().getTime();
         long diffTime = expiration - now;
 
-        // 1일 이내에 만료된다면 refreshToken 재발급
+        // 1일 이내에 만료된다면 RefreshToken 재발급
         if (diffTime < 86400000) {
             String newRefreshToken = jwtTokenProvider.createRefreshToken(new Date());
             refreshTokenEntity.updateRefreshToken(newRefreshToken);

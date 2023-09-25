@@ -4,8 +4,7 @@ import com.example.sulsul.config.jwt.JwtTokenProvider;
 import com.example.sulsul.config.jwt.dto.JwtTokenDto;
 import com.example.sulsul.exception.jwt.NotExpiredTokenException;
 import com.example.sulsul.exception.jwt.TokenNotFoundException;
-import com.example.sulsul.exception.refresh.RefreshTokenNotFoundException;
-import com.example.sulsul.exceptionhandler.ErrorResponse;
+import com.example.sulsul.handler.ErrorResponse;
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,7 +29,7 @@ public class RefreshTokenController {
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Operation(summary = "AccessToken 재발급", description = "RefreshToken의 유효기간이 3일 이내인 경우 RefreshToken도 재발급한다.")
+    @Operation(summary = "AccessToken 재발급", description = "RefreshToken의 유효기간이 1일 이내인 경우 RefreshToken도 재발급한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
@@ -44,25 +43,21 @@ public class RefreshTokenController {
     @GetMapping(value = "/refresh")
     public ResponseEntity<?> refresh(HttpServletRequest request) {
 
-        // access token 추출
-        String accessToken = jwtTokenProvider.resolveToken(request);
+        // AccessToken 추출
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
         if (accessToken == null) {
             throw new TokenNotFoundException();
         }
 
-        // expired access token인지 && 유효한 access token인지 검사
+        // AccessToken이 만료되었는지 유효한지 검사
         Claims claims = jwtTokenProvider.getExpiredTokenClaims(accessToken);
         if (claims == null) {
             throw new NotExpiredTokenException();
         }
 
-        // refresh token 추출
-        String refreshToken = request.getHeader("RefreshToken");
-        if (refreshToken == null) {
-            throw new RefreshTokenNotFoundException();
-        }
-
-        // refresh token이 만료되었는지 && 유효한지 검사
+        // RefreshToken 추출
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+        // RefreshToken이 만료되었는지 유효한지 검사
         jwtTokenProvider.validateRefreshToken(refreshToken);
 
         // 토큰 재발급

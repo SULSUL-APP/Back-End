@@ -2,7 +2,7 @@ package com.example.sulsul.teacherprofile.controller;
 
 import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.common.type.EType;
-import com.example.sulsul.exceptionhandler.ErrorResponse;
+import com.example.sulsul.handler.ErrorResponse;
 import com.example.sulsul.teacherprofile.dto.request.TeacherProfileRequest;
 import com.example.sulsul.teacherprofile.dto.response.ProfileListResponse;
 import com.example.sulsul.teacherprofile.dto.response.TeacherProfileResponse;

@@ -1,4 +1,4 @@
-package com.example.sulsul.exceptionhandler;
+package com.example.sulsul.handler;
 
 import com.example.sulsul.exception.*;
 import org.springframework.http.HttpStatus;

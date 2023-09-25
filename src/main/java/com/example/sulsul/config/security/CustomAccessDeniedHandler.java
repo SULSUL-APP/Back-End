@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/*
-액세스 권한이 없는 리소스에 접근할 경우 발생하는 예외 클래스
+/**
+ * 액세스 권한이 없는 리소스에 접근할 경우 발생하는 예외 클래스
  */
 @Slf4j
 @Component
@@ -22,7 +22,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         log.info("[handle] 접근이 막혔을 경우 에러 throw");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
+        response.setContentType("application/text");
         response.setCharacterEncoding("utf-8");
         response.getWriter().print(new AccessDeniedException().getMessage());
     }

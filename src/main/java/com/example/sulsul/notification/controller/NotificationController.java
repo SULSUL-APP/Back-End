@@ -2,8 +2,8 @@ package com.example.sulsul.notification.controller;
 
 import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.exception.notification.InvalidCommonNotiRequestException;
-import com.example.sulsul.exceptionhandler.ErrorResponse;
 import com.example.sulsul.fcm.FcmMessageService;
+import com.example.sulsul.handler.ErrorResponse;
 import com.example.sulsul.notification.dto.CommonNotiRequest;
 import com.example.sulsul.notification.dto.CommonNotiResponse;
 import com.example.sulsul.notification.dto.NotiGroupResponse;

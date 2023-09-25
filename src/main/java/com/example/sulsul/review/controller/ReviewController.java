@@ -3,7 +3,7 @@ package com.example.sulsul.review.controller;
 import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.exception.profile.TeacherProfileNotFoundException;
 import com.example.sulsul.exception.review.InvalidReviewCreateException;
-import com.example.sulsul.exceptionhandler.ErrorResponse;
+import com.example.sulsul.handler.ErrorResponse;
 import com.example.sulsul.review.dto.request.ReviewRequest;
 import com.example.sulsul.review.dto.response.ReviewGroupResponse;
 import com.example.sulsul.review.dto.response.ReviewResponse;
