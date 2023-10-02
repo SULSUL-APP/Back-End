@@ -12,7 +12,7 @@ import com.example.sulsul.exception.essay.InvalidEssayCreateException;
 import com.example.sulsul.exception.essay.InvalidRejectDetailException;
 import com.example.sulsul.exception.essay.TeacherCreateEssayException;
 import com.example.sulsul.exception.file.EmptyEssayFileException;
-import com.example.sulsul.fcm.FcmMessageService;
+import com.example.sulsul.fcm.service.FcmMessageService;
 import com.example.sulsul.file.entity.File;
 import com.example.sulsul.file.service.FileService;
 import com.example.sulsul.handler.ErrorResponse;
