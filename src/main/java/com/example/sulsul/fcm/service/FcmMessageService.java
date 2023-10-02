@@ -1,4 +1,4 @@
-package com.example.sulsul.fcm;
+package com.example.sulsul.fcm.service;
 
 import com.example.sulsul.exception.fcm.CommonMessageFailureException;
 import com.example.sulsul.exception.fcm.EssayMessageFailureException;
