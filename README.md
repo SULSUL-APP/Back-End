@@ -34,7 +34,7 @@ SULSUL은 교육 취약계층을 위한 비대면 논술첨삭 서비스입니�
 
 ### ✅ ERD
 
-![](https://github.com/SULSUL-APP/Back-End/assets/35721370/76820338-cb4c-40db-a5ff-5e951439ca6d)
+![ERD](https://github.com/SULSUL-APP/Back-End/assets/35721370/76820338-cb4c-40db-a5ff-5e951439ca6d)
 
 ### ✅ API 명세
 
