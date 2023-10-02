@@ -44,12 +44,10 @@ Swagger API 명세 추가예정
 
 ### ✅ Architecture
 
-임시 이미지입니다.  
 [자세한 설명](https://github.com/SULSUL-APP/Back-End/wiki/ERD)
 ![Architecture](https://user-images.githubusercontent.com/50859560/103137857-31791600-4710-11eb-9783-8a03dac3242c.png)
 
 ### ✅ CI/CD Pipeline
 
-임시 이미지입니다.  
-[자세한 설명](https://github.com/SULSUL-APP/Back-End/wiki/ERD)
-![Architecture](https://user-images.githubusercontent.com/50859560/103137857-31791600-4710-11eb-9783-8a03dac3242c.png)
+[자세한 설명](https://github.com/SULSUL-APP/Back-End/wiki/CI&CD-Pipeline)
+![ci-cd-pipeline](https://github.com/SULSUL-APP/Back-End/assets/35721370/f517ef3c-9f3d-42ac-8935-73f93a05ced4)
