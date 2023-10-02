@@ -166,7 +166,7 @@ public class JwtTokenProvider {
         String authorization = request.getHeader("Authorization");
 
         if (authorization != null && authorization.startsWith("Bearer ")) {
-            String token = authorization.substring(7);
+            String token = authorization.replace("Bearer ", "");
             log.info("[resolveToken] HTTP 헤더에서 Token 값 추출 완료: {}", token);
             return token;
         }

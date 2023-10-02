@@ -12,7 +12,7 @@ import com.example.sulsul.exception.comment.InvalidCommentCreateException;
 import com.example.sulsul.exception.comment.InvalidCommentUpdateException;
 import com.example.sulsul.exception.comment.NotAllowedCommentDeleteException;
 import com.example.sulsul.exception.comment.NotAllowedCommentUpdateException;
-import com.example.sulsul.fcm.FcmMessageService;
+import com.example.sulsul.fcm.service.FcmMessageService;
 import com.example.sulsul.handler.ErrorResponse;
 import com.example.sulsul.notification.service.NotificationService;
 import com.example.sulsul.user.entity.User;
