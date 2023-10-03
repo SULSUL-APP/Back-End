@@ -13,10 +13,10 @@ import com.example.sulsul.refreshtoken.RefreshToken;
 import com.example.sulsul.refreshtoken.RefreshTokenRepository;
 import com.example.sulsul.teacherprofile.entity.TeacherProfile;
 import com.example.sulsul.teacherprofile.repository.TeacherProfileRepository;
-import com.example.sulsul.user.dto.response.KakaoUserInfo;
 import com.example.sulsul.user.dto.request.PutMyPageRequest;
 import com.example.sulsul.user.dto.request.SignUpRequest;
 import com.example.sulsul.user.dto.response.CommonResponse;
+import com.example.sulsul.user.dto.response.KakaoUserInfo;
 import com.example.sulsul.user.dto.response.StudentResponse;
 import com.example.sulsul.user.dto.response.TeacherResponse;
 import com.example.sulsul.user.entity.Role;
@@ -46,6 +46,7 @@ public class UserService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final FcmTokenRepository fcmTokenRepository;
     private final JwtTokenProvider tokenProvider;
+
     /**
      * 초기 데이터는 Name, Email, ProfileImage.
      * 유저의 타입과 분야에 대한 추가정보를 받아서 추가 회원가입을 진행한다.
@@ -131,6 +132,7 @@ public class UserService {
 
     /**
      * 카카오 리소스 서버에 사용자 정보 요청
+     *
      * @param accessToken 카카오 액세스 토큰
      * @return ResponseEntity<KakaoUserInfo> 반환
      */
@@ -155,6 +157,11 @@ public class UserService {
         return restTemplate.exchange(request, KakaoUserInfo.class);
     }
 
+    /**
+     * 기존 유저의 refreshToken, fcmToken 제거
+     *
+     * @param user 기존 유저
+     */
     private void manageRegisteredUser(User user) {
         // 기존 유저의 refreshToken이 존재하는 경우 제거
         refreshTokenRepository.findByUserId(user.getId())
@@ -164,8 +171,17 @@ public class UserService {
         fcmTokenRepository.findByUser(user)
                 .ifPresent(fcmTokenRepository::delete);
     }
+
+    /**
+     * 카카오 유저 정보를 조회하고 유저 강제 회원가입
+     * 기존 유저가 존재하는 경우 기존 유저 정보를 업데이트
+     *
+     * @param attributes 카카오 유저 정보
+     * @param fcmToken   Fcm Token
+     * @return 저장한 User entity
+     */
     @Transactional
-    public User saveOrUpdate(KakaoUserInfo attributes, String fcmToken){
+    public User saveOrUpdate(KakaoUserInfo attributes, String fcmToken) {
         // 카카오 유저정보 조회
         String email = attributes.getKakao_account()
                 .getEmail();
@@ -210,15 +226,18 @@ public class UserService {
         return savedUser;
     }
 
+    /**
+     * access, refresh 토큰 생성
+     * refresh 토큰을 Redis에 저장
+     *
+     * @param user 유저 정보
+     * @return JwtTokenDto 반환
+     */
     @Transactional
-    public JwtTokenDto getToken(User user){
-
+    public JwtTokenDto getToken(User user) {
         JwtTokenDto jwtTokenDto = tokenProvider.createJwtToken(user.getEmail());
+        // refresh 토큰 저장
         refreshTokenRepository.save(new RefreshToken(user.getId(), jwtTokenDto.getRefreshToken()));
         return jwtTokenDto;
     }
-
-    // refresh 토큰 저장
-    // FCM 토큰 저장
-    // access, refresh 토큰 생성해서 반환, 게스트 여부도 전달
 }

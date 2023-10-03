@@ -9,13 +9,13 @@ import java.util.Map;
 @Getter
 public class ErrorResponse {
 
-    @Schema(description = "에러 코드", example = "COMMENT_02")
+    @Schema(description = "에러 코드")
     private final String code;
 
-    @Schema(description = "에러 메세지", example = "댓글 생성에 실패했습니다.")
+    @Schema(description = "에러 메세지")
     private final String message;
 
-    @Schema(description = "에러 세부내용", example = "{\"detail\":\"댓글은 2글자 이상 100글자 이하입니다.\"}")
+    @Schema(description = "에러 세부내용")
     private final Map<String, String> errors;
 
     @Builder

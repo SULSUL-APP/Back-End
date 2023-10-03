@@ -3,10 +3,10 @@ package com.example.sulsul.user.controller;
 import com.example.sulsul.common.CurrentUser;
 import com.example.sulsul.config.jwt.dto.JwtTokenDto;
 import com.example.sulsul.handler.ErrorResponse;
-import com.example.sulsul.user.dto.response.KakaoUserInfo;
 import com.example.sulsul.user.dto.request.KakaoTokenRequest;
 import com.example.sulsul.user.dto.request.PutMyPageRequest;
 import com.example.sulsul.user.dto.request.SignUpRequest;
+import com.example.sulsul.user.dto.response.KakaoUserInfo;
 import com.example.sulsul.user.dto.response.LoginResponse;
 import com.example.sulsul.user.entity.User;
 import com.example.sulsul.user.service.UserService;
@@ -49,18 +49,10 @@ public class UserController {
         ResponseEntity<KakaoUserInfo> response = userService.postWithAccessToken(kakaoTokenRequest.getKakaoToken());
         KakaoUserInfo userInfo = response.getBody();
 
-//        System.out.println(userInfo.getKakao_account().getEmail());
-//        System.out.println(userInfo.getKakao_account().getProfile().getNickname());
-//        System.out.println(userInfo.getKakao_account().getProfile().getProfile_image_url());
-
         User loginedUser = userService.saveOrUpdate(userInfo, kakaoTokenRequest.getFcmToken());
-
         JwtTokenDto jwtTokenDto = userService.getToken(loginedUser);
 
-        // refresh 토큰 저장
-
-
-        // access, refresh 토큰 생성해서 반환, 게스트 여부도 전달
+        // access, refresh 토큰 생성해서 반환, 게스트 여부도 함께 전달
         return new ResponseEntity<>(jwtTokenDto, HttpStatus.OK);
     }
 
