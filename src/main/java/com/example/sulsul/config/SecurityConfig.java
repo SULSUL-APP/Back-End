@@ -47,6 +47,7 @@ public class SecurityConfig {
 
     private final String[] POST_PERMIT_API_URL = {
             "/refresh",
+            "/users/auth/token/kakao"
     };
 
     private final LogoutHandler logoutService;
@@ -71,7 +72,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers(SWAGGER_URL).permitAll()
                 .antMatchers(HttpMethod.GET, GET_PERMIT_API_URL).permitAll()
-//                .antMatchers(HttpMethod.POST, POST_PERMIT_API_URL).permitAll()
+                .antMatchers(HttpMethod.POST, POST_PERMIT_API_URL).permitAll()
                 .anyRequest().authenticated()
 
                 .and()

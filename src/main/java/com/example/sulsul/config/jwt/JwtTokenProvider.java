@@ -8,7 +8,10 @@ import com.example.sulsul.exception.jwt.TokenNotValidException;
 import com.example.sulsul.exception.refresh.InvalidRefreshTokenException;
 import com.example.sulsul.exception.refresh.RefreshTokenExpiredException;
 import com.example.sulsul.exception.refresh.RefreshTokenNotFoundException;
+import com.example.sulsul.exception.user.UserNotFoundException;
+import com.example.sulsul.user.entity.Role;
 import com.example.sulsul.user.entity.User;
+import com.example.sulsul.user.repository.UserRepository;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final CustomUserDetailsServiceImpl userDetailsService;
+    private final UserRepository userRepository;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -59,11 +63,12 @@ public class JwtTokenProvider {
         log.info("Date 생성 Date : {} ", now);
 
         JwtTokenDto jwtTokenDto = JwtTokenDto.builder()
-                .accessToken(createAccessToken(email, now))
+                .accessToken("Bearer " + createAccessToken(email, now))
                 .refreshToken(createRefreshToken(now))
+                .isGuest(isGuest(email))
                 .build();
 
-        log.info("[createJwtToken] Jwt 토큰 생성 완료: {}, {}", jwtTokenDto.getAccessToken(), jwtTokenDto.getRefreshToken());
+        log.info("[createJwtToken] Jwt 토큰 생성 완료: {}, {}", jwtTokenDto.getAccessToken(), jwtTokenDto.getRefreshToken(), jwtTokenDto.getIsGuest());
 
         return jwtTokenDto;
     }
@@ -270,5 +275,16 @@ public class JwtTokenProvider {
             throw new TokenNotValidException();
         }
         return null;
+    }
+
+    private String isGuest(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                UserNotFoundException::new
+        );
+
+        if (user.getUserRole().equals(Role.GUEST)) {
+            return "true";
+        }
+        return "false";
     }
 }
