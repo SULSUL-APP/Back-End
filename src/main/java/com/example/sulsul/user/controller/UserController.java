@@ -1,7 +1,10 @@
 package com.example.sulsul.user.controller;
 
 import com.example.sulsul.common.CurrentUser;
+import com.example.sulsul.config.jwt.dto.JwtTokenDto;
 import com.example.sulsul.handler.ErrorResponse;
+import com.example.sulsul.user.dto.response.KakaoUserInfo;
+import com.example.sulsul.user.dto.request.KakaoTokenRequest;
 import com.example.sulsul.user.dto.request.PutMyPageRequest;
 import com.example.sulsul.user.dto.request.SignUpRequest;
 import com.example.sulsul.user.dto.response.LoginResponse;
@@ -27,6 +30,39 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    @Operation(summary = "token을 통한 소셜 로그인", description = "token 값을 받아서 유저 정보를 반환 받아 회원가입을 진행한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "CREATE",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping(value = "/auth/token/kakao")
+    public ResponseEntity<?> socialLogin(@RequestBody KakaoTokenRequest kakaoTokenRequest) {
+
+        log.info("[현재 요청된 token 값]: {}", kakaoTokenRequest.getKakaoToken());
+        ResponseEntity<KakaoUserInfo> response = userService.postWithAccessToken(kakaoTokenRequest.getKakaoToken());
+        KakaoUserInfo userInfo = response.getBody();
+
+//        System.out.println(userInfo.getKakao_account().getEmail());
+//        System.out.println(userInfo.getKakao_account().getProfile().getNickname());
+//        System.out.println(userInfo.getKakao_account().getProfile().getProfile_image_url());
+
+        User loginedUser = userService.saveOrUpdate(userInfo, kakaoTokenRequest.getFcmToken());
+
+        JwtTokenDto jwtTokenDto = userService.getToken(loginedUser);
+
+        // refresh 토큰 저장
+
+
+        // access, refresh 토큰 생성해서 반환, 게스트 여부도 전달
+        return new ResponseEntity<>(jwtTokenDto, HttpStatus.OK);
+    }
 
     @Operation(summary = "Guest 유저에 대한 추가 회원가입", description = "Guest 유저에 대해 추가 정보를 작성한다.")
     @ApiResponses({

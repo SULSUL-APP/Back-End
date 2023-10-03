@@ -11,5 +11,5 @@ public class JwtTokenDto {
 
     private String accessToken;
     private String refreshToken;
-
+    private String isGuest;
 }
