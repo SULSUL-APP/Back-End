@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### FCM ###
+src/main/resources/fcm/*.json
+src/main/resources/*.json
+### git ###
+.DS_Store

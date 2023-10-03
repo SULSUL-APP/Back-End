@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  springboot:
+    image: "junek3/sulsul-server"
+    environment:
+      - RDS_HOSTNAME=${RDS_HOSTNAME}
+      - RDS_USERNAME=${RDS_USERNAME}
+      - RDS_PASSWORD=${RDS_PASSWORD}
+      - RDS_DB_NAME=${RDS_DB_NAME}
+      - RDS_PORT=${RDS_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - TEMP_PW=${TEMP_PW}
+      - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
+      - REDIRECT_URI=${REDIRECT_URI}
+      - BUCKET=${BUCKET}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - REGION=${REGION}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: "no"
+    depends_on:
+      - redis
+
+  nginx:
+    image: "junek3/sulsul-nginx"
+    ports:
+      - "80:80"
+    restart: "always"
+
+  redis:
+    image: "redis:7.2"
+    ports:
+      - "6379:6379"
+    restart: "no"

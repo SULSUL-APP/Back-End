@@ -7,19 +7,20 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Builder
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "reviews")
+@Builder
+@Getter
+@Setter(AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Review extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String detail;
 
     @Column(nullable = false)
@@ -37,7 +38,7 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "essay_id")
     private Essay essay;
 
-    public void updateDetail() {
+    public void updateDetail(String detail) {
         this.detail = detail;
     }
 

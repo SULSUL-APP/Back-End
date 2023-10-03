@@ -1,23 +1,20 @@
 package com.example.sulsul.essay.entity;
 
 import com.example.sulsul.common.BaseEntity;
-import com.example.sulsul.common.type.EType;
-import com.example.sulsul.essay.entity.type.EssayState;
-import com.example.sulsul.essay.entity.type.ReviewState;
+import com.example.sulsul.common.type.EssayState;
+import com.example.sulsul.common.type.ReviewState;
 import com.example.sulsul.user.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
-
 @Entity
-@Getter
+@Table(name = "essays")
 @Builder
-@NoArgsConstructor
+@Getter
+@Setter(AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Essay extends BaseEntity {
     @Id
@@ -33,32 +30,22 @@ public class Essay extends BaseEntity {
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
-//    @OneToMany(mappedBy = "essay", cascade = CascadeType.ALL)
-//    private List<Comment> commentList = new ArrayList<>();
-//
-//    @OneToOne(mappedBy = "essay", cascade = CascadeType.ALL)
-//    private Review review
-//
-//    @OneToMany(mappedBy = "essay", cascade = CascadeType.ALL)
-//    private List<File> fileList = new ArrayList<>();
-
     @Column(nullable = false)
     @NotBlank(message = "대학 이름은 필수 값입니다.")
     private String univ;
 
     @Column(nullable = false)
     @NotBlank(message = "논술 연도는 필수 값입니다.")
-    private String year;
+    private String examYear;
 
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String inquiry; // 문의사항
 
-    @Column()
-    private String rejectDetail; //거절 사유
+    @Column(length = 1000)
+    private String rejectDetail; // 거절사유
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EType eType;
+    private String essayType;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -67,10 +54,12 @@ public class Essay extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReviewState reviewState; // 리뷰 생성 여부
 
+    public boolean isReviewed() {
+        return this.reviewState.equals(ReviewState.ON);
+    }
 
-
-    public void updateEType(EType eType) {
-        this.eType = eType;
+    public void updateEType(String essayType) {
+        this.essayType = essayType;
     }
 
     public void updateEssayState(EssayState essayState) {
@@ -85,4 +74,7 @@ public class Essay extends BaseEntity {
         this.rejectDetail = rejectDetail;
     }
 
+    public boolean checkEssayState(EssayState essayState) {
+        return this.essayState.equals(essayState);
+    }
 }

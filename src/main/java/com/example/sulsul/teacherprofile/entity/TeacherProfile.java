@@ -1,5 +1,7 @@
 package com.example.sulsul.teacherprofile.entity;
 
+import com.example.sulsul.common.BaseEntity;
+import com.example.sulsul.teacherprofile.dto.request.TeacherProfileRequest;
 import com.example.sulsul.user.entity.User;
 import lombok.*;
 
@@ -12,7 +14,7 @@ import javax.persistence.*;
 @Table(name = "teacher_profiles")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class TeacherProfile {
+public class TeacherProfile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,30 +22,29 @@ public class TeacherProfile {
     private Long id;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     private User teacher;
 
-    @Column()
+    @Column(length = 1000)
     private String careerDetail;
 
-    @Column()
+    @Column(length = 1000)
     private String introDetail;
 
-    @Column()
+    @Column(length = 1000)
     private String price;
 
-    @Column()
+    @Column(length = 1000)
     private String possibleUniv;
 
-    @Column()
+    @Column(length = 1000)
     private String otherDetail; // 기타 사항
 
-    @Column()
-    private Double reviewScore;
+    @Column
+    private String reviewScore;
 
-    @Column()
+    @Column
     private Integer completedCount;
-
 
     public boolean isNewTeacher() {
         return completedCount.equals(0);
@@ -53,28 +54,23 @@ public class TeacherProfile {
         this.completedCount += 1;
     }
 
-    public void updateReviewScore(Double reviewScore) {
+    public void updateReviewScore(String reviewScore) {
         this.reviewScore = reviewScore;
     }
 
-    public void updateCareerDetail(String careerDetail) {
-        this.careerDetail = careerDetail;
+    public TeacherProfile(User user, String reviewScore, Integer completedCount) {
+        this.teacher = user;
+        this.reviewScore = reviewScore;
+        this.completedCount = completedCount;
     }
 
-    public void updateIntroDetail(String introDetail) {
-        this.introDetail = introDetail;
-    }
+    public TeacherProfile updateTeacherProfile(TeacherProfileRequest teacherProfileRequest) {
+        this.careerDetail = teacherProfileRequest.getCareerDetail();
+        this.introDetail = teacherProfileRequest.getIntroDetail();
+        this.price = teacherProfileRequest.getPrice();
+        this.possibleUniv = teacherProfileRequest.getPossibleUniv();
+        this.otherDetail = teacherProfileRequest.getOtherDetail();
 
-    public void updatePrice(String price) {
-        this.price = price;
+        return this;
     }
-
-    public void updatePossibleUniv(String possibleUniv) {
-        this.possibleUniv = possibleUniv;
-    }
-
-    public void updateOtherDetail(String otherDetail) {
-        this.otherDetail = otherDetail;
-    }
-
 }

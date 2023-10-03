@@ -6,13 +6,14 @@ import com.example.sulsul.user.entity.User;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 
 @Entity
-@Getter
+@Table(name = "comments")
 @Builder
-@AllArgsConstructor
+@Getter
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Comment extends BaseEntity {
 
     @Id
@@ -28,12 +29,10 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false, length = 200)
-    @Size(min = 1, max = 200, message = "댓글 내용은 1자 이상 200자 이하입니다.")
+    @Column(length = 1000, nullable = false)
     private String detail;
 
     public void updateDetail(String detail) {
         this.detail = detail;
     }
-
 }

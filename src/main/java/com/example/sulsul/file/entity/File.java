@@ -1,6 +1,7 @@
 package com.example.sulsul.file.entity;
 
 import com.example.sulsul.common.BaseEntity;
+import com.example.sulsul.common.type.FileType;
 import com.example.sulsul.essay.entity.Essay;
 import com.example.sulsul.user.entity.User;
 import lombok.*;
@@ -19,7 +20,7 @@ public class File extends BaseEntity {
     @Column(name = "file_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String filePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,5 +30,9 @@ public class File extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private FileType fileType;
 
 }
