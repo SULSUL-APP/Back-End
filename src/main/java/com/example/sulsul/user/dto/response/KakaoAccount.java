@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class KakaoAccount implements Serializable {
 
-    public static final long serialVersionUID = 1234L;
+    private static final long serialVersionUID = -2638143251070509599L;
 
     private String email;
     private KakaoProfile profile;
