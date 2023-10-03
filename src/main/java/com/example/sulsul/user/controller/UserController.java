@@ -33,8 +33,8 @@ public class UserController {
 
     @Operation(summary = "token을 통한 소셜 로그인", description = "token 값을 받아서 유저 정보를 반환 받아 회원가입을 진행한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "CREATE",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = JwtTokenDto.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
