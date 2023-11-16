@@ -23,13 +23,13 @@ SULSUL은 교육 취약계층을 위한 비대면 논술첨삭 서비스입니�
   - Spring Data JPA
   - MySQL 8.0.x
   - Swagger
+  - Firebase Cloud Messaging
 
 - Deployment
   - AWS
   - Docker
   - Docker Compose
   - GitHub Actions
-  - Firebase Cloud Messaging
 ```
 
 ### 📌 ERD
