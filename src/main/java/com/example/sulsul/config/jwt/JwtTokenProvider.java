@@ -226,7 +226,7 @@ public class JwtTokenProvider {
      * AccessToken 헤더 설정
      */
     public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-        response.setHeader("AccessToken", "Bearer " + accessToken);
+        response.setHeader("AccessToken", accessToken);
     }
 
     /**
